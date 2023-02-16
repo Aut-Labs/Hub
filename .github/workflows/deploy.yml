@@ -1,0 +1,61 @@
+name: Deployment Dev
+
+on: workflow_dispatch
+
+jobs:
+  deploy:
+    name: Deployment
+    runs-on: ubuntu-20.04
+    if: github.ref == 'refs/heads/dev'
+    steps:
+      - name: SSH & Deploy
+        uses: appleboy/ssh-action@master
+        env: 
+          REPO_URL: ${{ github.repositoryUrl }}
+          REPO_NAME: ${{ github.repository }}
+        with:
+          host: ${{ secrets.SSH_SERVER_IP }}
+          username: ${{ secrets.SSH_SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            #!/usr/bin/env bash
+
+            DIR_NAME='try-aut'
+            TARGET='dev'
+
+
+            cd ~/$DIR_NAME || exit
+            sudo chmod -R a+rwX .
+
+            ACTION='\033[1;90m'
+            NOCOLOR='\033[0m'
+
+            # Checking if we are on the dev branch
+
+            echo -e ${ACTION}Checking Git repo
+            BRANCH=$(git rev-parse --abbrev-ref HEAD)
+            if [ "$BRANCH" != ${TARGET} ]
+            then
+              exit 0
+            fi
+
+            # Checking if the repository is up to date.
+
+            git fetch
+            HEADHASH=$(git rev-parse HEAD)
+            UPSTREAMHASH=$(git rev-parse ${TARGET}@{upstream})
+
+            if [ "$HEADHASH" == "$UPSTREAMHASH" ]
+            then
+              echo -e "${FINISHED}"Current branch is up to date with origin/${TARGET}."${NOCOLOR}"
+              exit 0
+            fi
+
+            # If that's not the case, we pull the latest changes and we build a new image
+            sudo git pull origin dev;
+
+            # Docker
+            docker rmi $(docker images -f "dangling=true" -q)
+            docker-compose -f docker-compose.yml up -d --build
+
+            exit 0;

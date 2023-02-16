@@ -1,0 +1,13 @@
+.git/
+.gitignore
+**/.gitkeep
+**/.DS_Store
+.next/
+.dockerignore
+Dockerfile
+docker-compose.yml
+node_modules/
+server/
+nginx/
+deprecated/
+README.md
