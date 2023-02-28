@@ -76,9 +76,7 @@ const Flipcard = (props) => {
       display: "flex",
     },
     flipper: {
-      height: "100%",
       position: "relative",
-      width: "100%",
     },
     front: {
       WebkitBackfaceVisibility: "hidden",

@@ -54,4 +54,4 @@ const setEnvValue = async () => {
   fs.writeFileSync("./.env", envVars.join(os.EOL));
 };
 
-setEnvValue();
+// setEnvValue();

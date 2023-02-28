@@ -70,137 +70,130 @@ import expand from "common/assets/image/expand.svg";
 import invite from "common/assets/image/invite.svg";
 import fingerprint from "common/assets/image/fingerprint.svg";
 
-export const TryOutData = {
-  title: "Try Āut",
-  subtitle: "Join the Coordination Renaissance - and expand your DAO.",
-  ownerItems: [
+export const ShowcaseData = {
+  title: "Nova Showcase",
+  subtitle:
+    "Pick a Nova, complete their onboarding quest and join their \n community to help them rise up the Nova leaderboard",
+  novaCards: [
     {
-      button: {
-        text: "Try it",
-        link: "https://playground.aut.id",
-      },
       front: {
-        title: "Expand",
-        icon: expand.src,
-        subtitle: (
-          <>
-            Do more with <br /> your DAO
-          </>
-        ),
+        title: "Nova Title",
+        description:
+          "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore",
       },
       back: {
-        description:
-          "Expand your community by importing an existing DAO Contract, adding 3 member Roles and verifying your Ownership.",
+        communityName: "RabitWhole",
+        quests: [
+          {
+            role: "Designer",
+            questLink: "https://www.google.com/",
+          },
+          {
+            role: "Copywriter",
+            questLink: "https://www.google.com/",
+          },
+          {
+            role: "Project Manager",
+            questLink: "https://www.google.com/",
+          },
+        ],
       },
-      complete: false,
-      validation: "CheckDAO",
     },
     {
-      button: {
-        text: "Try it",
-        link: "https://playground.aut.id",
-      },
       front: {
-        title: "Invite",
-        icon: invite.src,
-        subtitle: (
-          <>
-            A native Bound between <br /> DAOs & Members
-          </>
-        ),
+        title: "Nova Title",
+        description:
+          "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore",
       },
       back: {
-        description:
-          "Integrate dĀut to any website or DApp and invite members to signup or login to your DAO - Just like Google-Auth, but decentralized.",
+        communityName: "RabitWhole",
+        quests: [
+          {
+            role: "Designer",
+            questLink: "https://www.google.com/",
+          },
+          {
+            role: "Copywriter",
+            questLink: "https://www.google.com/",
+          },
+          {
+            role: "Project Manager",
+            questLink: "https://www.google.com/",
+          },
+        ],
       },
-      complete: false,
-      validation: "CheckTwitter",
     },
     {
-      button: {
-        text: "Try it",
-        link: "https://my.aut.id/",
-      },
       front: {
-        title: "Participate",
-        icon: fingerprint.src,
-        subtitle: (
-          <>
-            Own your <br /> own Identity
-          </>
-        ),
+        title: "Nova Title",
+        description:
+          "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore",
       },
       back: {
-        description:
-          "Customize your ĀutID - This is your Social Profile which keeps track of all your DAOs, tasks, Roles, and Commitments across the DAO eco-system.",
+        communityName: "RabitWhole",
+        quests: [
+          {
+            role: "Designer",
+            questLink: "https://www.google.com/",
+          },
+          {
+            role: "Copywriter",
+            questLink: "https://www.google.com/",
+          },
+          {
+            role: "Project Manager",
+            questLink: "https://www.google.com/",
+          },
+        ],
       },
-      complete: false,
-      validation: "CheckAut",
-    },
-  ],
-  memberItems: [
-    {
-      button: {
-        text: "Try it",
-        link: "https://playground.aut.id",
-      },
-      front: {
-        title: "Join",
-        icon: expand.src,
-        subtitle: (
-          <>
-            Join the invitation <br /> from your DAO{" "}
-          </>
-        ),
-      },
-      back: {
-        description:
-          "Expand your community by importing an existing DAO Contract, adding 3 member Roles and verifying your Ownership.",
-      },
-      complete: false,
-      validation: "CheckDAO",
     },
     {
-      button: {
-        text: "Try it",
-        link: "https://playground.aut.id",
-      },
       front: {
-        title: "Invite",
-        icon: invite.src,
-        subtitle: (
-          <>
-            Participate in 1 or various <br /> onboarding quests
-          </>
-        ),
+        title: "Nova Title",
+        description:
+          "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore",
       },
       back: {
-        description:
-          "Integrate dĀut to any website or DApp and invite members to signup or login to your DAO - Just like Google-Auth, but decentralized.",
+        communityName: "RabitWhole",
+        quests: [
+          {
+            role: "Designer",
+            questLink: "https://www.google.com/",
+          },
+          {
+            role: "Copywriter",
+            questLink: "https://www.google.com/",
+          },
+          {
+            role: "Project Manager",
+            questLink: "https://www.google.com/",
+          },
+        ],
       },
-      complete: false,
-      validation: "CheckDAO",
     },
     {
-      button: {
-        text: "Try it",
-        link: "https://my.aut.id/",
-      },
       front: {
-        title: "Participate",
-        icon: fingerprint.src,
-        subtitle: (
-          <>
-            Claim your āutID, <br /> explore your dashboard
-          </>
-        ),
+        title: "Nova Title",
+        description:
+          "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore",
       },
       back: {
-        description:
-          "Customize your ĀutID - This is your Social Profile which keeps track of all your DAOs, tasks, Roles, and Commitments across the DAO eco-system.",
+        communityName: "RabitWhole",
+        quests: [
+          {
+            role: "Designer",
+            questLink: "https://www.google.com/",
+          },
+          {
+            role: "Copywriter",
+            questLink: "https://www.google.com/",
+          },
+          {
+            role: "Project Manager",
+            questLink: "https://www.google.com/",
+          },
+        ],
       },
-      complete: false,
-      validation: "CheckDAO",
     },
   ],
 };

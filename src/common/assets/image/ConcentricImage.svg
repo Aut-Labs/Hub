@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 2208 2208">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#Degradado_sin_nombre_135);
+      }
+
+      .cls-2 {
+        filter: url(#outer-glow-4);
+      }
+
+      .cls-2, .cls-3 {
+        fill: #262626;
+      }
+
+      .cls-4, .cls-5, .cls-6 {
+        fill: none;
+        opacity: .5;
+        stroke: #ebebf2;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-5 {
+        filter: url(#outer-glow-2);
+      }
+
+      .cls-6 {
+        filter: url(#outer-glow-1);
+      }
+
+      .cls-7 {
+        opacity: .4;
+      }
+
+      .cls-3 {
+        filter: url(#outer-glow-3);
+      }
+
+      .cls-8 {
+        fill: url(#Degradado_sin_nombre_147);
+      }
+
+      .cls-9 {
+        fill: url(#Degradado_sin_nombre_143);
+      }
+
+      .cls-10 {
+        fill: url(#Degradado_sin_nombre_139);
+      }
+    </style>
+    <filter id="outer-glow-1" filterUnits="userSpaceOnUse">
+      <feOffset dx="0" dy="0"/>
+      <feGaussianBlur result="blur" stdDeviation="100"/>
+      <feFlood flood-color="#192afc" flood-opacity="1"/>
+      <feComposite in2="blur" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="outer-glow-2" filterUnits="userSpaceOnUse">
+      <feOffset dx="0" dy="0"/>
+      <feGaussianBlur result="blur-2" stdDeviation="100"/>
+      <feFlood flood-color="#14ecec" flood-opacity="1"/>
+      <feComposite in2="blur-2" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="outer-glow-3" filterUnits="userSpaceOnUse">
+      <feOffset dx="0" dy="0"/>
+      <feGaussianBlur result="blur-3" stdDeviation="100"/>
+      <feFlood flood-color="#192afc" flood-opacity="1"/>
+      <feComposite in2="blur-3" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="outer-glow-4" filterUnits="userSpaceOnUse">
+      <feOffset dx="0" dy="0"/>
+      <feGaussianBlur result="blur-4" stdDeviation="100"/>
+      <feFlood flood-color="#14ecec" flood-opacity="1"/>
+      <feComposite in2="blur-4" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <radialGradient id="Degradado_sin_nombre_135" data-name="Degradado sin nombre 135" cx="2205.79" cy="86.15" fx="2205.79" fy="86.15" r="1" gradientTransform="translate(-804483.06 -743922.55) rotate(45) scale(497.08 -497.08)" gradientUnits="userSpaceOnUse">
+      <stop offset=".79" stop-color="#192afc" stop-opacity="0"/>
+      <stop offset="1" stop-color="#14ecec"/>
+    </radialGradient>
+    <radialGradient id="Degradado_sin_nombre_139" data-name="Degradado sin nombre 139" cx="2206.09" cy="83.96" fx="2206.09" fy="83.96" r="1" gradientTransform="translate(-584553.44 -541610.15) rotate(45) scale(361.67 -361.67)" gradientUnits="userSpaceOnUse">
+      <stop offset=".71" stop-color="#192afc" stop-opacity="0"/>
+      <stop offset=".99" stop-color="#14ecec"/>
+    </radialGradient>
+    <radialGradient id="Degradado_sin_nombre_143" data-name="Degradado sin nombre 143" cx="2206.75" cy="79.06" fx="2206.75" fy="79.06" r="1" gradientTransform="translate(-362203.62 -337071.55) rotate(45) scale(224.78 -224.78)" gradientUnits="userSpaceOnUse">
+      <stop offset=".63" stop-color="#192afc" stop-opacity="0"/>
+      <stop offset="1" stop-color="#14ecec"/>
+    </radialGradient>
+    <radialGradient id="Degradado_sin_nombre_147" data-name="Degradado sin nombre 147" cx="2208.89" cy="63.17" fx="2208.89" fy="63.17" r="1" gradientTransform="translate(-160950.89 -151940.06) rotate(45) scale(100.87 -100.87)" gradientUnits="userSpaceOnUse">
+      <stop offset=".4" stop-color="#192afc" stop-opacity="0"/>
+      <stop offset=".96" stop-color="#14ecec"/>
+    </radialGradient>
+  </defs>
+  <g id="Circles">
+    <g class="cls-7">
+      <circle class="cls-6" cx="1104" cy="1103.96" r="802.92"/>
+      <circle class="cls-5" cx="1104" cy="1103.96" r="802.92"/>
+      <circle class="cls-4" cx="1104" cy="1103.96" r="802.92"/>
+      <circle class="cls-4" cx="1104" cy="1103.96" r="580.89"/>
+      <circle class="cls-4" cx="1104" cy="1103.96" r="361.44"/>
+      <circle class="cls-4" cx="1104" cy="1103.96" r="167.81"/>
+    </g>
+    <circle class="cls-3" cx="1104" cy="1103.96" r="500"/>
+    <circle class="cls-2" cx="1104" cy="1103.96" r="500"/>
+    <circle class="cls-1" cx="1104" cy="1103.96" r="500"/>
+    <circle class="cls-10" cx="1104" cy="1103.96" r="361.74"/>
+    <circle class="cls-9" cx="1104" cy="1103.96" r="225.08"/>
+    <circle class="cls-8" cx="1104" cy="1103.96" r="104.5"/>
+  </g>
+</svg>

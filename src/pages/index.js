@@ -10,6 +10,9 @@ import Web3AutProvider from "common/ProviderFactory/components/Web3Provider";
 import { useEffect } from "react";
 import { initializeConnectors } from "common/ProviderFactory/web3.connectors";
 import { Loading } from "common/components/ModalPopupWrapper";
+import Sticky from "react-stickynode";
+import { DrawerProvider } from "common/contexts/DrawerContext";
+import Navbar from "containers/Navbar";
 
 const Main = () => {
   const [connectState, setConnectState] = useState({});
@@ -37,32 +40,46 @@ const Main = () => {
       setConnectors(connectors);
       setAppReady(true);
     });
+
+    // setAppReady(true);
   }, []);
 
   return (
-    <PerfectScrollbar
-      options={{
-        suppressScrollX: true,
-        useBothWheelAxes: false,
-        swipeEasing: true,
-      }}
-      style={{
-        height: "100vh",
-      }}
-    >
-      {loading || !appReady || !connectors?.length ? (
+    <>
+      {loading || !appReady ? (
         <Loading />
       ) : (
         <Web3AutProvider connectors={connectors}>
-          <NovaShowcase
-            networks={networks}
-            connectors={connectors}
-            setLoading={setLoading}
-            onConnected={(state) => setConnectState(state)}
-          />
+          <Sticky top={0} innerZ={200} activeClass="sticky-nav-active">
+            <DrawerProvider>
+              <Navbar
+                networks={networks}
+                connectors={connectors}
+                setLoading={setLoading}
+                onConnected={(state) => setConnectState(state)}
+              />
+            </DrawerProvider>
+          </Sticky>
+          <PerfectScrollbar
+            options={{
+              suppressScrollX: true,
+              useBothWheelAxes: false,
+              swipeEasing: true,
+            }}
+            style={{
+              height: "100vh",
+            }}
+          >
+            <NovaShowcase
+              networks={networks}
+              connectors={connectors}
+              setLoading={setLoading}
+              onConnected={(state) => setConnectState(state)}
+            />
+          </PerfectScrollbar>
         </Web3AutProvider>
       )}
-    </PerfectScrollbar>
+    </>
   );
 };
 export default Main;

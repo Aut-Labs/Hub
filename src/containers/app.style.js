@@ -2,6 +2,8 @@ import { themeGet } from "@styled-system/theme-get";
 import styled, { createGlobalStyle, keyframes } from "styled-components";
 import AutLogo from "common/assets/image/noise.svg";
 import Circles from "common/assets/image/circles.png";
+import BubbleImage from "common/assets/image/bubble.svg";
+import ConcentricImage from "common/assets/image/ConcentricImage.svg";
 
 const Wobble_Vertical = keyframes`
   16.65% {
@@ -62,22 +64,6 @@ const GlobalStyle = createGlobalStyle`
   html {
     background-color: ${themeGet("colors.nightBlack")};
     overflow: hidden;
-
-    &:before {
-      content: ' ';
-      display: block;
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      background: transparent url(${AutLogo.src}) 0% 0% no-repeat padding-box;
-      mix-blend-mode: overlay;
-      opacity: 0.5;
-      background-position: center;
-      background-size: cover;
-    }
   }
 
   .ps__rail-y {
@@ -88,6 +74,82 @@ const GlobalStyle = createGlobalStyle`
     color: ${themeGet("colors.textColor")};
     font-family: ${themeGet("fonts.primary")};
     font-weight: 400;
+    &:before {
+      content: " ";
+      display: block;
+      position: absolute;
+      filter: blur(50px);
+      -webkit-filter: blur(50px);
+      transform: rotate(-105deg);
+      left: -750px;
+      z-index: -1;
+      bottom: -900px;
+      width: 1000px;
+      height: 1000px;
+      background-image: url(${BubbleImage.src});
+    }
+
+    &:after {
+      content: " ";
+      display: block;
+      position: absolute;
+      filter: blur(50px);
+      -webkit-filter: blur(50px);
+      right: 0;
+      z-index: -1;
+      top: -600px;
+      width: 600px;
+      height: 800px;
+      background-image: url(${BubbleImage.src});
+    }
+  }
+  }
+  .scrollbar-container {
+    &:before {
+      content: " ";
+      display: block;
+      position: absolute; 
+      right: 0;
+      z-index: -1; 
+      transform: translateY(80%) translateX(50%);
+      top: 0;
+      width: 750px;
+      height: 750px;
+      background-image: url(${ConcentricImage.src});
+    }
+  }
+  
+  .main-section  {
+    &:before {
+      content: " ";
+      display: block;
+      position: absolute;
+      left: 0px;
+      z-index: -1;
+      bottom: 700px;
+      transform: translateX(-50%);
+      width: 1000px;
+      height: 1000px;
+      background-image: url(${ConcentricImage.src});
+    }
+   
+    // width: 100%,
+    // zIndex: -1,
+    // position: absolute,  
+    // display: none,
+    // // transform: translateY(-50%),
+    // background-image: url(${ConcentricImage.src});
+    // ${themeGet("mediaQueries.md")} {
+    //   display: inherit,
+    //   height: 662px,
+    //   maxWidth: 662px,
+    //   right: calc(662px / 2 * -1),
+    // }
+    // ${themeGet("mediaQueries.xxl")} {
+    //   height: 892px,
+    //   maxWidth: 892px,
+    //   right: calc(892px / 2 * -1),
+    // }
   }
 
   h1,
@@ -108,19 +170,6 @@ const GlobalStyle = createGlobalStyle`
     font-family: ${themeGet("fonts.primary")};
   }
 
-  .scrollbar-container {
-    ${themeGet("mediaQueries.md")} {
-      &:before {
-        content: " ";
-        display: block;
-        position: absolute;
-        z-index: 9999;
-        background: url(${Circles.src}) left top no-repeat, url(${
-  Circles.src
-}) right bottom no-repeat;
-      }
-    }
-  }
 
   section {
     position: relative;
@@ -135,6 +184,9 @@ const GlobalStyle = createGlobalStyle`
   
 
   .main-container {
+    background: url(${Circles.src}) left top no-repeat, url(${
+  Circles.src
+}) right bottom no-repeat;
     @media only screen and (min-width: 992px) {
 
     height: 100vh;
