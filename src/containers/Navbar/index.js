@@ -7,6 +7,13 @@ import Logo from "common/components/UIElements/Logo";
 import Link from "next/link";
 import Button from "common/components/Button";
 import { useState } from "react";
+import axios from "axios";
+import {
+  arrayify,
+  hashMessage,
+  recoverAddress,
+  verifyMessage,
+} from "ethers/lib/utils";
 
 const navbarStyle = {
   className: "sass_app_dark_navbar",
@@ -41,8 +48,17 @@ const Navbar = ({ row, onConnected, connectors }) => {
   const { logo } = NavbarData;
 
   const [signing, setSigned] = useState(false);
+  const [connectedAddress, setConnectedAddress] = useState(null);
   const [verifying, setVerifying] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const handleButtonClick = () => {
+    if (connectedAddress) {
+      setConnectedAddress(null);
+    } else {
+      signMessage();
+    }
+  };
 
   const signMessage = async () => {
     setLoading(true);
@@ -54,14 +70,42 @@ const Navbar = ({ row, onConnected, connectors }) => {
         method: "eth_requestAccounts",
       });
       const account = accounts[0];
-      await connector.provider.request({
+
+      const responseNonce = await axios.get(
+        `http://localhost:4005/api/autID/user/nonce/${account}`
+      );
+
+      const nonce = responseNonce.data.nonce;
+
+      const signature = await connector.provider.request({
         method: "personal_sign",
-        params: ["Sign this message to access the content!", account],
+        params: [nonce, account],
       });
 
+      const jwtResponse = await axios.post(
+        `http://localhost:4005/api/autID/user/getToken`,
+        {
+          address: account,
+          signature,
+        }
+      );
+
+      console.log(jwtResponse.data);
+
+      const testAuth = await axios.get(
+        `http://localhost:4005/api/autID/user/me`,
+        {
+          headers: {
+            Authorization: jwtResponse.data.token,
+          },
+        }
+      );
+
+      console.log(testAuth.data);
+      setConnectedAddress(testAuth.data.address);
       onConnected({
         connected: true,
-        items: memberItems,
+        userData: testAuth.data,
       });
     } catch (error) {
       if (error?.code === 4001) {
@@ -106,13 +150,22 @@ const Navbar = ({ row, onConnected, connectors }) => {
         <Button
           colors="primary"
           variant="roundOutlined"
-          title="Connect Wallet"
+          title={connectedAddress || "Connect Wallet"}
           target="_blank"
           size="normal"
           isLoading={signing}
           disabled={loading}
-          onClick={signMessage}
+          onClick={handleButtonClick}
+          style={{
+            overflow: "hidden",
+            whiteSpace: "nowrap",
+            display: "block",
+            textOverflow: "ellipsis",
+          }}
           minWidth={{
+            _: "260px",
+          }}
+          maxWidth={{
             _: "260px",
           }}
           height={{
