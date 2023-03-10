@@ -1,0 +1,21 @@
+{
+  "name": "Āut",
+  "short_name": "Āut",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/favicon-light.ico",
+      "sizes": "48x48",
+      "type": "icon",
+      "color_scheme": "light"
+    },
+    {
+      "src": "/favicon-dark.ico",
+      "sizes": "48x48",
+      "type": "icon",
+      "color_scheme": "dark"
+    }
+  ]
+}

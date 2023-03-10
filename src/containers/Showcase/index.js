@@ -1,17 +1,14 @@
 import Container from "common/components/Container";
 import Typography from "common/components/Typography";
 import Section from "common/components/Section";
-import GenesisImage from "common/assets/image/genesis.svg";
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect } from "react";
 import AutCard from "./card";
 import { ShowcaseData } from "common/data";
 import { Grid } from "./showcase.style";
-import styled from "styled-components";
 import ConcentricImage from "common/assets/image/ConcentricImage.svg";
-import Text from "common/components/Text";
 import Button from "common/components/Button";
 
-const NovaShowcase = ({ front, back }) => {
+const NovaShowcase = () => {
   const { novaCards, title, subtitle } = ShowcaseData;
 
   useEffect(() => {

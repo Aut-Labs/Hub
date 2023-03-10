@@ -28,7 +28,7 @@ export const theme = {
     mega: "0.25em",
   },
   fonts: {
-    primary: "'FractulRegular', sans-serif",
+    primary: "var(--fractul-regular)"
   },
   borders: [0, "1px solid", "2px solid", "3px solid", "4px solid"],
   radius: [0, 3, 5, 10, 15, 20, 25, 50, 60, "50%"],
@@ -37,7 +37,7 @@ export const theme = {
     primary: {
       color: colors.offWhite,
       backgroundColor: colors.transparent,
-      borderColor: colors.offWhite,
+      borderColor: colors.divider,
       ".reusecore__loader": {
         borderColor: colors.offWhite,
       },

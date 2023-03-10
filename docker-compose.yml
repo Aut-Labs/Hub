@@ -1,16 +1,13 @@
 version: '3.9'
 services:
-  try_aut_web: 
-    container_name: try_aut_web
+  nova_showcase_web: 
+    container_name: nova_showcase_web
     image: try_aut_web
     build: ./
 
-  try_aut_nginx:
-    container_name: try_aut_nginx
-    image: try_aut_nginx
+  nova_showcase_nginx:
+    container_name: nova_showcase_nginx
+    image: nova_showcase_nginx
     build: ./nginx
     ports:
       - 3001:9080
-
-networks:
-  try_aut:

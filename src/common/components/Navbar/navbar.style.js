@@ -16,10 +16,12 @@ import {
 } from "styled-system";
 import { darkenColor, lightenColor } from "../lightenDarken";
 
+
+
 const NavbarStyle = styled.nav`
   /* Navbar default style goes here */
   display: flex;
-  background-color: ${themeGet("colors.nightBlack")};
+  background-color: ${themeGet('colors.nightBlack')};
   align-items: center;
   border: 0;
   position: fixed;
@@ -27,6 +29,7 @@ const NavbarStyle = styled.nav`
   left: 0;
   width: 100%;
   transition: 0.35s ease-in-out;
+  
 
   // &:before {
   //   content: " ";
@@ -36,7 +39,6 @@ const NavbarStyle = styled.nav`
   .container {
     display: flex;
     justify-content: space-between;
-    align-items: center;
     width: 100%;
     height: 100%;
   }
@@ -107,6 +109,7 @@ const NavbarStyle = styled.nav`
   }
 
   .sticky-nav-active {
+
     // .sass_app_dark_navbar {
     //   padding: 15px 0;
     //   background-color: #111111;
@@ -117,7 +120,7 @@ const NavbarStyle = styled.nav`
     //   visibility: hidden;
     // }
     // .sticky-logo {
-
+      
     // }
     .main_menu li a {
       color: ${themeGet("colors.white")};

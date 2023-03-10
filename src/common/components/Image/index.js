@@ -7,9 +7,9 @@ import NextImage from "../NextImage";
 const ImageWrapper = styled("figure")`
   display: flex;
 
-  & > DIV {
-    width: 100%;
-    height: 100%;
+  & > span {
+    width: 100% !important;
+    height: 100% !important;
   }
   ${base}
   ${themed('Image')}
@@ -17,7 +17,7 @@ const ImageWrapper = styled("figure")`
 
 const Image = ({ src, alt, ...props }) => (
   <ImageWrapper {...props}>
-    <NextImage src={src} alt={alt} />
+    <NextImage width="100%" height="100%" src={src} alt={alt} />
   </ImageWrapper>
 );
 

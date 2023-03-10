@@ -6,10 +6,6 @@ export default function Error({ statusCode }) {
     <Fragment>
       <Head>
         <title>404: Not found</title>
-        <link
-          href="https://fonts.googleapis.com/css?family=Lato:400,700|Poppins:400,500,600,700|Roboto:400,500,700&display=swap"
-          rel="stylesheet"
-        />
       </Head>
       <ResetCSS />
       {/* <div>

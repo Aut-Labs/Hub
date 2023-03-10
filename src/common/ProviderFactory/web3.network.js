@@ -1,11 +1,5 @@
 import { toHex } from "common/utils/misc";
 
-const nativeCurrency = {
-    name: "Matic",
-    symbol: "MATIC",
-    decimals: 18
-};
-
 export const EnableAndChangeNetwork = async (provider, config) => {
     // console.info('Changing Network', config);
     const params = [

@@ -1,12 +1,12 @@
 import styled from "styled-components";
-import { variant, alignItems, boxShadow, fontWeight, textAlign, justifyContent, display } from "styled-system";
+import { variant, alignItems, boxShadow, fontWeight, minWidth } from "styled-system";
 import { buttonStyle, colorStyle, sizeStyle } from "../customVariant";
 import { themeGet } from "@styled-system/theme-get";
 import { base } from "../base";
 
 export const buttonStyles = {
   normal: {
-    fontFamily: "FractulAltLight",
+    fontFamily: 'var(--fractul-alt-light)',
     letterSpacing: "0.01em",
     fontSize: {
       _: "14px",
@@ -45,7 +45,7 @@ export const buttonStyles = {
     },
   },
   chunky: {
-    fontFamily: "FractulAltLight",
+    fontFamily: 'var(--fractul-alt-light)',
     letterSpacing: "0.01em",
     fontSize: {
       _: "14px",
@@ -84,7 +84,7 @@ export const buttonStyles = {
     },
   },
   square: {
-    fontFamily: "FractulAltLight",
+    fontFamily: 'var(--fractul-alt-light)',
     letterSpacing: "0.01em",
     borderRadius: 0,
     fontSize: {
@@ -158,15 +158,13 @@ const ButtonStyle = styled("button")`
     }
   }
 
-  ${display}
   ${alignItems}
-  ${justifyContent}
+  ${minWidth}
   ${boxShadow}
   ${buttonStyle}
   ${colorStyle}
   ${sizeStyle}
   ${fontWeight}
-  ${textAlign}
   ${base}
 `;
 

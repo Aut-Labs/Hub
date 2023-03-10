@@ -1,6 +1,6 @@
+/* eslint-disable jsx-a11y/alt-text */
 import WalletConnectLogo from "common/assets/image/wallet-connect.svg";
 import MetamaskLogo from "common/assets/image/metamask.svg";
-import Text from "common/components/Text";
 import Button from "common/components/Button";
 import Image from "common/components/Image";
 import styled from "styled-components";
@@ -21,46 +21,40 @@ const btnConfig = {
   },
 };
 
-const AutButton = styled(Button)({
-  fontSize: "1.56rem",
-  width: "16.25rem",
-  height: "3.438rem",
-  marginBottom: "10px",
-  display: "flex",
-  alignItems: "center",
-  paddingLeft: "15px",
-  ".btn-text": {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: "100%",
-    margin: 0,
-  },
-});
-
-const AutButtonTxt = styled(Text)({
-  flex: 1,
-  margin: 0,
-});
+const ConnectButton = styled(Button)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  grid-gap: 10px;
+`;
 
 export default function ConnectorBtn({ connectorType, setConnector }) {
-  // const [connector] = getConnector(connectorType);
-  const dispatch = useAppDispatch();
-  const [connector] = useSelector(NetworkConnector(connectorType));
-
   return (
-    <AutButton
+    <ConnectButton
+      colors="primary"
       onClick={async () => {
-        await connector.connectEagerly();
-        dispatch(setWallet(connectorType));
-        setConnector(connector);
+        setConnector(connectorType);
       }}
-      title={
-        <>
+      iconPosition="left"
+      icon={
+        <span
+          style={{
+            display: "flex",
+            height: "30px",
+            width: "30px"
+          }}
+        >
           {btnConfig[connectorType].icon}
-          <AutButtonTxt content={btnConfig[connectorType].label} />
-        </>
+        </span>
       }
+      variant="roundOutlined"
+      title={btnConfig[connectorType].label}
+      size="normal"
+      minWidth={{
+        _: "185px",
+        lg: "200px",
+        xxl: "440px",
+      }}
     />
   );
 }

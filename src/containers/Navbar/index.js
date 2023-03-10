@@ -4,16 +4,10 @@ import Container from "common/components/Container";
 import { NavbarData } from "common/data";
 import PropTypes from "prop-types";
 import Logo from "common/components/UIElements/Logo";
-import Link from "next/link";
 import Button from "common/components/Button";
+import { openModal } from "@redq/reuse-modal";
+import Web3NetworkProvider from "common/ProviderFactory/components/Web3NetworkProvider";
 import { useState } from "react";
-import axios from "axios";
-import {
-  arrayify,
-  hashMessage,
-  recoverAddress,
-  verifyMessage,
-} from "ethers/lib/utils";
 
 const navbarStyle = {
   className: "sass_app_dark_navbar",
@@ -44,78 +38,46 @@ const logoStyles = {
   },
 };
 
-const Navbar = ({ row, onConnected, connectors }) => {
+const Navbar = ({ row, networks, onConnected }) => {
   const { logo } = NavbarData;
+  const [isAuthorised, setIsAuthorised] = useState(false);
 
-  const [signing, setSigned] = useState(false);
-  const [connectedAddress, setConnectedAddress] = useState(null);
-  const [verifying, setVerifying] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const handleButtonClick = () => {
-    if (connectedAddress) {
-      setConnectedAddress(null);
-    } else {
-      signMessage();
-    }
+  const openPopup = () => {
+    openModal({
+      config: {
+        className: "customModal",
+        style: {
+          transform: "scale(1)",
+          border: 0,
+          background: "red",
+        },
+        animationFrom: { transform: "scale(0.3)" }, // react-spring <Spring from={}> props value
+        animationTo: { transform: "scale(1)" }, //  react-spring <Spring to={}> props value
+        transition: {
+          mass: 1,
+          tension: 130,
+          friction: 26,
+        },
+        disableDragging: true,
+        width: 450,
+        height: 450,
+      },
+      overlayClassName: "customeOverlayClass",
+      closeOnClickOutside: false,
+      component: Web3NetworkProvider,
+      componentProps: {
+        networks,
+        onClose: async ({ connected, account }, errorMessage) => {
+          setIsAuthorised(connected);
+          onConnected(connected, account);
+        },
+      },
+    });
   };
 
-  const signMessage = async () => {
-    setLoading(true);
-    setSigned(true);
-    try {
-      const [connector] = connectors[0];
-      await connector.activate();
-      const accounts = await connector.provider.request({
-        method: "eth_requestAccounts",
-      });
-      const account = accounts[0];
-
-      const responseNonce = await axios.get(
-        `http://localhost:4005/api/autID/user/nonce/${account}`
-      );
-
-      const nonce = responseNonce.data.nonce;
-
-      const signature = await connector.provider.request({
-        method: "personal_sign",
-        params: [nonce, account],
-      });
-
-      const jwtResponse = await axios.post(
-        `http://localhost:4005/api/autID/user/getToken`,
-        {
-          address: account,
-          signature,
-        }
-      );
-
-      console.log(jwtResponse.data);
-
-      const testAuth = await axios.get(
-        `http://localhost:4005/api/autID/user/me`,
-        {
-          headers: {
-            Authorization: jwtResponse.data.token,
-          },
-        }
-      );
-
-      console.log(testAuth.data);
-      setConnectedAddress(testAuth.data.address);
-      onConnected({
-        connected: true,
-        userData: testAuth.data,
-      });
-    } catch (error) {
-      if (error?.code === 4001) {
-        // setErrorMessage(error.message);
-      }
-    } finally {
-      setLoading(false);
-      setSigned(false);
-    }
-  };
+  const onDisconnect = () => {
+    setIsAuthorised(false);
+  }
 
   return (
     <NavbarWrapper {...navbarStyle}>
@@ -138,40 +100,40 @@ const Navbar = ({ row, onConnected, connectors }) => {
             sm: "space-between",
           }}
         >
-          <Link href="/" shallow>
-            <Logo
-              logoSrc={logo}
-              alt="Aut Logo"
-              logoStyle={logoStyles}
-              className="sticky-logo nav-logo"
+          <Logo
+            logoSrc={logo}
+            href="/"
+            alt="Aut Logo"
+            logoStyle={logoStyles}
+            className="sticky-logo nav-logo"
+          />
+          {!!isAuthorised && (
+            <Button
+              colors="primary"
+              variant="roundOutlined"
+              title="Disconnect"
+              target="_blank"
+              size="normal"
+              onClick={onDisconnect}
+              minWidth={{
+                _: "220px",
+              }}
             />
-          </Link>
+          )}
+          {!isAuthorised && (
+            <Button
+              colors="primary"
+              variant="roundOutlined"
+              title="Connect"
+              target="_blank"
+              size="normal"
+              onClick={openPopup}
+              minWidth={{
+                _: "220px",
+              }}
+            />
+          )}
         </Box>
-        <Button
-          colors="primary"
-          variant="roundOutlined"
-          title={connectedAddress || "Connect Wallet"}
-          target="_blank"
-          size="normal"
-          isLoading={signing}
-          disabled={loading}
-          onClick={handleButtonClick}
-          style={{
-            overflow: "hidden",
-            whiteSpace: "nowrap",
-            display: "block",
-            textOverflow: "ellipsis",
-          }}
-          minWidth={{
-            _: "260px",
-          }}
-          maxWidth={{
-            _: "260px",
-          }}
-          height={{
-            _: "60px",
-          }}
-        />
       </Container>
     </NavbarWrapper>
   );

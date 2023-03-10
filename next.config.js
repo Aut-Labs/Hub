@@ -1,13 +1,14 @@
-module.exports = () => {
-  const rewrites = () => {
-    return [
-      {
-        source: "/ipfs/:cid",
-        destination: "https://infura-ipfs.io/ipfs/:cid",
-      }
-    ];
-  };
-  return {
-    rewrites,
-  };
+const withPlugins = require('next-compose-plugins');
+
+const nextConfig = {
+  reactStrictMode: true,
+  compiler: {
+    styledComponents: true
+  },
+  strictMode: true,
+  images: {
+    domains: [],
+  },
 };
+
+module.exports = withPlugins([], nextConfig);

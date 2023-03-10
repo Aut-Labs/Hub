@@ -1,38 +1,33 @@
-import { environment } from "api/environment";
 import Button from "common/components/Button";
 import styled from "styled-components";
 
+const ConnectButton = styled(Button)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  grid-gap: 10px;
+`;
 
-const AutButton = styled(Button)({
-  fontSize: "1.56rem",
-  width: "22rem",
-  height: "3.438rem",
-  marginBottom: "10px",
-  display: 'flex',
-  alignItems: 'center',
-  paddingLeft: '15px',
-  '.btn-text': {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-    margin: 0,
-  }
-});
-
-export const NetworkSelectors = ({ onSelect }) => {
+export const NetworkSelectors = ({ onSelect, networks }) => {
   return (
     <>
-      {environment.networks.split(",").map((networkName, index) => {
-        const label = environment.networkNames.split(",")[index];
-        const foundChainId = Number(environment.chainIds.split(",")[index]);
+      {networks.map((network, index) => {
         return (
-          <AutButton
+          <ConnectButton
             key={`key-${index}`}
+            colors="primary"
+            disabled={network.disabled}
             onClick={() => {
-              onSelect(foundChainId, networkName.trim());
+              onSelect(network);
             }}
-            title={<>Switch to {label}</>}
+            variant="roundOutlined"
+            title={<>Switch to {network.name}</>}
+            size="normal"
+            minWidth={{
+              _: "185px",
+              lg: "200px",
+              xxl: "440px",
+            }}
           />
         );
       })}

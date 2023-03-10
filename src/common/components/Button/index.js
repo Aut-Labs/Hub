@@ -54,7 +54,7 @@ const Button = forwardRef(
 
     return (
       <ButtonStyle
-        innerRef={ref}
+        ref={ref}
         type={type}
         className={addAllClasses.join(" ")}
         icon={icon}
@@ -71,6 +71,8 @@ const Button = forwardRef(
     );
   }
 );
+
+Button.displayName = "Button";
 
 Button.propTypes = {
   /** ClassName of the button */
