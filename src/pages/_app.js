@@ -41,7 +41,7 @@ export default function CustomApp({ Component, pageProps }) {
             content="initial-scale=1.0, width=device-width"
             key="viewport"
           />
-          <meta property="og:title" content="Try Āut" />
+          <meta property="og:title" content="Nova Showcase" />
           <meta
             name="description"
             content="Do more with your DAO. Āut is a suite of DAO-native Tools to expand decentralized communities."
