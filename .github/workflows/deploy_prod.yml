@@ -20,7 +20,7 @@ jobs:
           script: |
             #!/usr/bin/env bash
 
-            DIR_NAME='try-aut'
+            DIR_NAME='nova-showcase'
             TARGET='main'
 
             cd ~/$DIR_NAME || exit

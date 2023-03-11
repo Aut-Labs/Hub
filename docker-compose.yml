@@ -10,4 +10,4 @@ services:
     image: nova_showcase_nginx
     build: ./nginx
     ports:
-      - 3001:9080
+      - 4002:9080

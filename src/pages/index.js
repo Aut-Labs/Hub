@@ -16,6 +16,7 @@ import { Modal } from "@redq/reuse-modal";
 import styled from "styled-components";
 import BubbleBottomLeft from "common/assets/image/bubble_bottom_left.png";
 import BubbleTopRight from "common/assets/image/bubble_top_right.png";
+import Footer from "containers/Footer";
 
 const generateConfig = (networks) => {
   const readOnlyUrls = networks.reduce((prev, curr) => {
@@ -121,6 +122,7 @@ const Main = () => {
             <TopRightBubble loading="lazy" src={BubbleTopRight.src} />
             <Modal>
               <NovaShowcase connectState={connectState} />
+              <Footer />
             </Modal>
           </PerfectScrollbar>
         </DAppProvider>
