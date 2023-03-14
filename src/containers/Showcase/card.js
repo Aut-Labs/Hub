@@ -10,6 +10,29 @@ import themeGet from "@styled-system/theme-get";
 import { display } from "styled-system";
 import Box from "common/components/Box";
 
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+}
+
+function replaceAll(str, find, replace) {
+  return str.replace(new RegExp(escapeRegExp(find), "g"), replace);
+}
+
+export function ipfsCIDToHttpUrl(url, isJson = false) {
+  if (!url) {
+    return url;
+  }
+  if (!url.includes("https://"))
+    return isJson
+      ? `https://cloudflare-ipfs.com/ipfs/${replaceAll(
+          url,
+          "ipfs://",
+          ""
+        )}/metadata.json`
+      : `https://cloudflare-ipfs.com/ipfs/${replaceAll(url, "ipfs://", "")}`;
+  return url;
+}
+
 const AutCardFront = styled("div")({
   width: "100%",
   height: "100%",
@@ -51,7 +74,7 @@ const AutCardBack = styled("div")({
   width: "100%",
 });
 
-const AutCard = ({ front, back, index }) => {
+const AutCard = ({ daoData, index }) => {
   const [isFlipped, setFlipped] = useState(false);
 
   const questClicked = (e, quest) => {
@@ -89,12 +112,13 @@ const AutCard = ({ front, back, index }) => {
               color="white"
               as="subtitle1"
             >
-              {front.title}
+              {daoData.name}
             </Typography>
-            <div
+            <Image
+              src={ipfsCIDToHttpUrl(daoData?.image)}
+              alt="Dao image"
               style={{
                 marginTop: "15px",
-                background: "linear-gradient(to bottom, #15ECEC 0%, #fff 100%)",
                 width: "100px",
                 height: "100px",
               }}
@@ -108,7 +132,7 @@ const AutCard = ({ front, back, index }) => {
               color="white"
               as="subtitle2"
             >
-              {front.description}
+              {daoData.description}
             </Typography>
             <div
               style={{
@@ -158,13 +182,13 @@ const AutCard = ({ front, back, index }) => {
               color="white"
               as="subtitle2"
             >
-              {back.communityName}
+              {daoData.name}
             </Typography>
             <Box
               marginTop={{ _: "20px", md: "10px", lg: "13px", xl: "20px" }}
               width="100%"
             >
-              {back.quests.map((quest, i) => {
+              {daoData.properties.quests.map((quest, i) => {
                 return (
                   <div
                     key={i}
@@ -188,7 +212,7 @@ const AutCard = ({ front, back, index }) => {
                       color="white"
                       as="body"
                     >
-                      {quest.role}
+                      {quest.metadata.name}
                     </Typography>
                     <Button
                       style={{
