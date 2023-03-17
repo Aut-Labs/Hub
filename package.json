@@ -15,7 +15,7 @@
     "@lottiefiles/lottie-player": "^1.5.7",
     "@lottiefiles/react-lottie-player": "^3.4.7",
     "@next/font": "^13.2.3",
-    "@redq/reuse-modal": "^1.1.9",
+    "@redq/reuse-modal": "^2.0.0",
     "@styled-system/theme-get": "^5.1.2",
     "@usedapp/core": "^1.2.2",
     "@usedapp/wallet-connect-connector": "^1.0.1",

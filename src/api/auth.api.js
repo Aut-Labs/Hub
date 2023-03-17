@@ -25,6 +25,6 @@ export const authoriseWithWeb3 = async (signer) => {
     const isAuthorised = !!jwtResponse.data.token;
     return isAuthorised;
   } catch (error) {
-    return false;
+    throw error;
   }
 };

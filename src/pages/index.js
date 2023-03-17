@@ -35,7 +35,7 @@ const generateConfig = (networks) => {
 
   return {
     readOnlyUrls,
-    fastMulticallEncoding: true,
+    autoConnect: false,
     networks: networks
       .filter((n) => !n.disabled)
       .map((n) => ({
