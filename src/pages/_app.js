@@ -4,7 +4,7 @@ import { ThemeProvider } from "styled-components";
 import { theme } from "common/theme";
 import ResetCSS from "common/assets/css/style";
 import GlobalStyle from "containers/app.style";
-import localFont from "@next/font/local";
+import localFont from "next/font/local";
 
 export function reportWebVitals(metric) {
   // console.log(metric);

@@ -8,6 +8,16 @@ import { Grid } from "./showcase.style";
 import ConcentricImage from "common/assets/image/ConcentricImage.svg";
 import Button from "common/components/Button";
 
+export function ipfsCIDToHttpUrl(url) {
+  if (!url) {
+    return url;
+  }
+  if (!url.includes("https://")) {
+    return `${process.env.NEXT_PUBLIC_IPFS_URL}/${replaceAll(url, "ipfs://", "")}`;
+  }
+  return url;
+}
+
 const NovaShowcase = () => {
   const { novaCards, title, subtitle } = ShowcaseData;
 

@@ -17,7 +17,7 @@ const btnConfig = {
   },
   [ConnectorTypes.WalletConnect]: {
     label: "WalletConnect",
-    icon: <Image src={WalletConnectLogo.src} />,
+    icon: <Image src={WalletConnectLogo.src} alt="Wallet Connect Logo" />,
   },
 };
 
