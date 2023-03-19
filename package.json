@@ -11,7 +11,6 @@
   },
   "dependencies": {
     "@aut-labs-private/abi-types": "^0.0.22",
-    "@aut-labs-private/sdk": "^0.0.27",
     "@lottiefiles/lottie-player": "^1.5.7",
     "@lottiefiles/react-lottie-player": "^3.4.7",
     "@next/font": "^13.2.3",

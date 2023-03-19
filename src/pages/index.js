@@ -5,7 +5,6 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import Sticky from "react-stickynode";
 import { DrawerProvider } from "common/contexts/DrawerContext";
 import Navbar from "containers/Navbar";
-import AutSDK from "@aut-labs-private/sdk";
 import { getAppConfig } from "api/index.api";
 import { useEffect } from "react";
 import { DAppProvider, MetamaskConnector } from "@usedapp/core";
@@ -91,9 +90,6 @@ const Main = () => {
       .then(async (res) => {
         setNetworks(res);
         setConfig(generateConfig(res));
-        new AutSDK({
-          nftStorageApiKey: process.env.NEXT_PUBLIC_NFT_STORAGE_KEY,
-        });
         setLoading(false);
       })
       .catch();
