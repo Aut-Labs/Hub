@@ -17,6 +17,7 @@ import styled from "styled-components";
 import BubbleBottomLeft from "common/assets/image/bubble_bottom_left.png";
 import BubbleTopRight from "common/assets/image/bubble_top_right.png";
 import Footer from "containers/Footer";
+import Image from "common/components/Image";
 
 const generateConfig = (networks) => {
   const readOnlyUrls = networks.reduce((prev, curr) => {
@@ -50,18 +51,20 @@ const generateConfig = (networks) => {
     connectors: {
       metamask: new MetamaskConnector(),
       walletConnect: new WalletConnectConnector({
-        rpc: networks.reduce((prev, curr) => {
-          // eslint-disable-next-line prefer-destructuring
-          prev[curr.chainId] = curr.rpcUrls[0];
-          return prev;
-        }, {}),
+        rpc: networks
+          .filter((n) => !n.disabled)
+          .reduce((prev, curr) => {
+            // eslint-disable-next-line prefer-destructuring
+            prev[curr.chainId] = curr.rpcUrls[0];
+            return prev;
+          }, {}),
         infuraId: "d8df2cb7844e4a54ab0a782f608749dd",
       }),
     },
   };
 };
 
-const BottomLeftBubble = styled("img")({
+const BottomLeftBubble = styled(Image)({
   position: "fixed",
   width: "700px",
   height: "700px",
@@ -69,7 +72,7 @@ const BottomLeftBubble = styled("img")({
   bottom: "-350px",
 });
 
-const TopRightBubble = styled("img")({
+const TopRightBubble = styled(Image)({
   position: "fixed",
   width: "700px",
   height: "700px",
@@ -118,8 +121,8 @@ const Main = () => {
               height: "100vh",
             }}
           >
-            <BottomLeftBubble loading="lazy" src={BubbleBottomLeft.src} />
-            <TopRightBubble loading="lazy" src={BubbleTopRight.src} />
+            <BottomLeftBubble src={BubbleBottomLeft.src} />
+            <TopRightBubble src={BubbleTopRight.src} />
             <Modal>
               <NovaShowcase connectState={connectState} />
               <Footer />

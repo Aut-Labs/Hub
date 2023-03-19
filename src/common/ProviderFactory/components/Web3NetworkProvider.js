@@ -25,11 +25,9 @@ const ErrorWrapper = styled(Box)({
   borderRadius: "16px",
 });
 
-const Web3NetworkProvider = ({ shouldBeAllowListed = false, onClose }) => {
+const Web3NetworkProvider = ({ onClose }) => {
   const { isLoading, waitingUserConfirmation, errorMessage, connect } =
-    useAutWalletConnect({
-      shouldBeAllowListed,
-    });
+    useAutWalletConnect();
 
   const changeConnector = async (connectorType) => {
     try {
