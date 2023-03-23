@@ -95,11 +95,11 @@ export const Grid = styled("div")`
 
   ${themeGet("mediaQueries.md")} {
     grid-template-areas: "first second third";
-    grid-gap: 20px;
+    grid-gap: 25px;
   }
 
-  ${themeGet("mediaQueries.lg")} {
+  ${themeGet("mediaQueries.xl")} {
     grid-template-areas: "first second third forth";
-    grid-gap: 20px;
+    grid-gap: 25px;
   }
 `;

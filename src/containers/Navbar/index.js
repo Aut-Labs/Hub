@@ -68,6 +68,8 @@ const Navbar = ({ row, networks, onConnected }) => {
       componentProps: {
         networks,
         onClose: async ({ connected, account }, errorMessage) => {
+          console.warn(connected);
+          console.warn(account);
           setIsAuthorised(connected);
           onConnected(connected, account);
         },
@@ -77,7 +79,7 @@ const Navbar = ({ row, networks, onConnected }) => {
 
   const onDisconnect = () => {
     setIsAuthorised(false);
-  }
+  };
 
   return (
     <NavbarWrapper {...navbarStyle}>

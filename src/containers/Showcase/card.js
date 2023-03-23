@@ -9,6 +9,7 @@ import Button from "common/components/Button";
 import themeGet from "@styled-system/theme-get";
 import { display } from "styled-system";
 import Box from "common/components/Box";
+import { fetchMetadata } from "@aut-labs-private/sdk";
 
 function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
@@ -24,14 +25,28 @@ export function ipfsCIDToHttpUrl(url, isJson = false) {
   }
   if (!url.includes("https://"))
     return isJson
-      ? `https://cloudflare-ipfs.com/ipfs/${replaceAll(
+      ? `${process.env.NEXT_PUBLIC_IPFS_GATEWAY}/${replaceAll(
           url,
           "ipfs://",
           ""
         )}/metadata.json`
-      : `https://cloudflare-ipfs.com/ipfs/${replaceAll(url, "ipfs://", "")}`;
+      : `${process.env.NEXT_PUBLIC_IPFS_GATEWAY}/${replaceAll(
+          url,
+          "ipfs://",
+          ""
+        )}`;
   return url;
 }
+
+const getRoleName = (daoData, quest) => {
+  const role = daoData.properties.rolesSets[0].roles.find(
+    (r) => r.id === quest.role
+  );
+  if (role) {
+    return role.roleName;
+  }
+  return "N/A";
+};
 
 const AutCardFront = styled("div")({
   width: "100%",
@@ -41,22 +56,25 @@ const AutCardFront = styled("div")({
 
 const AutCardContainer = styled("div")`
   ${themeGet("mediaQueries.sm")} {
-    width: 270px;
-    height: 320px;
-  }
-  ${themeGet("mediaQueries.md")} {
-    width: 270px;
-    height: 320px;
-  }
-  ${themeGet("mediaQueries.xl")} {
     width: 300px;
     height: 350px;
   }
+  ${themeGet("mediaQueries.md")} {
+    width: 300px;
+    height: 350px;
+  }
+  ${themeGet("mediaQueries.xl")} {
+    width: 330px;
+    height: 380px;
+  }
   ${themeGet("mediaQueries.xxl")} {
-    width: 350px;
-    height: 400px;
+    width: 380px;
+    height: 430px;
   }
   box-shadow: 10px 10px 10px black;
+  &.highlighted {
+    box-shadow: 20px 20px 20px #0063a2;
+  }
   background-color: #262626;
   border-color: #3f3f40;
   border-style: solid;
@@ -74,7 +92,11 @@ const AutCardBack = styled("div")({
   width: "100%",
 });
 
-const AutCard = ({ daoData, index }) => {
+const AutCard = ({
+  daoData,
+  highlightData = { highlighted: false, questId: null },
+  index,
+}) => {
   const [isFlipped, setFlipped] = useState(false);
 
   const questClicked = (e, quest) => {
@@ -100,7 +122,11 @@ const AutCard = ({ daoData, index }) => {
         <AutCardFront
           className={`aut-card-front ${isFlipped ? "flipped" : ""}`}
         >
-          <AutCardContainer className="aut-card-container front">
+          <AutCardContainer
+            className={`aut-card-container front ${
+              highlightData.highlighted && "highlighted"
+            }`}
+          >
             <Typography
               fontWeight="bold"
               fontFamlily="FractulAltBold"
@@ -156,7 +182,11 @@ const AutCard = ({ daoData, index }) => {
           </AutCardContainer>
         </AutCardFront>
         <AutCardBack className="aut-card-back">
-          <AutCardContainer className="aut-card-container back">
+          <AutCardContainer
+            className={`aut-card-container back ${
+              highlightData.highlighted && "highlighted"
+            }`}
+          >
             <Typography
               fontWeight="bold"
               fontFamlily="FractulAltBold"
@@ -212,7 +242,7 @@ const AutCard = ({ daoData, index }) => {
                       color="white"
                       as="body"
                     >
-                      {quest.metadata.name}
+                      {getRoleName(daoData, quest)}
                     </Typography>
                     <Button
                       style={{
@@ -223,6 +253,12 @@ const AutCard = ({ daoData, index }) => {
                         borderWidth: "2px",
                         whiteSpace: "nowrap",
                         textAlign: "center",
+                      }}
+                      disabled={() => {
+                        if (highlightData.highlighted) {
+                          return highlightData.questId !== quest.questId;
+                        }
+                        return false;
                       }}
                       title="View Quest"
                       variant="outlined"

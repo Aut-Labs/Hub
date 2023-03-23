@@ -16,6 +16,7 @@ import { Modal } from "@redq/reuse-modal";
 import styled from "styled-components";
 import BubbleBottomLeft from "common/assets/image/bubble_bottom_left.png";
 import BubbleTopRight from "common/assets/image/bubble_top_right.png";
+import ConcentricImage from "common/assets/image/ConcentricImage.svg";
 import Footer from "containers/Footer";
 
 const generateConfig = (networks) => {
@@ -61,6 +62,22 @@ const generateConfig = (networks) => {
   };
 };
 
+const CirclesLeft = styled("img")({
+  position: "fixed",
+  width: "600px",
+  height: "600px",
+  left: "-21%",
+  bottom: "calc(100% - 450px)",
+});
+
+const CirclesRight = styled("img")({
+  position: "fixed",
+  width: "500px",
+  height: "500px",
+  top: "calc(100% - 250px)",
+  right: "-250px",
+});
+
 const BottomLeftBubble = styled("img")({
   position: "fixed",
   width: "700px",
@@ -78,7 +95,7 @@ const TopRightBubble = styled("img")({
 });
 
 const Main = () => {
-  const [connectState, setConnectState] = useState({});
+  const [connectState, setConnectState] = useState(false);
   const [isLoading, setLoading] = useState(true);
   const [config, setConfig] = useState(null);
   const [networks, setNetworks] = useState();
@@ -118,10 +135,12 @@ const Main = () => {
               height: "100vh",
             }}
           >
+            <CirclesLeft loading="lazy" src={ConcentricImage.src} />
+            <CirclesRight loading="lazy" src={ConcentricImage.src} />
             <BottomLeftBubble loading="lazy" src={BubbleBottomLeft.src} />
             <TopRightBubble loading="lazy" src={BubbleTopRight.src} />
             <Modal>
-              <NovaShowcase connectState={connectState} />
+              <NovaShowcase connectedState={connectState} />
               <Footer />
             </Modal>
           </PerfectScrollbar>

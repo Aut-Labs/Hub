@@ -9,13 +9,43 @@ import ConcentricImage from "common/assets/image/ConcentricImage.svg";
 import Button from "common/components/Button";
 import { fetchMetadata } from "@aut-labs-private/sdk";
 import axios from "axios";
+import AutLoading from "common/components/AutLoading";
+import styled from "styled-components";
+import { useRouter } from "next/router";
+import { getCache } from "api/cache.api";
 
-const NovaShowcase = () => {
+const LoadingContainer = styled("div")({
+  display: "flex",
+  justifyContent: "center",
+  width: "100%",
+  height: "300px",
+  transform: `translate(0%, 20%)`,
+});
+
+const NovaShowcase = ({ connectedState }) => {
   const { novaCards, title, subtitle } = ShowcaseData;
+  const router = useRouter();
 
   const [daoList, setDaoList] = useState(null);
+  const [highlightedDaoCache, setHighlightedDaoCache] = useState(null);
+
+  console.warn("CONNECTION STATE", connectedState);
+  useEffect(() => {
+    const fetchCache = async () => {
+      const cache = await getCache("UserPhases");
+      setHighlightedDaoCache({
+        daoAddress: cache.daoAddress,
+        questId: cache.questId,
+      });
+      console.warn(cache);
+    };
+    //Mark quests and communities from cache Taos DMs
+    //Copy timer from Try aut
+    if (connectedState) fetchCache();
+  }, [connectedState]);
 
   useEffect(() => {
+    console.log("queryDao", router.query.dao);
     const fetchData = async () => {
       const response = await axios.get(
         `http://localhost:4005/api/autID/user/daos`
@@ -29,27 +59,41 @@ const NovaShowcase = () => {
         const dao = daos[i];
         // prettier-ignore
         const metadata =
-          await fetchMetadata(dao.daoMetadataUri, "https://cloudflare-ipfs.com/ipfs");
+          await fetchMetadata(dao.daoMetadataUri, process.env.NEXT_PUBLIC_IPFS_GATEWAY);
         const daoModel = metadata;
-
+        daoModel.daoAddress = dao.daoAddress;
+        daoModel.onboardingQuestAddress = dao.onboardingQuestAddress;
         daoModel.properties.quests = [];
 
         for (let j = 0; j < dao.quests.length; j++) {
           const quest = dao.quests[j];
           const questMetadata = await fetchMetadata(
             quest.metadataUri,
-            "https://cloudflare-ipfs.com/ipfs"
+            process.env.NEXT_PUBLIC_IPFS_GATEWAY
           );
           quest.metadata = questMetadata;
           daoModel.properties.quests.push(quest);
         }
         daoData.push(daoModel);
       }
-      debugger;
       setDaoList(daoData);
+      console.log(daoData);
     };
     fetchData();
   }, []);
+
+  const checkIsHighlighted = (daoAddress) => {
+    if (highlightedDaoCache?.daoAddress) {
+      return {
+        highlighted: highlightedDaoCache?.daoAddress === daoAddress,
+        questId: highlightedDaoCache.questId,
+      };
+    }
+    return {
+      highlighted: router.query.dao === daoAddress,
+      questId: null,
+    };
+  };
 
   useEffect(() => {
     console.log(ConcentricImage);
@@ -93,7 +137,7 @@ const NovaShowcase = () => {
             {subtitle}
           </Typography>
         </div>
-        {daoList && (
+        {daoList ? (
           <Grid>
             {daoList.map((dao, i) => {
               return (
@@ -104,10 +148,14 @@ const NovaShowcase = () => {
                     flexDirection: "column",
                   }}
                 >
-                  <AutCard daoData={dao}></AutCard>
+                  <AutCard
+                    daoData={dao}
+                    highlightData={checkIsHighlighted(dao.daoAddress)}
+                  ></AutCard>
                   <Button
                     style={{
-                      marginTop: "56px",
+                      marginTop: "24px",
+                      marginBottom: "24px",
                       padding: "0px",
                       fontSize: "18px",
                       height: "60px",
@@ -116,13 +164,13 @@ const NovaShowcase = () => {
                       textAlign: "center",
                     }}
                     width={{
-                      _: "270px",
-                      sm: "270px",
-                      md: "270px",
-                      xl: "300px",
-                      xxl: "350px",
+                      _: "300px",
+                      sm: "300px",
+                      md: "300px",
+                      xl: "330px",
+                      xxl: "380px",
                     }}
-                    title="CLAIM in 5d 2h 30m"
+                    title="View"
                     variant="roundOutlined"
                     fontWeight="normal"
                     size="normal"
@@ -132,6 +180,10 @@ const NovaShowcase = () => {
               );
             })}
           </Grid>
+        ) : (
+          <LoadingContainer>
+            <AutLoading />
+          </LoadingContainer>
         )}
       </Container>
     </Section>
