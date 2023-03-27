@@ -101,7 +101,10 @@ const AutCard = ({
 
   const questClicked = (e, quest) => {
     e.stopPropagation();
-    console.log(quest);
+    window.open(
+      `${process.env.NEXT_PUBLIC_DASHBOARD_URL}/quest?questId=${quest.questId}&onboardingQuestAddress=${daoData.onboardingQuestAddress}&daoAddress=${daoData?.daoAddress}`,
+      "_blank"
+    );
   };
 
   const flipCard = () => {

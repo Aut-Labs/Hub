@@ -95,6 +95,13 @@ const NovaShowcase = ({ connectedState }) => {
     };
   };
 
+  const viewDao = (daoAddress) => {
+    window.open(
+      `${process.env.NEXT_PUBLIC_TRY_AUT_URL}/?daoAddress=${daoAddress}`,
+      "_blank"
+    );
+  };
+
   useEffect(() => {
     console.log(ConcentricImage);
   }, []);
@@ -175,6 +182,7 @@ const NovaShowcase = ({ connectedState }) => {
                     fontWeight="normal"
                     size="normal"
                     colors="primary"
+                    onClick={() => viewDao(dao.daoAddress)}
                   />
                 </div>
               );
