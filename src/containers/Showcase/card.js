@@ -116,7 +116,12 @@ const AutCard = ({
   };
 
   return (
-    <div className="inner-content">
+    <div
+      style={{
+        marginBottom: "35px",
+      }}
+      className="inner-content"
+    >
       <Flipcard
         isFlipped={isFlipped}
         onClick={flipCard}
@@ -256,12 +261,6 @@ const AutCard = ({
                         borderWidth: "2px",
                         whiteSpace: "nowrap",
                         textAlign: "center",
-                      }}
-                      disabled={() => {
-                        if (highlightData.highlighted) {
-                          return highlightData.questId !== quest.questId;
-                        }
-                        return false;
                       }}
                       title="View Quest"
                       variant="outlined"

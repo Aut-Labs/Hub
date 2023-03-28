@@ -48,7 +48,7 @@ const NovaShowcase = ({ connectedState }) => {
     console.log("queryDao", router.query.dao);
     const fetchData = async () => {
       const response = await axios.get(
-        `http://localhost:4005/api/autID/user/daos`
+        `${process.env.NEXT_PUBLIC_API_URL}/autID/user/daos`
       );
 
       const daos = response.data;
@@ -94,17 +94,6 @@ const NovaShowcase = ({ connectedState }) => {
       questId: null,
     };
   };
-
-  const viewDao = (daoAddress) => {
-    window.open(
-      `${process.env.NEXT_PUBLIC_TRY_AUT_URL}/?daoAddress=${daoAddress}`,
-      "_blank"
-    );
-  };
-
-  useEffect(() => {
-    console.log(ConcentricImage);
-  }, []);
 
   return (
     <Section className="main-section">
@@ -159,7 +148,7 @@ const NovaShowcase = ({ connectedState }) => {
                     daoData={dao}
                     highlightData={checkIsHighlighted(dao.daoAddress)}
                   ></AutCard>
-                  <Button
+                  {/* <Button
                     style={{
                       marginTop: "24px",
                       marginBottom: "24px",
@@ -183,7 +172,7 @@ const NovaShowcase = ({ connectedState }) => {
                     size="normal"
                     colors="primary"
                     onClick={() => viewDao(dao.daoAddress)}
-                  />
+                  /> */}
                 </div>
               );
             })}
