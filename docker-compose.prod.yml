@@ -1,0 +1,13 @@
+version: '3.9'
+services:
+  nova_showcase_prod: 
+    container_name: nova_showcase_prod
+    image: nova_showcase_prod
+    build: ./
+
+  nova_showcase_nginx_prod:
+    container_name: nova_showcase_nginx_prod
+    image: nova_showcase_nginx_prod
+    build: ./nginx/prod
+    ports:
+      - 4002:9080

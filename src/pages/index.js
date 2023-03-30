@@ -5,7 +5,6 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import Sticky from "react-stickynode";
 import { DrawerProvider } from "common/contexts/DrawerContext";
 import Navbar from "containers/Navbar";
-import AutSDK from "@aut-labs-private/sdk";
 import { getAppConfig } from "api/index.api";
 import { useEffect } from "react";
 import { DAppProvider, MetamaskConnector } from "@usedapp/core";
@@ -18,6 +17,7 @@ import BubbleBottomLeft from "common/assets/image/bubble_bottom_left.png";
 import BubbleTopRight from "common/assets/image/bubble_top_right.png";
 import ConcentricImage from "common/assets/image/ConcentricImage.svg";
 import Footer from "containers/Footer";
+import Image from "common/components/Image";
 
 const generateConfig = (networks) => {
   const readOnlyUrls = networks.reduce((prev, curr) => {
@@ -36,7 +36,7 @@ const generateConfig = (networks) => {
 
   return {
     readOnlyUrls,
-    fastMulticallEncoding: true,
+    autoConnect: false,
     networks: networks
       .filter((n) => !n.disabled)
       .map((n) => ({
@@ -51,11 +51,13 @@ const generateConfig = (networks) => {
     connectors: {
       metamask: new MetamaskConnector(),
       walletConnect: new WalletConnectConnector({
-        rpc: networks.reduce((prev, curr) => {
-          // eslint-disable-next-line prefer-destructuring
-          prev[curr.chainId] = curr.rpcUrls[0];
-          return prev;
-        }, {}),
+        rpc: networks
+          .filter((n) => !n.disabled)
+          .reduce((prev, curr) => {
+            // eslint-disable-next-line prefer-destructuring
+            prev[curr.chainId] = curr.rpcUrls[0];
+            return prev;
+          }, {}),
         infuraId: "d8df2cb7844e4a54ab0a782f608749dd",
       }),
     },
@@ -86,7 +88,7 @@ const BottomLeftBubble = styled("img")({
   bottom: "-350px",
 });
 
-const TopRightBubble = styled("img")({
+const TopRightBubble = styled(Image)({
   position: "fixed",
   width: "700px",
   height: "700px",
@@ -105,9 +107,6 @@ const Main = () => {
       .then(async (res) => {
         setNetworks(res);
         setConfig(generateConfig(res));
-        new AutSDK({
-          nftStorageApiKey: process.env.NEXT_PUBLIC_NFT_STORAGE_KEY,
-        });
         setLoading(false);
       })
       .catch();

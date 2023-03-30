@@ -83,12 +83,18 @@ export const BlackHoleWrapper = styled("div")`
 
 export const Grid = styled("div")`
   display: flex;
+  justify-content: center;
   flex-direction: column;
   align-items: center;
   grid-gap: 20px;
   display: grid;
 
   ${themeGet("mediaQueries.xs")} {
+    grid-gap: 15px;
+    grid-template-areas: "first";
+  }
+
+  ${themeGet("mediaQueries.sm")} {
     grid-gap: 15px;
     grid-template-areas: "first second";
   }

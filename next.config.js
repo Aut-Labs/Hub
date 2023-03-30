@@ -1,21 +1,18 @@
 const withPlugins = require("next-compose-plugins");
 
-const nextConfig = {
+module.exports = {
   reactStrictMode: true,
   compiler: {
     styledComponents: true,
   },
-  strictMode: true,
   images: {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "cloudflare-ipfs.com",
+        hostname: new URL(process.env.NEXT_PUBLIC_IPFS_URL).hostname,
         port: "",
         pathname: "/**",
       },
     ],
   },
 };
-
-module.exports = withPlugins([], nextConfig);

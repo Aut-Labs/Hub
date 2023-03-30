@@ -10,12 +10,10 @@
     "update-env": "node ./setup-environment.js"
   },
   "dependencies": {
-    "@aut-labs-private/abi-types": "^0.0.4",
-    "@aut-labs-private/sdk": "^0.0.21",
+    "@aut-labs-private/abi-types": "^0.0.22",
     "@lottiefiles/lottie-player": "^1.5.7",
     "@lottiefiles/react-lottie-player": "^3.4.7",
-    "@next/font": "^13.2.3",
-    "@redq/reuse-modal": "^1.1.9",
+    "@redq/reuse-modal": "^2.0.0",
     "@styled-system/theme-get": "^5.1.2",
     "@usedapp/core": "^1.2.2",
     "@usedapp/wallet-connect-connector": "^1.0.1",
@@ -49,6 +47,7 @@
     "react-scrollspy": "^3.4.3",
     "react-slick": "^0.28.1",
     "react-stickynode": "4.0.0",
+    "sharp": "^0.31.3",
     "styled-components": "^5.2.1",
     "styled-system": "5.1.5"
   },

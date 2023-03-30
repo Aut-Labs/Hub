@@ -38,7 +38,7 @@ const logoStyles = {
   },
 };
 
-const Navbar = ({ row, networks, onConnected }) => {
+const Navbar = ({ row, onConnected }) => {
   const { logo } = NavbarData;
   const [isAuthorised, setIsAuthorised] = useState(false);
 
@@ -59,17 +59,14 @@ const Navbar = ({ row, networks, onConnected }) => {
           friction: 26,
         },
         disableDragging: true,
-        width: 450,
-        height: 450,
+        width: 480,
+        height: 480,
       },
       overlayClassName: "customeOverlayClass",
       closeOnClickOutside: false,
       component: Web3NetworkProvider,
       componentProps: {
-        networks,
-        onClose: async ({ connected, account }, errorMessage) => {
-          console.warn(connected);
-          console.warn(account);
+        onClose: async ({ connected, account }) => {
           setIsAuthorised(connected);
           onConnected(connected, account);
         },

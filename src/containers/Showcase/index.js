@@ -22,25 +22,36 @@ const LoadingContainer = styled("div")({
   transform: `translate(0%, 20%)`,
 });
 
+export function ipfsCIDToHttpUrl(url) {
+  if (!url) {
+    return url;
+  }
+  if (!url.includes("https://")) {
+    return `${process.env.NEXT_PUBLIC_IPFS_URL}/${replaceAll(
+      url,
+      "ipfs://",
+      ""
+    )}`;
+  }
+  return url;
+}
+
 const NovaShowcase = ({ connectedState }) => {
-  const { novaCards, title, subtitle } = ShowcaseData;
   const router = useRouter();
 
   const [daoList, setDaoList] = useState(null);
   const [highlightedDaoCache, setHighlightedDaoCache] = useState(null);
 
-  console.warn("CONNECTION STATE", connectedState);
   useEffect(() => {
     const fetchCache = async () => {
       const cache = await getCache("UserPhases");
-      setHighlightedDaoCache({
-        daoAddress: cache.daoAddress,
-        questId: cache.questId,
-      });
-      console.warn(cache);
+      if (cache) {
+        setHighlightedDaoCache({
+          daoAddress: cache.daoAddress,
+          questId: cache.questId,
+        });
+      }
     };
-    //Mark quests and communities from cache Taos DMs
-    //Copy timer from Try aut
     if (connectedState) fetchCache();
   }, [connectedState]);
 
@@ -59,7 +70,7 @@ const NovaShowcase = ({ connectedState }) => {
         const dao = daos[i];
         // prettier-ignore
         const metadata =
-          await fetchMetadata(dao.daoMetadataUri, process.env.NEXT_PUBLIC_IPFS_GATEWAY);
+          await fetchMetadata(dao.daoMetadataUri, process.env.NEXT_PUBLIC_IPFS_URL);
         const daoModel = metadata;
         daoModel.daoAddress = dao.daoAddress;
         daoModel.onboardingQuestAddress = dao.onboardingQuestAddress;
@@ -69,7 +80,7 @@ const NovaShowcase = ({ connectedState }) => {
           const quest = dao.quests[j];
           const questMetadata = await fetchMetadata(
             quest.metadataUri,
-            process.env.NEXT_PUBLIC_IPFS_GATEWAY
+            process.env.NEXT_PUBLIC_IPFS_URL
           );
           quest.metadata = questMetadata;
           daoModel.properties.quests.push(quest);

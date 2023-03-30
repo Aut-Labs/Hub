@@ -55,6 +55,7 @@ jobs:
             sudo git pull origin dev;
 
             # Docker
+            docker-compose -f docker-compose.yml down
             docker rmi $(docker images -f "dangling=true" -q)
             docker-compose -f docker-compose.yml up -d --build
 

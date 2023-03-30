@@ -25,16 +25,12 @@ export function ipfsCIDToHttpUrl(url, isJson = false) {
   }
   if (!url.includes("https://"))
     return isJson
-      ? `${process.env.NEXT_PUBLIC_IPFS_GATEWAY}/${replaceAll(
+      ? `${process.env.NEXT_PUBLIC_IPFS_URL}/${replaceAll(
           url,
           "ipfs://",
           ""
         )}/metadata.json`
-      : `${process.env.NEXT_PUBLIC_IPFS_GATEWAY}/${replaceAll(
-          url,
-          "ipfs://",
-          ""
-        )}`;
+      : `${process.env.NEXT_PUBLIC_IPFS_URL}/${replaceAll(url, "ipfs://", "")}`;
   return url;
 }
 
@@ -55,6 +51,11 @@ const AutCardFront = styled("div")({
 });
 
 const AutCardContainer = styled("div")`
+  ${themeGet("mediaQueries.xs")} {
+    width: 300px;
+    height: 350px;
+  }
+
   ${themeGet("mediaQueries.sm")} {
     width: 300px;
     height: 350px;
