@@ -76,7 +76,7 @@ const Navbar = ({ row, onConnected }) => {
 
   const onDisconnect = () => {
     setIsAuthorised(false);
-  }
+  };
 
   return (
     <NavbarWrapper {...navbarStyle}>

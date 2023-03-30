@@ -1,6 +1,7 @@
 import { themeGet } from "@styled-system/theme-get";
 import styled, { createGlobalStyle, keyframes } from "styled-components";
 import AutLogo from "common/assets/image/noise.png";
+import ConcentricImage from "common/assets/image/ConcentricImage.svg";
 
 const Wobble_Vertical = keyframes`
   16.65% {

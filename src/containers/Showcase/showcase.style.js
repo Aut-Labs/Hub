@@ -83,6 +83,7 @@ export const BlackHoleWrapper = styled("div")`
 
 export const Grid = styled("div")`
   display: flex;
+  justify-content: center;
   flex-direction: column;
   align-items: center;
   grid-gap: 20px;
@@ -90,16 +91,21 @@ export const Grid = styled("div")`
 
   ${themeGet("mediaQueries.xs")} {
     grid-gap: 15px;
+    grid-template-areas: "first";
+  }
+
+  ${themeGet("mediaQueries.sm")} {
+    grid-gap: 15px;
     grid-template-areas: "first second";
   }
 
   ${themeGet("mediaQueries.md")} {
     grid-template-areas: "first second third";
-    grid-gap: 20px;
+    grid-gap: 25px;
   }
 
-  ${themeGet("mediaQueries.lg")} {
+  ${themeGet("mediaQueries.xl")} {
     grid-template-areas: "first second third forth";
-    grid-gap: 20px;
+    grid-gap: 25px;
   }
 `;
