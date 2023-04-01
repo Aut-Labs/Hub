@@ -5,8 +5,6 @@ import { memo, useEffect, useState } from "react";
 import AutCard from "./card";
 import { ShowcaseData } from "common/data";
 import { Grid } from "./showcase.style";
-import ConcentricImage from "common/assets/image/ConcentricImage.svg";
-import Button from "common/components/Button";
 import { fetchMetadata } from "@aut-labs-private/sdk";
 import axios from "axios";
 import AutLoading from "common/components/AutLoading";
@@ -38,6 +36,7 @@ export function ipfsCIDToHttpUrl(url) {
 
 const NovaShowcase = ({ connectedState }) => {
   const router = useRouter();
+  const { title, subtitle } = ShowcaseData;
 
   const [daoList, setDaoList] = useState(null);
   const [highlightedDaoCache, setHighlightedDaoCache] = useState(null);
@@ -56,7 +55,6 @@ const NovaShowcase = ({ connectedState }) => {
   }, [connectedState]);
 
   useEffect(() => {
-    console.log("queryDao", router.query.dao);
     const fetchData = async () => {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/autID/user/daos`
@@ -190,7 +188,7 @@ const NovaShowcase = ({ connectedState }) => {
           </Grid>
         ) : (
           <LoadingContainer>
-            <AutLoading />
+            <AutLoading width="130px" height="130px" />
           </LoadingContainer>
         )}
       </Container>

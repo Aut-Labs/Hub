@@ -1,9 +1,7 @@
-const withPlugins = require("next-compose-plugins");
-
 module.exports = {
   reactStrictMode: true,
   compiler: {
-    styledComponents: true,
+    styledComponents: true
   },
   images: {
     remotePatterns: [

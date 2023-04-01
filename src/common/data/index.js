@@ -72,8 +72,9 @@ import fingerprint from "common/assets/image/fingerprint.svg";
 
 export const ShowcaseData = {
   title: "Nova Showcase",
-  subtitle:
-    "Pick a Nova, complete their onboarding quest and join their \n community to help them rise up the Nova leaderboard",
+  subtitle: (
+    <>Pick a Nova, complete their onboarding quest and join their <br/> community to help them rise up the Nova leaderboard </>
+  ),
   novaCards: [
     {
       front: {
