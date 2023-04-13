@@ -5,6 +5,8 @@ import { memo, useEffect, useState } from "react";
 import AutCard from "./card";
 import { ShowcaseData } from "common/data";
 import { Grid } from "./showcase.style";
+import ConcentricImage from "common/assets/image/ConcentricImage.svg";
+import Button from "common/components/Button";
 import { fetchMetadata } from "@aut-labs-private/sdk";
 import axios from "axios";
 import AutLoading from "common/components/AutLoading";
@@ -37,7 +39,6 @@ export function ipfsCIDToHttpUrl(url) {
 const NovaShowcase = ({ connectedState }) => {
   const router = useRouter();
   const { title, subtitle } = ShowcaseData;
-
   const [daoList, setDaoList] = useState(null);
   const [highlightedDaoCache, setHighlightedDaoCache] = useState(null);
 
@@ -60,7 +61,16 @@ const NovaShowcase = ({ connectedState }) => {
         `${process.env.NEXT_PUBLIC_API_URL}/autID/user/daos`
       );
 
-      const daos = response.data;
+      const daos = response.data?.filter((dao) => {
+        let foundActiveQuest = false;
+        for (let j = 0; j < dao.quests.length; j++) {
+          const quest = dao.quests[j];
+          if (quest.active) {
+            foundActiveQuest = true;
+          }
+        }
+        return foundActiveQuest;
+      });
 
       const daoData = [];
 
@@ -86,7 +96,6 @@ const NovaShowcase = ({ connectedState }) => {
         daoData.push(daoModel);
       }
       setDaoList(daoData);
-      console.log(daoData);
     };
     fetchData();
   }, []);
@@ -143,21 +152,39 @@ const NovaShowcase = ({ connectedState }) => {
           </Typography>
         </div>
         {daoList ? (
-          <Grid>
-            {daoList.map((dao, i) => {
-              return (
-                <div
-                  key={i}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
-                  <AutCard
-                    daoData={dao}
-                    highlightData={checkIsHighlighted(dao.daoAddress)}
-                  ></AutCard>
-                  {/* <Button
+          <>
+            {daoList.length === 0 ? (
+              <Typography
+                textAlign="center"
+                zIndex="1"
+                mt="0"
+                px={{
+                  _: "12px",
+                  sm: "0",
+                }}
+                mb={{
+                  _: "60px",
+                }}
+                as="subtitle1"
+              >
+                No Novas found
+              </Typography>
+            ) : (
+              <Grid>
+                {daoList.map((dao, i) => {
+                  return (
+                    <div
+                      key={i}
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                      }}
+                    >
+                      <AutCard
+                        daoData={dao}
+                        highlightData={checkIsHighlighted(dao.daoAddress)}
+                      ></AutCard>
+                      {/* <Button
                     style={{
                       marginTop: "24px",
                       marginBottom: "24px",
@@ -182,10 +209,12 @@ const NovaShowcase = ({ connectedState }) => {
                     colors="primary"
                     onClick={() => viewDao(dao.daoAddress)}
                   /> */}
-                </div>
-              );
-            })}
-          </Grid>
+                    </div>
+                  );
+                })}
+              </Grid>
+            )}
+          </>
         ) : (
           <LoadingContainer>
             <AutLoading width="130px" height="130px" />
