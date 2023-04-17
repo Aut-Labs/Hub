@@ -1,0 +1,10 @@
+.sw-category-wrapper {
+  width: 100%;
+
+  .sw-category-options {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    grid-gap: 20px;
+  }
+}

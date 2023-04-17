@@ -1,0 +1,40 @@
+.sw-description-wrapper {
+  width: 100%;
+  margin: 0 auto;
+
+  .sw-form-field {
+    width: 100%;
+
+    + .sw-form-field {
+      margin-top: 15px;
+    }
+  }
+
+  .sw-form-field-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    grid-gap: 20px;
+
+    .MuiFormControl-root {
+      flex: 1;
+    }
+
+    .MuiFormHelperText-root {
+      text-align: end;
+      margin-right: 0;
+    }
+
+    .MuiInputBase-root {
+      color: $primary-color;
+      input {
+        text-align: center !important;
+      }
+
+      &::before,
+      &::after {
+        border-bottom: 2px solid $primary-color;
+      }
+    }
+  }
+}

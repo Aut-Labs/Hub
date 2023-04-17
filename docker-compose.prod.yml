@@ -1,13 +1,14 @@
-version: '3.9'
-services:
-  nova_showcase_prod: 
-    container_name: nova_showcase_prod
-    image: nova_showcase_prod
-    build: ./
+version: '3.7'
 
-  nova_showcase_nginx_prod:
-    container_name: nova_showcase_nginx_prod
-    image: nova_showcase_nginx_prod
-    build: ./nginx/prod
+services:
+
+  aut_dashboard_prod:
+    container_name: aut_dashboard_prod
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - '.:/app'
+      - '/app/node_modules'
     ports:
-      - 4002:9080
+      - '3333:80'

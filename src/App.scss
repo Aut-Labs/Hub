@@ -1,0 +1,149 @@
+@import "react-perfect-scrollbar/dist/css/styles.css";
+
+.sw-background.loading {
+  filter: blur(5px);
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.33);
+  }
+  80%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes pulse-dot {
+  0% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0.8);
+  }
+}
+
+* {
+  /* Text rendering */
+  text-rendering: optimizeLegibility;
+  -o-text-rendering: optimizeLegibility;
+  -ms-text-rendering: optimizeLegibility;
+  -moz-text-rendering: optimizeLegibility;
+  -webkit-text-rendering: optimizeLegibility;
+  -webkit-tap-highlight-color: transparent;
+
+  /* Remove the focus ring */
+  &:focus {
+    outline: none !important;
+  }
+}
+
+/* HTML and Body default styles */
+html,
+body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 100%;
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+}
+
+/* Font size */
+html {
+  font-family: "FractulRegular", sans-serif;
+  background-color: #262626;
+  height: 100%;
+  font-size: 16px;
+
+  &:before {
+    content: " ";
+    display: block;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: transparent url("./assets/noise.png") 0% 0% no-repeat
+      padding-box;
+    mix-blend-mode: overlay;
+    opacity: 0.5;
+    background-position: center;
+    background-size: cover;
+  }
+
+  body,
+  #root {
+    margin: 0;
+    height: 100%;
+    background: transparent;
+    overflow: hidden;
+  }
+
+  // body {
+  //   &:before {
+  //     content: " ";
+  //     display: block;
+  //     position: absolute;
+  //     filter: blur(50px);
+  //     -webkit-filter: blur(50px);
+  //     transform: rotate(-105deg);
+  //     left: -750px;
+  //     z-index: -1;
+  //     bottom: -900px;
+  //     width: 1000px;
+  //     height: 1000px;
+  //     background-image: url("./assets/bubble.svg");
+  //   }
+
+  //   &:after {
+  //     content: " ";
+  //     display: block;
+  //     position: absolute;
+  //     filter: blur(50px);
+  //     -webkit-filter: blur(50px);
+  //     right: 0;
+  //     z-index: -1;
+  //     top: -600px;
+  //     width: 600px;
+  //     height: 800px;
+  //     background-image: url("./assets/bubble.svg");
+  //   }
+  // }
+}
+
+.bg-card {
+  background-color: #1e293b;
+}
+
+.bg-default {
+  background-color: #0f172a;
+}
+
+.text-default {
+  color: #ffffff;
+}
+
+.text-secondary {
+  color: rgb(148, 163, 184);
+}
+
+.text-disable {
+  color: #475569;
+}
+
+.border, .divider {
+  border-color: rgba(241,245,249,.12);
+}
+
+.spinner-center {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  top: 50%;
+}

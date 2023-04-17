@@ -1,0 +1,56 @@
+.sw-tasks-base-container {
+  height: 100%;
+
+  .sw-box {
+    height: 100%;
+  }
+
+  .tasks-loading-spinner,
+  .no-tasks {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 50%;
+  }
+
+  .submit-action {
+    display: flex;
+    align-items: flex-end;
+    flex-direction: column;
+    justify-content: flex-end;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  .MuiInputBase-root {
+    color: #000;
+  }
+
+  .task-group {
+    min-height: 160px;
+    position: relative;
+
+    + .task-group {
+      margin-top: 20px;
+    }
+  }
+
+  .upload-file {
+    display: flex;
+    align-items: center;
+    grid-gap: 15px;
+    margin-top: 30px;
+  }
+}
+// .refreshing-loading-spinner {
+//   position: absolute;
+//   left: 10px;
+//   bottom: 10px;
+//   text-align: center;
+// }
+
+// .create-task-btn {
+//   position: absolute;
+//   right: 10px;
+//   bottom: 10px;
+// }
