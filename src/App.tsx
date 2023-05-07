@@ -2,10 +2,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { Box } from "@mui/material";
-import { Route, Routes, useLocation, Navigate } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { useAppDispatch } from "@store/store.model";
 import SWSnackbar from "./components/snackbar";
-import Web3DautConnect from "@api/ProviderFactory/web3-daut-connect";
 import { NetworkConfig } from "@api/ProviderFactory/network.config";
 import { environment } from "@api/environment";
 import { ethers } from "ethers";
@@ -15,12 +14,10 @@ import { setNetworks } from "@store/WalletProvider/WalletProvider";
 import { getAppConfig } from "@api/aut.api";
 import AutSDK from "@aut-labs-private/sdk";
 import { IsAuthenticated } from "@auth/auth.reducer";
-import AutDashboardMain from "./pages/AutDashboardMain";
-import GetStarted from "./pages/GetStarted/GetStarted";
-import AutLoading from "@components/AutLoading";
 import ErrorPage from "@components/ErrorPage";
-import Callback from "./pages/Oauth2Callback/Callback";
-import NetworkResolver from "./pages/PublicQuest/NetworkResolver";
+import { ToolbarConnector } from "./pages/PublicQuest/ToolbarConnector";
+import QuestDetails from "./pages/PublicQuest/QuestDetails";
+import { DaoList } from "./pages/PublicQuest/DaoList";
 
 const generateConfig = (networks: NetworkConfig[]): Config => {
   const enabled_networks = networks.filter((n) => !n.disabled);
@@ -72,7 +69,6 @@ const generateConfig = (networks: NetworkConfig[]): Config => {
 
 function App() {
   const dispatch = useAppDispatch();
-  const [isLoading, setLoading] = useState(true);
   const [config, setConfig] = useState<Config>();
   const [error, setError] = useState(false);
   const isAutheticated = useSelector(IsAuthenticated);
@@ -81,8 +77,8 @@ function App() {
   const returnUrl = useMemo(() => {
     if (!isAutheticated) return "/";
     const shouldGoToDashboard =
-      location.pathname === "/" || !location.pathname.includes("aut-dashboard");
-    const goTo = shouldGoToDashboard ? "/aut-dashboard" : location.pathname;
+      location.pathname === "/" || !location.pathname.includes("quest");
+    const goTo = shouldGoToDashboard ? "/quest" : location.pathname;
     const url = location.state?.from;
     return url || goTo;
   }, [isAutheticated]);
@@ -108,40 +104,22 @@ function App() {
       {!error && config && (
         <>
           <DAppProvider config={config}>
-            <Web3DautConnect config={config} setLoading={setLoading} />
             <Box
               sx={{
                 height: "100%",
                 backgroundColor: "transparent"
               }}
-              className={isLoading ? "sw-loading" : ""}
             >
-              {isLoading ? (
-                <AutLoading />
-              ) : (
-                <Routes>
-                  <Route path="callback" element={<Callback />} />
-                  {!isAutheticated && (
-                    <>
-                      <Route path="/" element={<GetStarted />} />
-                      <Route path="/quest/*" element={<NetworkResolver />} />
-                      <Route
-                        path="*"
-                        element={<Navigate to="/" state={{ from: location }} />}
-                      />
-                    </>
-                  )}
-                  {isAutheticated && (
-                    <>
-                      <Route
-                        path="aut-dashboard/*"
-                        element={<AutDashboardMain />}
-                      />
-                      <Route path="*" element={<Navigate to={returnUrl} />} />
-                    </>
-                  )}
-                </Routes>
-              )}
+              <ToolbarConnector />
+              <Routes>
+                <Route path="/" element={<DaoList />} />
+                {isAutheticated && (
+                  <>
+                    <Route path="quest/*" element={<QuestDetails />} />
+                    <Route path="" element={<Navigate to={returnUrl} />} />
+                  </>
+                )}
+              </Routes>
             </Box>
           </DAppProvider>
         </>

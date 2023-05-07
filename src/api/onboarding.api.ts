@@ -221,7 +221,7 @@ const applyForQuest = async (
     };
   }
   return {
-    data: response.data
+    data: body.questId
   };
 };
 
@@ -779,7 +779,7 @@ export const onboardingApi = createApi({
       invalidatesTags: ["Quests", "Tasks"]
     }),
     applyForQuest: builder.mutation<
-      boolean,
+      number,
       {
         questId: number;
         onboardingQuestAddress: string;

@@ -44,8 +44,10 @@ const QuestInfo = ({
   const confirm = useConfirmDialog();
   const [hasUserCompletedQuest, { data: isQuestComplete }] =
     useLazyHasUserCompletedQuestQuery();
-  const [apply, { isLoading: isApplying, isError, error, reset, isSuccess }] =
-    useApplyForQuestMutation();
+  const [
+    apply,
+    { data, isLoading: isApplying, isError, error, reset, isSuccess }
+  ] = useApplyForQuestMutation();
 
   const { data: quest } = useGetOnboardingQuestByIdQuery(
     {
@@ -83,7 +85,7 @@ const QuestInfo = ({
       addDays(new Date(quest.startDate), quest.durationInDays)
     );
   }, [quest]);
-
+  // Use this stuff
   const canApplyForAQuest = useMemo(() => {
     return !isOwner && !cache && !!hasQuestStarted && !hasQuestEnded;
   }, [cache, hasQuestStarted, hasQuestEnded, isOwner]);
@@ -346,6 +348,9 @@ const QuestInfo = ({
             gridTemplateColumns: "1fr 2fr"
           }}
         >
+          {
+            // Also rip that off
+          }
           <BetaCountdown
             textAlign="left"
             hasStarted={hasQuestStarted}

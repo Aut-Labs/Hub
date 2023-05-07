@@ -435,6 +435,55 @@ const getCommunity = async (daoAddress: string, api: BaseQueryApi) => {
   };
 };
 
+const getAllNovas = async (body: any, api: BaseQueryApi) => {
+  const response = await axios.get(`${environment.apiUrl}/autID/user/daos`);
+
+  const daos = response.data?.filter((dao) => {
+    let foundActiveQuest = false;
+    for (let j = 0; j < dao.quests.length; j++) {
+      const quest = dao.quests[j];
+      if (quest.active) {
+        foundActiveQuest = true;
+      }
+    }
+    return foundActiveQuest;
+  });
+
+  const daoData = [];
+
+  for (let i = 0; i < daos.length; i++) {
+    const dao = daos[i];
+    // prettier-ignore
+    const metadata =
+      await fetchMetadata(dao.daoMetadataUri, environment.nftStorageUrl);
+    const daoModel = metadata;
+    (daoModel as any).daoAddress = dao.daoAddress;
+    (daoModel as any).onboardingQuestAddress = dao.onboardingQuestAddress;
+    (daoModel as any).properties.quests = [];
+
+    for (let j = 0; j < dao.quests.length; j++) {
+      const quest = dao.quests[j];
+      const questMetadata = await fetchMetadata(
+        quest.metadataUri,
+        environment.nftStorageUrl
+      );
+      quest.metadata = questMetadata;
+      (daoModel as any).properties.quests.push(quest);
+    }
+    daoData.push(daoModel);
+  }
+  // setDaoList(daoData);
+  return {
+    data: { daos: daoData }
+  };
+};
+
+interface DaoModel {
+  daoAddress: string;
+  onboardingQuestAddress: string;
+  properties: any;
+}
+
 export const communityApi = createApi({
   reducerPath: "communityApi",
   baseQuery: async (args, api, extraOptions) => {
@@ -445,6 +494,10 @@ export const communityApi = createApi({
 
     if (url === "getCommunity") {
       return getCommunity(body, api);
+    }
+
+    if (url === "getAllNovas") {
+      return getAllNovas(body, api);
     }
     return {
       data: "Test"
@@ -472,8 +525,25 @@ export const communityApi = createApi({
           url: "getCommunity"
         };
       }
+    }),
+    getAllNovas: builder.query<
+      {
+        daos: any;
+      },
+      void
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "getAllNovas"
+        };
+      }
     })
   })
 });
 
-export const { useGetAllMembersQuery, useGetCommunityQuery } = communityApi;
+export const {
+  useGetAllMembersQuery,
+  useGetCommunityQuery,
+  useGetAllNovasQuery
+} = communityApi;

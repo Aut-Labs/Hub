@@ -116,6 +116,18 @@ export default (theme: Theme) =>
   ({
     ...theme.components.MuiButton,
     styleOverrides: {
+      squareOffWhite: {
+        borderColor: theme.palette.divider,
+        "&:hover": {
+          backgroundColor: theme.palette.offWhite.main,
+          color: theme.palette.nightBlack.main
+        },
+        "&.Mui-disabled": {
+          borderColor: theme.palette.divider,
+          color: theme.palette.offWhite.main,
+          opacity: "0.5"
+        }
+      },
       outlinedOffWhite: {
         borderColor: theme.palette.divider,
         "&:hover": {
