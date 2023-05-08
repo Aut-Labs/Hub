@@ -27,6 +27,10 @@ import { communityUpdateState } from "@store/Community/community.reducer";
 import { useAppDispatch } from "@store/store.model";
 import { useApplyForQuestMutation } from "@api/onboarding.api";
 import { useEthers } from "@usedapp/core";
+import ErrorDialog from "@components/Dialog/ErrorPopup";
+import { el } from "date-fns/locale";
+import { set } from "date-fns";
+import SuccessDialog from "@components/Dialog/SuccessPopup";
 
 const TOOLBAR_HEIGHT = 84;
 
@@ -51,6 +55,9 @@ export const DaoList = () => {
     refetchOnMountOrArgChange: true,
     skip: false
   });
+  const [alreadyApplied, setAlreadyApplied] = useState(false);
+  const [openApplySuccess, setOpenApplySuccess] = useState(false);
+
   const [cache, setCache] = useState<CacheModel>(null);
 
   useEffect(() => {
@@ -64,8 +71,18 @@ export const DaoList = () => {
     };
     if (authenticated) {
       fetchCache();
+    } else {
+      setCache(null);
     }
   }, [authenticated]);
+
+  // useEffect(() => {
+  //   console.log("authenticated", authenticated);
+  //   if (!authenticated) {
+  //     console.log("reset cache");
+  //     setCache(null);
+  //   }
+  // }, [authenticated]);
 
   // const checkIsHighlighted = (daoAddress) => {
   //   let highlightedDaoCache;
@@ -99,7 +116,7 @@ export const DaoList = () => {
     } else {
       return {
         daoAddress: null,
-        highlighted: false,
+        highlighted: searchParams.get("daoAddress") === daoAddress,
         questId: null
       };
     }
@@ -170,7 +187,12 @@ export const DaoList = () => {
     };
     const start = async () => {
       if (questToApply && connectStatus === "connected") {
-        applyToQuest();
+        const cache = await getCache(CacheTypes.UserPhases);
+        if (cache && cache.questId) {
+          setAlreadyApplied(true);
+        } else {
+          applyToQuest();
+        }
       } else if (questToApply && connectStatus === "initial") {
         dispatch(changeConnectStatus("start"));
       }
@@ -180,6 +202,7 @@ export const DaoList = () => {
 
   useEffect(() => {
     if (isSuccess) {
+      setOpenApplySuccess(true);
       const start = async () => {
         try {
           const updatedCache = await updateCache({
@@ -231,6 +254,23 @@ export const DaoList = () => {
       }}
     >
       <Container maxWidth="lg" sx={{ py: "20px" }}>
+        <ErrorDialog
+          handleClose={() => {
+            setAlreadyApplied(false);
+          }}
+          open={alreadyApplied}
+          message={"You have already applied for a quest."}
+        />
+        <SuccessDialog
+          open={openApplySuccess}
+          message="Congrats!"
+          titleVariant="h2"
+          subtitle="Whoop! You successfully applied for the quest!"
+          subtitleVariant="subtitle1"
+          handleClose={() => {
+            setOpenApplySuccess(false);
+          }}
+        ></SuccessDialog>
         <Box
           sx={{
             display: "flex",

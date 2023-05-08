@@ -10,7 +10,8 @@ import {
   CardContent,
   CardHeader,
   IconButton,
-  Stack
+  Stack,
+  Button
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import { memo, useMemo } from "react";
@@ -205,40 +206,42 @@ const TaskCard = ({
             <OverflowTooltip maxLine={4} text={row.metadata?.description} />
           </Stack>
 
-          {/* <Box
+          <Box
             sx={{
               width: "100%",
               display: "flex"
             }}
           >
-            {plugin.pluginDefinitionId ===
-              PluginDefinitionType.OnboardingOpenTaskPlugin && (
-              <Button
-                sx={{
-                  width: "80%",
-                  mt: 6,
-                  mb: 4,
-                  mx: "auto"
-                }}
-                onClick={() => {
-                  navigate({
-                    pathname: `/aut-dashboard/modules/Task/OnboardingOpenTaskPlugin/${row.taskId}/submissions`,
-                    search: new URLSearchParams({
-                      onboardingQuestAddress,
-                      returnUrlLinkName: "Back to quest",
-                      returnUrl: `/aut-dashboard/modules/OnboardingStrategy/QuestOnboardingPlugin/${questId}`,
-                      questId: `${questId}`
-                    }).toString()
-                  });
-                }}
-                size="large"
-                variant="outlined"
-                color="offWhite"
-              >
-                Submissions
-              </Button>
-            )}
-          </Box> */}
+            <Button
+              sx={{
+                width: "80%",
+                mt: 6,
+                mb: 4,
+                mx: "auto"
+              }}
+              onClick={() => {
+                navigate({
+                  pathname: `/quest/${path}/${row.taskId}`,
+                  search: new URLSearchParams({
+                    questId: searchParams.get(RequiredQueryParams.QuestId),
+                    onboardingQuestAddress: searchParams.get(
+                      RequiredQueryParams.OnboardingQuestAddress
+                    ),
+                    daoAddress: searchParams.get(
+                      RequiredQueryParams.DaoAddress
+                    ),
+                    returnUrlLinkName: "Back to quest",
+                    returnUrl: `${location?.pathname}${location?.search}`
+                  }).toString()
+                });
+              }}
+              size="large"
+              variant="outlined"
+              color="offWhite"
+            >
+              Go to task
+            </Button>
+          </Box>
         </CardContent>
       </GridCard>
     </>

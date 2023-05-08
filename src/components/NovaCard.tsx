@@ -347,8 +347,8 @@ export const NovaCard = ({
                     </div>
                     <div
                       style={{
-                        display: "flex-end",
-                        justifyContent: "center",
+                        display: "flex",
+                        justifyContent: "flex-end",
                         width: "120px"
                       }}
                     >

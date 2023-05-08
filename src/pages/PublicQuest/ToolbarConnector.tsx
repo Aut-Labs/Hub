@@ -144,8 +144,14 @@ export const ToolbarConnector = () => {
     setIsLoading(false);
     setIsOpen(false);
     dispatch(changeConnectStatus("disconnected"));
+    dispatch(
+      setAuthenticated({
+        isAuthenticated: false,
+        userInfo: {}
+      })
+    );
     // exclude the rest of the app data (main page)
-    // dispatch(resetState);
+    dispatch(resetState);
     localStorage.removeItem(AUTH_TOKEN_KEY);
   };
 
@@ -165,14 +171,6 @@ export const ToolbarConnector = () => {
 
   return (
     <Box>
-      {/* <ErrorDialog
-        handleClose={() => {
-          // handle error
-        }}
-        open={isError}
-        message={error}
-      /> */}
-      {/* USE THIS TO FORCE AUTHERNTICATION WHEN SLECTING NOVA QUESTS */}
       <DialogWrapper open={isOpen} onClose={closeAndDisconnect}>
         <>
           <AppTitle

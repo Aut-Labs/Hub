@@ -340,11 +340,6 @@ const TaskCard = ({
           subheaderTypographyProps={{
             color: "white"
           }}
-          action={
-            <IconButton color="offWhite">
-              <EditIcon />
-            </IconButton>
-          }
           title={plugin?.metadata?.properties?.title}
         />
         <CardContent

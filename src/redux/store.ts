@@ -29,7 +29,11 @@ type RootState = ReturnType<typeof reducers>;
 
 const rootReducer = (state: RootState, action: Action) => {
   if (action.type === "RESET_ALL") {
-    state = undefined;
+    state = {
+      communityApi: state.communityApi,
+      walletProvider: state.walletProvider,
+      auth: state.auth
+    } as RootState;
   }
   return reducers(state, action);
 };

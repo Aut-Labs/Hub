@@ -3,12 +3,14 @@ import {
   useLazyHasUserCompletedQuestQuery,
   useWithdrawFromAQuestMutation
 } from "@api/onboarding.api";
+import { isAuthenticated } from "@auth/auth.reducer";
 import { LoadingButton } from "@mui/lab";
 import { Stack, CircularProgress, Tooltip, Button } from "@mui/material";
 import { useEthers } from "@usedapp/core";
 import { isAfter, addDays } from "date-fns";
 import { useMemo, useEffect } from "react";
 import { useConfirmDialog } from "react-mui-confirm";
+import { useSelector } from "react-redux";
 
 export const ApplyOrWithdrawFromQuest = ({
   daoData,
@@ -22,6 +24,7 @@ export const ApplyOrWithdrawFromQuest = ({
   const [hasUserCompletedQuest, { data: isQuestComplete }] =
     useLazyHasUserCompletedQuestQuery();
   // const [cache, setCache] = useState<CacheModel>(null);
+  const authenticated = useSelector(isAuthenticated);
   const confirm = useConfirmDialog();
   const { account } = useEthers();
   const isOwner = useMemo(() => {
@@ -42,7 +45,7 @@ export const ApplyOrWithdrawFromQuest = ({
       addDays(new Date(quest.startDate), quest.durationInDays)
     );
   }, [quest]);
-  // Use this stuff
+
   const canApplyForAQuest = useMemo(() => {
     return !isOwner && !cache && !!hasQuestStarted && !hasQuestEnded;
   }, [cache, hasQuestStarted, hasQuestEnded, isOwner]);
@@ -108,7 +111,9 @@ export const ApplyOrWithdrawFromQuest = ({
           console.log(error);
         }
       };
-      start();
+      if (authenticated) {
+        start();
+      }
     }
   }, [isQuestComplete]);
 
@@ -135,7 +140,9 @@ export const ApplyOrWithdrawFromQuest = ({
         console.log(error);
       }
     };
-    start();
+    if (authenticated) {
+      start();
+    }
   }, []);
 
   return (
@@ -192,7 +199,9 @@ export const ApplyOrWithdrawFromQuest = ({
       {!canApplyForAQuest && !hasAppliedForQuest && (
         <Tooltip
           title={
-            !hasQuestStarted
+            hasQuestEnded
+              ? "Quest has ended"
+              : !hasQuestStarted
               ? "Quest hasn't started yet"
               : "Already applied to another quest"
           }
