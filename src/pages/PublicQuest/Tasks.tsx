@@ -1,60 +1,35 @@
-import { Quest, Task } from "@aut-labs-private/sdk";
+import { Task } from "@aut-labs-private/sdk";
 import {
-  Badge,
   Box,
-  Paper,
-  Table,
-  TableBody,
   TableCell,
-  TableContainer,
-  Link as BtnLink,
-  TableHead,
   TableRow,
-  Tooltip,
   Typography,
   styled,
   tableCellClasses,
-  Chip,
-  Button,
   Card,
-  CardActionArea,
   CardContent,
   CardHeader,
   IconButton,
   Stack
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import { memo, useMemo } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import {
+  useNavigate,
+  useSearchParams,
+  useLocation,
+  useParams
+} from "react-router-dom";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import { TaskStatus, TaskType } from "@aut-labs-private/sdk/dist/models/task";
 import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
-import CopyAddress from "@components/CopyAddress";
-import LinkWithQuery from "@components/LinkWithQuery";
 import OverflowTooltip from "@components/OverflowTooltip";
 import AutLoading from "@components/AutLoading";
 import { useRemoveTaskFromQuestMutation } from "@api/onboarding.api";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import { differenceInDays } from "date-fns";
 import { useConfirmDialog } from "react-mui-confirm";
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover
-  },
-  "&:last-child td, &:last-child th": {
-    border: 0
-  }
-}));
-
-const TaskStyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}, &.${tableCellClasses.body}`]: {
-    color: theme.palette.common.white,
-    borderColor: theme.palette.divider
-  }
-}));
+import { RequiredQueryParams } from "@api/RequiredQueryParams";
 
 export const taskStatuses: any = {
   [TaskStatus.Created]: {
@@ -94,134 +69,6 @@ const taskTypes = {
   }
 };
 
-const TaskListItem = memo(
-  ({
-    row,
-    quest,
-    hasAppliedForQuest,
-    hasQuestStarted
-  }: {
-    row: Task;
-    quest: Quest;
-    hasQuestStarted: boolean;
-    hasAppliedForQuest: boolean;
-  }) => {
-    const location = useLocation();
-    const params = useParams<{ questId: string }>();
-
-    const { plugin } = useGetAllPluginDefinitionsByDAOQuery(null, {
-      selectFromResult: ({ data }) => ({
-        plugin: (data || []).find(
-          (p) => taskTypes[row.taskType].pluginType === p.pluginDefinitionId
-        )
-      })
-    });
-
-    const path = useMemo(() => {
-      if (!plugin) return;
-      return `task/${PluginDefinitionType[plugin.pluginDefinitionId]}`;
-    }, [plugin]);
-
-    return (
-      <StyledTableRow
-        sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-      >
-        <TaskStyledTableCell component="th" scope="row">
-          <span
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gridGap: "8px"
-            }}
-          >
-            <Box>
-              <Badge
-                invisible={!!row.metadata?.name}
-                badgeContent={
-                  <Tooltip title="Something went wrong fetching ipfs metadata. This does not affect the contract interactions">
-                    <ErrorOutlineIcon
-                      color="error"
-                      sx={{
-                        width: {
-                          sm: "16px"
-                        }
-                      }}
-                    />
-                  </Tooltip>
-                }
-              >
-                <Tooltip
-                  disableHoverListener={
-                    !quest?.active || !hasAppliedForQuest || !hasQuestStarted
-                  }
-                  title={
-                    !quest?.active || !hasAppliedForQuest || !hasQuestStarted
-                      ? ""
-                      : "View task details"
-                  }
-                >
-                  <BtnLink
-                    variant="subtitle2"
-                    sx={{
-                      color: "primary.light",
-                      "&:hover": {
-                        textDecoration:
-                          !quest?.active ||
-                          !hasAppliedForQuest ||
-                          !hasQuestStarted
-                            ? "unset"
-                            : "underline"
-                      }
-                    }}
-                    {...(quest?.active &&
-                      hasQuestStarted &&
-                      hasAppliedForQuest && {
-                        to: `/quest/${path}/${row.taskId}`,
-                        preserveParams: true,
-                        queryParams: {
-                          onboardingQuestAddress: plugin?.pluginAddress,
-                          returnUrlLinkName: "Back to quest",
-                          returnUrl: `${location?.pathname}${location?.search}`,
-                          questId: params.questId
-                        },
-                        component: LinkWithQuery
-                      })}
-                  >
-                    {row.metadata?.name || "n/a"}
-                  </BtnLink>
-                </Tooltip>
-              </Badge>
-            </Box>
-            <OverflowTooltip
-              typography={{
-                maxWidth: "300px"
-              }}
-              text={row.metadata?.description}
-            />
-          </span>
-        </TaskStyledTableCell>
-        <TaskStyledTableCell align="right">
-          <CopyAddress address={row.creator} />
-          <BtnLink
-            color="primary.light"
-            variant="caption"
-            target="_blank"
-            href={`https://my.aut.id/${row.creator}`}
-          >
-            View profile
-          </BtnLink>
-        </TaskStyledTableCell>
-        <TaskStyledTableCell align="right">
-          <Chip {...taskStatuses[row.status]} size="small" />
-        </TaskStyledTableCell>
-        <TaskStyledTableCell align="right">
-          {taskTypes[row.taskType]?.label}
-        </TaskStyledTableCell>
-      </StyledTableRow>
-    );
-  }
-);
-
 // interface TasksParams {
 //   isLoading: boolean;
 //   tasks: Task[];
@@ -256,6 +103,7 @@ const TaskCard = ({
   const params = useParams<{ questId: string }>();
   const navigate = useNavigate();
   const confirm = useConfirmDialog();
+  const [searchParams] = useSearchParams();
   const [removeTask, { error, isError, isLoading, reset }] =
     useRemoveTaskFromQuestMutation();
 
@@ -314,7 +162,20 @@ const TaskCard = ({
           action={
             <IconButton
               onClick={() => {
-                navigate(`/quest/${path}/${row.taskId}`);
+                navigate({
+                  pathname: `/quest/${path}/${row.taskId}`,
+                  search: new URLSearchParams({
+                    questId: searchParams.get(RequiredQueryParams.QuestId),
+                    onboardingQuestAddress: searchParams.get(
+                      RequiredQueryParams.OnboardingQuestAddress
+                    ),
+                    daoAddress: searchParams.get(
+                      RequiredQueryParams.DaoAddress
+                    ),
+                    returnUrlLinkName: "Back to quest",
+                    returnUrl: `${location?.pathname}${location?.search}`
+                  }).toString()
+                });
               }}
               color="offWhite"
             >

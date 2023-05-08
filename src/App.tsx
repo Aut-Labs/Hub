@@ -113,6 +113,9 @@ function App() {
               <ToolbarConnector />
               <Routes>
                 <Route path="/" element={<DaoList />} />
+                {!isAutheticated && (
+                  <Route path="*" element={<Navigate to="/" />} />
+                )}
                 {isAutheticated && (
                   <>
                     <Route path="quest/*" element={<QuestDetails />} />

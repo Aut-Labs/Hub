@@ -88,7 +88,6 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
     control
   });
 
-  console.log(task, "task");
   const [submitJoinDiscordTask, { error, isError, isLoading, reset }] =
     useSubmitJoinDiscordTaskMutation();
 

@@ -76,8 +76,6 @@ const QuestDetails = () => {
     }, {});
   }, [plugins]);
 
-  console.log(taskPluginTypes);
-
   return (
     <PerfectScrollbar
       style={{
