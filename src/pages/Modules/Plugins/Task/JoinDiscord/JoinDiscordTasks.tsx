@@ -7,7 +7,7 @@ import { StepperButton } from "@components/Stepper";
 import { Box, Button, Chip, Container, Stack, Typography } from "@mui/material";
 import { AutTextField } from "@theme/field-text-styles";
 import { pxToRem } from "@utils/text-size";
-import { memo, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
@@ -15,18 +15,21 @@ import { dateToUnix } from "@utils/date-format";
 import { addMinutes } from "date-fns";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { useSelector } from "react-redux";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import DoneIcon from "@mui/icons-material/Done";
 import {
   DiscordLink,
   IsDiscordVerified
 } from "@store/Community/community.reducer";
 import DiscordServerVerificationPopup from "@components/Dialog/DiscordServerVerificationPopup";
 import LinkWithQuery from "@components/LinkWithQuery";
+import { countWords } from "@utils/helpers";
 
 const errorTypes = {
-  maxWords: `Words cannot be more than 3`,
+  maxWords: `Words cannot be more than 6`,
   maxNameChars: `Characters cannot be more than 24`,
-  maxLength: `Characters cannot be more than 280`
+  maxLength: `Characters cannot be more than 257`
 };
 
 interface PluginParams {
@@ -107,6 +110,7 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
   const isDiscordVerified = useSelector(IsDiscordVerified);
   const inviteLink = useSelector(DiscordLink);
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [discordDialogOpen, setDiscordDialogOpen] = useState(false);
   const { control, handleSubmit, getValues, formState } = useForm({
     mode: "onChange",
@@ -144,221 +148,255 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
     });
   };
 
+  useEffect(() => {
+    if (isSuccess) {
+      navigate({
+        pathname: `/aut-dashboard/modules/OnboardingStrategy/QuestOnboardingPlugin/${+searchParams.get(
+          RequiredQueryParams.QuestId
+        )}`
+      });
+    }
+  }, [isSuccess]);
+
   return (
-    <>
-      {isSuccess ? (
-        <TaskSuccess reset={reset} pluginId={data?.taskId} />
-      ) : (
-        <Container
-          sx={{ py: "20px", display: "flex", flexDirection: "column" }}
-          maxWidth="lg"
-          component="form"
-          autoComplete="off"
-          onSubmit={handleSubmit(onSubmit)}
-        >
-          <DiscordServerVerificationPopup
-            open={discordDialogOpen}
-            handleClose={() => setDiscordDialogOpen(false)}
-          ></DiscordServerVerificationPopup>
-          <ErrorDialog
-            handleClose={() => reset()}
-            open={isError}
-            message={error}
-          />
-          <LoadingDialog open={isLoading} message="Creating task..." />
+    <Container
+      sx={{ py: "20px", display: "flex", flexDirection: "column" }}
+      maxWidth="lg"
+      component="form"
+      autoComplete="off"
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      <DiscordServerVerificationPopup
+        open={discordDialogOpen}
+        handleClose={() => setDiscordDialogOpen(false)}
+      ></DiscordServerVerificationPopup>
+      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
+      <LoadingDialog open={isLoading} message="Creating task..." />
 
-          <Box
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,
+          mb: 4,
+          position: "relative",
+          mx: "auto",
+          width: "100%"
+        }}
+      >
+        <Stack alignItems="center" justifyContent="center">
+          <Button
+            startIcon={<ArrowBackIosNewIcon />}
+            color="offWhite"
             sx={{
-              display: "flex",
-              flexDirection: "column",
-              flex: 1,
-              mb: 4,
-              position: "relative",
-              mx: "auto",
-              width: "100%"
+              position: {
+                sm: "absolute"
+              },
+              left: {
+                sm: "0"
+              }
             }}
+            to={searchParams.get("returnUrl")}
+            component={Link}
           >
-            <Stack alignItems="center" justifyContent="center">
-              <Button
-                startIcon={<ArrowBackIcon />}
-                color="offWhite"
-                sx={{
-                  position: {
-                    sm: "absolute"
-                  },
-                  left: {
-                    sm: "0"
-                  }
-                }}
-                to={searchParams.get("returnUrl")}
-                component={Link}
-              >
-                {searchParams.get("returnUrlLinkName") || "Back"}
-              </Button>
-              <Typography textAlign="center" color="white" variant="h3">
-                Creating Join Discord task
-              </Typography>
-            </Stack>
-
-            <Typography
-              className="text-secondary"
-              mt={2}
-              mx="auto"
-              textAlign="center"
-              color="white"
-              sx={{
-                width: {
-                  xs: "100%",
-                  sm: "600px",
-                  xxl: "800px"
-                }
-              }}
-              variant="body1"
-            >
-              Ask your community to Join your Discord Community.
+            {/* {searchParams.get("returnUrlLinkName") || "Back"} */}
+            <Typography color="white" variant="body">
+              Back
             </Typography>
-          </Box>
+          </Button>
+          <Typography textAlign="center" color="white" variant="h3">
+            Join Discord
+          </Typography>
+        </Stack>
+
+        <Typography
+          mt={2}
+          mx="auto"
+          textAlign="center"
+          color="white"
+          sx={{
+            width: {
+              xs: "100%",
+              sm: "700px",
+              xxl: "1000px"
+            }
+          }}
+          variant="body"
+        >
+          Ask your community to Join your Discord Community.
+        </Typography>
+      </Box>
+      <Stack
+        direction="column"
+        gap={8}
+        sx={{
+          margin: "0 auto",
+          width: {
+            xs: "100%",
+            sm: "650px",
+            xxl: "800px"
+          }
+        }}
+      >
+        {!isDiscordVerified && (
           <Stack
-            direction="column"
-            gap={4}
             sx={{
               margin: "0 auto",
               width: {
                 xs: "100%",
                 sm: "400px",
-                xxl: "800px"
+                xxl: "500px"
               }
             }}
           >
-            <Controller
-              name="title"
-              control={control}
-              rules={{
-                required: true
+            {/* <Typography
+              className="text-secondary"
+              mx="auto"
+              my={2}
+              textAlign="center"
+              color="white"
+              variant="body1"
+            >
+              Please verify the discord account for your community.
+            </Typography> */}
+            <Button
+              sx={{
+                textTransform: "uppercase"
               }}
-              render={({ field: { name, value, onChange } }) => {
-                return (
-                  <AutTextField
-                    variant="standard"
-                    color="offWhite"
-                    required
-                    autoFocus
-                    name={name}
-                    value={value || ""}
-                    onChange={onChange}
-                    placeholder="Title"
-                    helperText={
-                      <FormHelperText
-                        errorTypes={errorTypes}
-                        value={value}
-                        name={name}
-                        errors={formState.errors}
-                      />
-                    }
-                  />
-                );
-              }}
-            />
-
-            <Controller
-              name="description"
-              control={control}
-              rules={{
-                required: true
-              }}
-              render={({ field: { name, value, onChange } }) => {
-                return (
-                  <AutTextField
-                    name={name}
-                    value={value || ""}
-                    onChange={onChange}
-                    variant="outlined"
-                    color="offWhite"
-                    required
-                    multiline
-                    rows={5}
-                    placeholder="Write a personalised message to your community asking them to join your community."
-                    helperText={
-                      <FormHelperText
-                        errorTypes={errorTypes}
-                        value={value}
-                        name={name}
-                        errors={formState.errors}
-                      />
-                    }
-                  />
-                );
-              }}
-            />
-            {!isDiscordVerified && (
-              <Stack>
-                <Typography
-                  className="text-secondary"
-                  mx="auto"
-                  my={2}
-                  textAlign="center"
-                  color="white"
-                  variant="body1"
-                >
-                  Please verify the discord account for your community.
-                </Typography>
-                <Button
-                  sx={{
-                    mb: pxToRem(50)
-                  }}
-                  onClick={() => setDiscordDialogOpen(true)}
-                  type="button"
-                  variant="outlined"
-                  size="medium"
-                  color="offWhite"
-                >
-                  "Verify Discord
-                </Button>
-              </Stack>
-            )}
-
-            {isDiscordVerified && (
-              <Chip color="success" label="Discord Verified" />
-            )}
-
-            {/* <Controller
-              name="inviteUrl"
-              control={control}
-              rules={{
-                required: true
-              }}
-              render={({ field: { name, value, onChange } }) => {
-                return (
-                  <AutTextField
-                    variant="standard"
-                    color="offWhite"
-                    required
-                    name={name}
-                    value={value || ""}
-                    onChange={onChange}
-                    placeholder="1234"
-                    helperText={
-                      <FormHelperText
-                        value={value}
-                        name={name}
-                        errors={formState.errors}
-                      >
-                        Discord Invite
-                      </FormHelperText>
-                    }
-                  />
-                );
-              }}
-            /> */}
-
-            <StepperButton
-              label="Create Task"
-              disabled={!formState.isValid || !inviteLink}
-            />
+              onClick={() => setDiscordDialogOpen(true)}
+              type="button"
+              variant="outlined"
+              size="medium"
+              color="offWhite"
+            >
+              Connect your discord
+            </Button>
           </Stack>
-        </Container>
-      )}
-    </>
+        )}
+
+        {isDiscordVerified && (
+          <Chip icon={<DoneIcon />} color="success" label="Discord Verified" />
+        )}
+        <Controller
+          name="title"
+          control={control}
+          rules={{
+            required: true,
+            validate: {
+              maxWords: (v: string) => countWords(v) <= 6
+            }
+          }}
+          render={({ field: { name, value, onChange } }) => {
+            return (
+              <AutTextField
+                variant="standard"
+                color="offWhite"
+                required
+                autoFocus
+                name={name}
+                value={value || ""}
+                onChange={onChange}
+                placeholder="Title"
+                helperText={
+                  <FormHelperText
+                    errorTypes={errorTypes}
+                    value={value}
+                    name={name}
+                    errors={formState.errors}
+                  >
+                    <Typography color="white" variant="caption">
+                      {6 - countWords(value)} Words left
+                    </Typography>
+                  </FormHelperText>
+                }
+              />
+            );
+          }}
+        />
+
+        <Controller
+          name="description"
+          control={control}
+          rules={{
+            required: true
+          }}
+          render={({ field: { name, value, onChange } }) => {
+            return (
+              <AutTextField
+                name={name}
+                value={value || ""}
+                onChange={onChange}
+                variant="outlined"
+                color="offWhite"
+                required
+                multiline
+                rows={5}
+                placeholder="Write a personalised message to your community asking them to join your community."
+                helperText={
+                  <FormHelperText
+                    errorTypes={errorTypes}
+                    value={value}
+                    name={name}
+                    errors={formState.errors}
+                  >
+                    <Typography color="white" variant="caption">
+                      {257 - (value?.length || 0)} of 257 characters left
+                    </Typography>
+                  </FormHelperText>
+                }
+              />
+            );
+          }}
+        />
+
+        {/* <Controller
+        name="inviteUrl"
+        control={control}
+        rules={{
+          required: true
+        }}
+        render={({ field: { name, value, onChange } }) => {
+          return (
+            <AutTextField
+              variant="standard"
+              color="offWhite"
+              required
+              name={name}
+              value={value || ""}
+              onChange={onChange}
+              placeholder="1234"
+              helperText={
+                <FormHelperText
+                  value={value}
+                  name={name}
+                  errors={formState.errors}
+                >
+                  Discord Invite
+                </FormHelperText>
+              }
+            />
+          );
+        }}
+      /> */}
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            mb: 4,
+            justifyContent: {
+              xs: "center",
+              sm: "flex-end"
+            }
+          }}
+        >
+          <StepperButton
+            label="Confirm"
+            disabled={!formState.isValid || !inviteLink}
+            sx={{ width: "250px" }}
+          />
+        </Box>
+      </Stack>
+    </Container>
   );
 };
 

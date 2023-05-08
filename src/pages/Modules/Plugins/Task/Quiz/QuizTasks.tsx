@@ -15,15 +15,18 @@ import { dateToUnix } from "@utils/date-format";
 import { addMinutes } from "date-fns";
 import AddIcon from "@mui/icons-material/Add";
 import QuestionsAndAnswers, { emptyQuestion } from "./QuestionsAndAnswers";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { saveQestions } from "@api/tasks.api";
 import LinkWithQuery from "@components/LinkWithQuery";
+import { countWords } from "@utils/helpers";
 
 const errorTypes = {
-  maxWords: `Words cannot be more than 3`,
+  maxWords: `Words cannot be more than 6`,
   maxNameChars: `Characters cannot be more than 24`,
-  maxLength: `Characters cannot be more than 280`
+  maxLength: `Characters cannot be more than 257`
 };
 
 interface PluginParams {
@@ -101,6 +104,7 @@ addMinutes(endDatetime, 45);
 
 const QuizTasks = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [answersSaved, setAnswersSaved] = useState(false);
   const {
     control,
@@ -180,185 +184,198 @@ const QuizTasks = ({ plugin }: PluginParams) => {
     });
   };
 
+  useEffect(() => {
+    if (isSuccess) {
+      navigate({
+        pathname: `/aut-dashboard/modules/OnboardingStrategy/QuestOnboardingPlugin/${+searchParams.get(
+          RequiredQueryParams.QuestId
+        )}`
+      });
+    }
+  }, [isSuccess]);
+
   return (
-    <>
-      {isSuccess ? (
-        <TaskSuccess
-          reset={() => {
-            reset();
-            setAnswersSaved(false);
-            resetForm({
-              title: "",
-              description: "",
-              questions: [emptyQuestion]
-            });
-          }}
-          pluginId={data?.taskId}
-        />
-      ) : (
-        <Container
-          sx={{ py: "20px", display: "flex", flexDirection: "column" }}
-          maxWidth="lg"
-          component="form"
-          autoComplete="off"
-          onSubmit={handleSubmit(onSubmit)}
-        >
-          <ErrorDialog
-            handleClose={() => reset()}
-            open={isError}
-            message={error}
-          />
-          <LoadingDialog open={isLoading} message="Creating task..." />
+    <Container
+      sx={{ py: "20px", display: "flex", flexDirection: "column" }}
+      maxWidth="lg"
+      component="form"
+      autoComplete="off"
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
+      <LoadingDialog open={isLoading} message="Creating task..." />
 
-          <Box
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,
+          mb: 4,
+          mx: "auto",
+          position: "relative",
+          width: "100%"
+        }}
+      >
+        <Stack alignItems="center" justifyContent="center">
+          <Button
+            startIcon={<ArrowBackIosNewIcon />}
+            color="offWhite"
             sx={{
-              display: "flex",
-              flexDirection: "column",
-              flex: 1,
-              mb: 4,
-              mx: "auto",
-              position: "relative",
-              width: "100%"
+              position: {
+                sm: "absolute"
+              },
+              left: {
+                sm: "0"
+              }
             }}
+            to={searchParams.get("returnUrl")}
+            component={Link}
           >
-            <Stack alignItems="center" justifyContent="center">
-              <Button
-                startIcon={<ArrowBackIcon />}
-                color="offWhite"
-                sx={{
-                  position: {
-                    sm: "absolute"
-                  },
-                  left: {
-                    sm: "0"
-                  }
-                }}
-                to={searchParams.get("returnUrl")}
-                component={Link}
-              >
-                {searchParams.get("returnUrlLinkName") || "Back"}
-              </Button>
-              <Typography textAlign="center" color="white" variant="h3">
-                Creating Quiz task
-              </Typography>
-            </Stack>
-            <Typography
-              sx={{
-                width: {
-                  xs: "100%",
-                  sm: "600px",
-                  xxl: "800px"
-                }
-              }}
-              className="text-secondary"
-              mt={2}
-              mx="auto"
-              textAlign="center"
-              color="white"
-              variant="body1"
-            >
-              Test your community’s knowledge with a series of multiple-choice
-              question(s).
+            {/* {searchParams.get("returnUrlLinkName") || "Back"} */}
+            <Typography color="white" variant="body">
+              Back
             </Typography>
-          </Box>
-          <Stack
-            direction="column"
-            gap={4}
-            sx={{
-              margin: "0 auto",
-              width: {
-                xs: "100%",
-                sm: "400px",
-                xxl: "800px"
-              }
-            }}
-          >
-            <Controller
-              name="title"
-              control={control}
-              rules={{
-                required: true
-              }}
-              render={({ field: { name, value, onChange } }) => {
-                return (
-                  <AutTextField
-                    variant="standard"
-                    color="offWhite"
-                    required
-                    autoFocus
+          </Button>
+          <Typography textAlign="center" color="white" variant="h3">
+            Create a Quiz
+          </Typography>
+        </Stack>
+        <Typography
+          sx={{
+            width: {
+              xs: "100%",
+              sm: "700px",
+              xxl: "1000px"
+            }
+          }}
+          mt={2}
+          mx="auto"
+          textAlign="center"
+          color="white"
+          variant="body"
+        >
+          Test your community’s knowledge with a series of multiple-choice
+          question(s).
+        </Typography>
+      </Box>
+      <Stack
+        direction="column"
+        gap={8}
+        sx={{
+          margin: "0 auto",
+          width: {
+            xs: "100%",
+            sm: "650px",
+            xxl: "800px"
+          }
+        }}
+      >
+        <Controller
+          name="title"
+          control={control}
+          rules={{
+            required: true,
+            validate: {
+              maxWords: (v: string) => countWords(v) <= 6
+            }
+          }}
+          render={({ field: { name, value, onChange } }) => {
+            return (
+              <AutTextField
+                variant="standard"
+                color="offWhite"
+                required
+                autoFocus
+                name={name}
+                value={value || ""}
+                onChange={onChange}
+                placeholder="Title"
+                helperText={
+                  <FormHelperText
+                    errorTypes={errorTypes}
+                    value={value}
                     name={name}
-                    value={value || ""}
-                    onChange={onChange}
-                    placeholder="Title"
-                    helperText={
-                      <FormHelperText
-                        errorTypes={errorTypes}
-                        value={value}
-                        name={name}
-                        errors={formState.errors}
-                      >
-                        <span>e.g. Community Manager Quiz</span>
-                      </FormHelperText>
-                    }
-                  />
-                );
-              }}
-            />
+                    errors={formState.errors}
+                  >
+                    <Typography color="white" variant="caption">
+                      {6 - countWords(value)} Words left
+                    </Typography>
+                  </FormHelperText>
+                }
+              />
+            );
+          }}
+        />
 
-            <Controller
-              name="description"
-              control={control}
-              rules={{
-                required: true,
-                maxLength: 280
-              }}
-              render={({ field: { name, value, onChange } }) => {
-                return (
-                  <AutTextField
+        <Controller
+          name="description"
+          control={control}
+          rules={{
+            required: true,
+            maxLength: 257
+          }}
+          render={({ field: { name, value, onChange } }) => {
+            return (
+              <AutTextField
+                name={name}
+                value={value || ""}
+                onChange={onChange}
+                variant="outlined"
+                color="offWhite"
+                required
+                multiline
+                rows={5}
+                placeholder="Describe the Quiz to your community"
+                helperText={
+                  <FormHelperText
+                    errorTypes={errorTypes}
+                    value={value}
                     name={name}
-                    value={value || ""}
-                    onChange={onChange}
-                    variant="outlined"
-                    color="offWhite"
-                    required
-                    multiline
-                    rows={5}
-                    placeholder="Describe the Quiz to your community"
-                    helperText={
-                      <FormHelperText
-                        errorTypes={errorTypes}
-                        value={value}
-                        name={name}
-                        errors={formState.errors}
-                      >
-                        <span>
-                          {280 - (value?.length || 0)}/280 characters left
-                        </span>
-                      </FormHelperText>
-                    }
-                  />
-                );
-              }}
-            />
-          </Stack>
+                    errors={formState.errors}
+                  >
+                    <Typography color="white" variant="caption">
+                      {257 - (value?.length || 0)} of 257 characters left
+                    </Typography>
+                  </FormHelperText>
+                }
+              />
+            );
+          }}
+        />
+      </Stack>
 
-          <QuestionsAndAnswers control={control} />
+      <QuestionsAndAnswers control={control} />
 
-          <Stack
-            sx={{
-              margin: "0 auto",
-              width: {
-                xs: "100%",
-                sm: "400px",
-                xxl: "800px"
-              }
-            }}
-          >
-            <StepperButton label="Create Task" disabled={!formState.isValid} />
-          </Stack>
-        </Container>
-      )}
-    </>
+      <Stack
+        sx={{
+          margin: "0 auto",
+          mt: 8,
+          width: {
+            xs: "100%",
+            sm: "650px",
+            xxl: "800px"
+          }
+        }}
+      >
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            mb: 4,
+            justifyContent: {
+              xs: "center",
+              sm: "flex-end"
+            }
+          }}
+        >
+          <StepperButton
+            label="Confirm"
+            disabled={!formState.isValid}
+            sx={{ width: "250px" }}
+          />
+        </Box>
+      </Stack>
+    </Container>
   );
 };
 

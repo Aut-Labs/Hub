@@ -300,9 +300,9 @@ const Quest = ({ plugin }: PluginParams) => {
             />
           )}
 
-          {!isAdmin && (
+          {/* {!isAdmin && (
             <Tasks isAdmin={isAdmin} isLoading={isLoading} tasks={tasks} />
-          )}
+          )} */}
         </>
       )}
     </Container>

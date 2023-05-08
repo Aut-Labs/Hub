@@ -12,17 +12,33 @@ const fetch = async (body: any, api: BaseQueryApi) => {
   const response = await sdk.pluginRegistry.getAllPluginDefinitionsByDAO(
     selectedCommunityAddress
   );
+
   if (response?.isSuccess) {
     const definitionsWithMetadata: PluginDefinition[] = [];
     for (let i = 0; i < response.data.length; i++) {
       const def = response.data[i];
-      definitionsWithMetadata.push({
+
+      const pluginData = {
         ...def,
         metadata: await fetchMetadata<typeof def.metadata>(
           def.metadataURI,
           environment.nftStorageUrl
         )
-      });
+      };
+
+      if (
+        pluginData.metadata.properties.module.title === "Onboarding Strategy"
+      ) {
+        pluginData.metadata.properties.module.type = "OnboardingStrategy";
+        pluginData.metadata.properties.type = "OnboardingStrategy";
+      }
+
+      if (pluginData.metadata.properties.module.title === "Task Type") {
+        pluginData.metadata.properties.module.type = "Task";
+        pluginData.metadata.properties.type = "Task";
+      }
+
+      definitionsWithMetadata.push(pluginData);
     }
     response.data = definitionsWithMetadata;
     return response;

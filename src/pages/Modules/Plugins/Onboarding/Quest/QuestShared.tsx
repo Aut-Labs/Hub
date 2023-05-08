@@ -331,7 +331,7 @@ export const QuestTasks = memo(
           </Box>
         )}
 
-        <Tasks isAdmin={isAdmin} isLoading={isLoading} tasks={filteredTasks} />
+        {/* <Tasks isAdmin={isAdmin} isLoading={isLoading} tasks={filteredTasks} /> */}
       </Box>
     );
   }

@@ -237,9 +237,11 @@ const PublicQuest = () => {
           </Typography>
 
           <Tasks
-            hasAppliedForQuest={hasAppliedForQuest}
-            quest={quest}
-            hasQuestStarted={hasQuestStarted}
+            questId={quest?.questId}
+            onboardingQuestAddress={searchParams.get(
+              RequiredQueryParams.OnboardingQuestAddress
+            )}
+            isAdmin={false}
             isLoading={isLoadingTasks}
             tasks={tasks}
           />

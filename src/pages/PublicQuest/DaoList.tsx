@@ -12,7 +12,6 @@ import {
 import { GridBox } from "../Modules/Plugins/Task/Quiz/QuestionsAndAnswers";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import { PluginDefinitionCard } from "../Modules/Shared/PluginCard";
 import { useEffect, useState } from "react";
 import { useGetAllNovasQuery } from "@api/community.api";
 import NovaCard from "@components/NovaCard";
@@ -26,6 +25,8 @@ import {
 import { CacheModel, CacheTypes, getCache, updateCache } from "@api/cache.api";
 import { communityUpdateState } from "@store/Community/community.reducer";
 import { useAppDispatch } from "@store/store.model";
+import { useApplyForQuestMutation } from "@api/onboarding.api";
+import { useEthers } from "@usedapp/core";
 
 const TOOLBAR_HEIGHT = 84;
 
@@ -38,10 +39,8 @@ export const DaoList = () => {
   const navigate = useNavigate();
   //apply
 
-  const [
-    apply,
-    { data, isLoading: isApplying, isError, error, reset, isSuccess }
-  ] = useApplyForQuestMutation();
+  const [apply, { isLoading: isApplying, isError, error, reset, isSuccess }] =
+    useApplyForQuestMutation();
   //
   const [searchParams, setSearchParams] = useSearchParams();
   const authenticated = useSelector(isAuthenticated);
@@ -112,13 +111,14 @@ export const DaoList = () => {
   };
 
   useEffect(() => {
-    if (selectedQuest && connectStatus === "disconnected") {
+    if ((questToApply || selectedQuest) && connectStatus === "disconnected") {
       setSelectedQuest(null);
+      setQuestToApply(null);
     }
-    if (connectStatus === "disconnected" && !selectedQuest) {
+    if (connectStatus === "disconnected" && !questToApply && !selectedQuest) {
       dispatch(changeConnectStatus("initial"));
     }
-  }, [connectStatus, selectedQuest]);
+  }, [connectStatus, selectedQuest, questToApply]);
 
   useEffect(() => {
     const navigateToQuest = async () => {
@@ -144,34 +144,33 @@ export const DaoList = () => {
   }, [connectStatus, selectedQuest]);
   //apply
   const applyForQuest = async (quest) => {
-    setSelectedQuest(quest);
+    setQuestToApply(quest);
   };
 
-  useEffect(() => {
-    if (selectedQuest && connectStatus === "disconnected") {
-      setQuestToApply(null);
-    }
-    if (connectStatus === "disconnected" && !questToApply) {
-      dispatch(changeConnectStatus("initial"));
-    }
-  }, [connectStatus, questToApply]);
+  // useEffect(() => {
+  //   if (questToApply && connectStatus === "disconnected") {
+  //     setQuestToApply(null);
+  //   }
+  //   if (connectStatus === "disconnected" && !questToApply) {
+  //     dispatch(changeConnectStatus("initial"));
+  //   }
+  // }, [connectStatus, questToApply]);
 
   useEffect(() => {
-    const navigateToQuest = async () => {
+    const applyToQuest = async () => {
       await dispatch(
         communityUpdateState({
           selectedCommunityAddress: questToApply.daoAddress
         })
       );
-      navigate({
-        pathname: "/quest",
-        search: `?questId=${questToApply.questId}&onboardingQuestAddress=${questToApply.onboardingQuestAddress}&daoAddress=${questToApply.daoAddress}`
+      apply({
+        onboardingQuestAddress: questToApply.onboardingQuestAddress,
+        questId: +questToApply.questId
       });
-      setQuestToApply(null);
     };
     const start = async () => {
       if (questToApply && connectStatus === "connected") {
-        navigateToQuest();
+        applyToQuest();
       } else if (questToApply && connectStatus === "initial") {
         dispatch(changeConnectStatus("start"));
       }
@@ -293,6 +292,8 @@ export const DaoList = () => {
                   highlightData={highlightData(dao.daoAddress)}
                   onQuestSelected={questDetails}
                   onApplyForQuest={applyForQuest}
+                  questToApplyFor={questToApply}
+                  isApplying={isApplying}
                 />
               ))}
             </GridBox>

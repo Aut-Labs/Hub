@@ -250,7 +250,13 @@ export const ToolbarConnector = () => {
           }
         }}
       >
-        <img src={Logo} alt="Aut Logo" />
+        <img
+          src={Logo}
+          onClick={() => {
+            navigate("/");
+          }}
+          alt="Aut Logo"
+        />
         {/* <AppTitle
           sx={{
             cursor: "pointer"

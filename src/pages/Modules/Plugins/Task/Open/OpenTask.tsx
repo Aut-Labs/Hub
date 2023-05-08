@@ -132,7 +132,7 @@ const UserSubmitContent = ({
               control={control}
               rules={{
                 required: true,
-                maxLength: 2000
+                maxLength: 257
               }}
               render={({ field: { name, value, onChange } }) => {
                 return (

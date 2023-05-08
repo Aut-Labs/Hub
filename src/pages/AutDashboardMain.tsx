@@ -23,27 +23,27 @@ const AutDashboardMain = () => {
     }
   );
 
-  const modules = useMemo(() => {
-    const { allRoutes, menuItems } = pluginRoutes(plugins || [], isAdmin);
-    return {
-      menuItem: {
-        title: "Modules",
-        route: "modules",
-        exact: true,
-        icon: StackIcon,
-        children: menuItems
-      },
-      routes: allRoutes
-    };
-  }, [plugins, isAdmin]);
+  // const modules = useMemo(() => {
+  //   // const { allRoutes, menuItems } = pluginRoutes(plugins || [], isAdmin);
+  //   return {
+  //     menuItem: {
+  //       title: "Modules",
+  //       route: "modules",
+  //       exact: true,
+  //       icon: StackIcon,
+  //       children: menuItems
+  //     },
+  //     routes: allRoutes
+  //   };
+  // }, [plugins, isAdmin]);
 
   return (
     <>
       {isLoading ? (
         <AutLoading />
       ) : (
-        <SidebarDrawer addonMenuItems={[modules.menuItem]}>
-          <Suspense fallback={<AutLoading />}>
+        <SidebarDrawer addonMenuItems={[]}>
+          {/* <Suspense fallback={<AutLoading />}>
             <Routes>
               <Route index element={<Dashboard />} />
               <Route path="members" element={<Members />} />
@@ -51,7 +51,7 @@ const AutDashboardMain = () => {
               {modules.routes.map((r) => r)}
               <Route path="*" element={<Navigate to="/aut-dashboard" />} />
             </Routes>
-          </Suspense>
+          </Suspense> */}
         </SidebarDrawer>
       )}
     </>

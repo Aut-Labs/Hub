@@ -484,8 +484,11 @@ interface DaoModel {
   properties: any;
 }
 
+const KEEP_DATA_UNUSED = 10 * 60;
+
 export const communityApi = createApi({
   reducerPath: "communityApi",
+  keepUnusedDataFor: KEEP_DATA_UNUSED,
   baseQuery: async (args, api, extraOptions) => {
     const { url, body } = args;
     if (url === "getAllMembers") {

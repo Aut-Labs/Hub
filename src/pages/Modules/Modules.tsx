@@ -10,7 +10,7 @@ import {
   styled
 } from "@mui/material";
 import { memo, useEffect, useMemo } from "react";
-import { PluginDefinitionCard } from "./Shared/PluginCard";
+// import { PluginDefinitionCard } from "./Shared/PluginCard";
 import LoadingProgressBar from "@components/LoadingProgressBar";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { setTitle } from "@store/ui-reducer";
@@ -130,14 +130,14 @@ const Modules = () => {
           <AutLoading width="130px" height="130px" />
         ) : (
           <>
-            <GridBox sx={{ flexGrow: 1, mt: 4 }}>
+            {/* <GridBox sx={{ flexGrow: 1, mt: 4 }}>
               {myModules.map((plugin, index) => (
                 <PluginDefinitionCard
                   key={`modules-plugin-${index}`}
                   plugin={plugin}
                 />
               ))}
-            </GridBox>
+            </GridBox> */}
           </>
         )}
       </Container>

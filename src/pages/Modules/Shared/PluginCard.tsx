@@ -1,6 +1,7 @@
 import { useAddPluginToDAOMutation } from "@api/plugin-registry.api";
 import { PluginDefinition } from "@aut-labs-private/sdk";
 import {
+  Box,
   Button,
   Card,
   CardActionArea,
@@ -15,15 +16,19 @@ import {
 } from "@mui/material";
 import { memo, useMemo } from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import { Link } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import LoadingButton from "@mui/lab/LoadingButton";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { useSelector } from "react-redux";
 import { SelectedNetworkConfig } from "@store/WalletProvider/WalletProvider";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
-import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
+import {
+  ModuleDefinition,
+  PluginDefinitionType
+} from "@aut-labs-private/sdk/dist/models/plugin";
 import LinkWithQuery from "@components/LinkWithQuery";
+import { useEthers } from "@usedapp/core";
+// import { useActivateModuleMutation } from "@api/module-registry.api";
 
 const GridCard = styled(Card)(({ theme }) => {
   return {
@@ -59,6 +64,17 @@ const PluginCard = ({
     return `${PluginDefinitionType[plugin.pluginDefinitionId]}`;
   }, []);
 
+  const actionName = useMemo(() => {
+    if (!plugin?.pluginAddress) return "Install";
+
+    if (
+      plugin.pluginDefinitionId === PluginDefinitionType.QuestOnboardingPlugin
+    ) {
+      return "View Quests";
+    }
+    return "Add Task";
+  }, [plugin]);
+
   return (
     <>
       <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
@@ -67,7 +83,8 @@ const PluginCard = ({
           bgcolor: "nightBlack.main",
           borderColor: "divider",
           borderRadius: "16px",
-          boxShadow: 3
+          minHeight: "300px",
+          boxShadow: 7
         }}
         variant="outlined"
       >
@@ -87,7 +104,7 @@ const PluginCard = ({
             variant: "subtitle1"
           }}
           subheaderTypographyProps={{
-            className: "text-secondary"
+            color: "white"
           }}
           action={
             <>
@@ -95,33 +112,23 @@ const PluginCard = ({
             </>
           }
           title={plugin?.metadata?.properties?.title}
-          subheader={plugin?.metadata?.properties?.module?.shortDescription}
+          subheader={plugin?.metadata?.properties?.shortDescription}
         />
         <CardContent
           sx={{
             pt: 0
           }}
         >
-          <Stack direction="row" alignItems="flex-end">
-            {!plugin.pluginAddress && (
-              <Typography
-                className="text-secondary"
-                variant="body"
-                lineHeight={1.7}
-              >
-                Price
-              </Typography>
-            )}
-
+          <Stack direction="row" alignItems="flex-end" justifyContent="center">
             <Typography
               sx={{
                 letterSpacing: "-.04em",
-                color: !!plugin.pluginAddress ? "primary.main" : "success.main"
+                color: !!plugin.pluginAddress ? "primary.main" : "error.light"
               }}
               lineHeight={1}
               variant="h2"
             >
-              {!!plugin.pluginAddress ? "Installed" : "Free"}
+              {!!plugin.pluginAddress ? "Activated" : "Inactive"}
             </Typography>
 
             {!!plugin.pluginAddress && (
@@ -137,39 +144,48 @@ const PluginCard = ({
             )}
           </Stack>
 
-          <LoadingButton
-            loading={isLoading}
+          <Box
             sx={{
               width: "100%",
-              my: 6
+              display: "flex"
             }}
-            disabled={
-              isFetching || !path || (!plugin.pluginAddress && !isAdmin)
-            }
-            variant="outlined"
-            loadingIndicator={
-              <Stack direction="row" gap={1} alignItems="center">
-                <Typography className="text-secondary">
-                  Activating...
-                </Typography>
-                <CircularProgress
-                  size="20px"
-                  color={plugin.pluginAddress ? "offWhite" : "primary"}
-                />
-              </Stack>
-            }
-            {...(!!plugin.pluginAddress && {
-              to: path,
-              preserveParams: true,
-              component: LinkWithQuery
-            })}
-            {...(!plugin.pluginAddress && {
-              onClick: () => addPlugin(plugin)
-            })}
-            color={plugin.pluginAddress ? "offWhite" : "primary"}
           >
-            {plugin.pluginAddress ? "Go to plugin" : "Install"}
-          </LoadingButton>
+            <LoadingButton
+              loading={isLoading}
+              sx={{
+                width: "80%",
+                my: 6,
+                mx: "auto"
+              }}
+              size="large"
+              disabled={
+                isFetching || !path || (!plugin.pluginAddress && !isAdmin)
+              }
+              variant="outlined"
+              loadingIndicator={
+                <Stack direction="row" gap={1} alignItems="center">
+                  <Typography className="text-secondary">
+                    Activating...
+                  </Typography>
+                  <CircularProgress
+                    size="20px"
+                    color={plugin.pluginAddress ? "offWhite" : "primary"}
+                  />
+                </Stack>
+              }
+              {...(!!plugin.pluginAddress && {
+                to: path,
+                preserveParams: true,
+                component: LinkWithQuery
+              })}
+              {...(!plugin.pluginAddress && {
+                onClick: () => addPlugin(plugin)
+              })}
+              color="offWhite"
+            >
+              {actionName}
+            </LoadingButton>
+          </Box>
 
           {/* <Stack direction="row" justifyContent="flex-end">
             <Typography
@@ -190,7 +206,7 @@ const PluginCard = ({
   );
 };
 
-export const EmptyPluginCard = () => {
+export const EmptyPluginCard = ({ type }) => {
   return (
     <GridCard
       sx={{
@@ -198,7 +214,8 @@ export const EmptyPluginCard = () => {
         borderColor: "divider",
         borderStyle: "dashed",
         borderRadius: "16px",
-        boxShadow: 3
+        boxShadow: 7,
+        minHeight: "300px"
       }}
       variant="outlined"
     >
@@ -218,16 +235,13 @@ export const EmptyPluginCard = () => {
             cursor: "pointer"
           }}
         >
-          <Typography
-            className="text-secondary"
-            variant="body"
-            lineHeight={1.7}
-          >
-            Request a plugin type
+          <Typography textAlign="center" color="white" variant="body">
+            Request new <br /> {type} plugin
           </Typography>
           <AddIcon
-            className="text-secondary"
             sx={{
+              mt: 2,
+              color: "white",
               fontSize: "80px"
             }}
           />
@@ -237,83 +251,109 @@ export const EmptyPluginCard = () => {
   );
 };
 
-export const PluginDefinitionCard = ({
-  plugin
-}: {
-  plugin: PluginDefinition;
-}) => {
-  return (
-    <GridCard
-      sx={{
-        bgcolor: "nightBlack.main",
-        borderColor: "divider",
-        borderRadius: "16px",
-        minHeight: "300px",
-        boxShadow: 3,
-        display: "flex",
-        flexDirection: "column"
-      }}
-      variant="outlined"
-    >
-      <CardHeader
-        sx={{
-          alignItems: "center",
-          ".MuiCardHeader-action": {
-            mt: "3px"
-          },
-          display: "flex",
-          flexDirection: "column"
-        }}
-        titleTypographyProps={{
-          fontFamily: "FractulAltBold",
-          mb: 2,
-          fontWeight: 900,
-          color: "white",
-          variant: "subtitle1"
-        }}
-        title={plugin?.metadata?.properties?.module?.title}
-      />
-      <CardContent
-        sx={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column"
-        }}
-      >
-        <Stack flex={1}>
-          <Typography className="text-secondary" variant="body">
-            {plugin?.metadata?.properties?.module?.shortDescription}
-          </Typography>
-        </Stack>
+// export const ModuleDefinitionCard = ({
+//   module,
+//   isFetching
+// }: {
+//   isFetching: boolean;
+//   module: ModuleDefinition;
+// }) => {
+//   const [activateOnboarding, { isLoading }] = useActivateModuleMutation();
 
-        <Button
-          sx={{
-            width: "100%",
-            my: 6
-          }}
-          variant="outlined"
-          color="offWhite"
-          to={plugin?.metadata?.properties?.module?.type}
-          component={Link}
-        >
-          View module
-        </Button>
-        {/* <Stack direction="row" justifyContent="flex-end">
-          <Typography
-            className="text-secondary"
-            sx={{
-              mr: "2px",
-              fontWeight: "bold",
-              fontFamily: "FractulAltBold",
-              fontSize: "12px"
-            }}
-          >
-            {plugin?.metadata?.name}
-          </Typography>
-        </Stack> */}
-      </CardContent>
-    </GridCard>
-  );
-};
+//   return (
+//     <GridCard
+//       sx={{
+//         bgcolor: "nightBlack.main",
+//         borderColor: "divider",
+//         borderRadius: "16px",
+//         minHeight: "300px",
+//         boxShadow: 7,
+//         display: "flex",
+//         flexDirection: "column"
+//       }}
+//       variant="outlined"
+//     >
+//       <CardHeader
+//         sx={{
+//           alignItems: "center",
+//           ".MuiCardHeader-action": {
+//             mt: "3px"
+//           },
+//           display: "flex",
+//           flexDirection: "column"
+//         }}
+//         titleTypographyProps={{
+//           fontFamily: "FractulAltBold",
+//           mb: 2,
+//           fontWeight: 900,
+//           color: "white",
+//           variant: "subtitle1"
+//         }}
+//         title={`${module?.metadata?.properties?.title}`}
+//       />
+//       <CardContent
+//         sx={{
+//           flex: 1,
+//           display: "flex",
+//           flexDirection: "column"
+//         }}
+//       >
+//         <Stack flex={1} maxWidth="80%" mx="auto">
+//           <Typography variant="body" textAlign="center" color="white">
+//             {module?.metadata?.properties?.shortDescription}
+//           </Typography>
+//         </Stack>
+//         <LoadingButton
+//           loading={isLoading}
+//           sx={{
+//             width: "80%",
+//             mx: "auto",
+//             my: 6
+//           }}
+//           disabled={isLoading || isFetching}
+//           variant="outlined"
+//           size="large"
+//           loadingIndicator={
+//             <Stack direction="row" gap={1} alignItems="center">
+//               <Typography className="text-secondary">Activating...</Typography>
+//               <CircularProgress
+//                 size="20px"
+//                 color={module.isActivated ? "offWhite" : "primary"}
+//               />
+//             </Stack>
+//           }
+//           {...(module.isActivated && {
+//             to: module?.metadata?.properties?.type,
+//             preserveParams: true,
+//             component: LinkWithQuery
+//           })}
+//           {...(!module.isActivated && {
+//             onClick: () =>
+//               activateOnboarding({
+//                 moduleId: 1
+//               })
+//           })}
+//           color="offWhite"
+//         >
+//           {module.isActivated ? "Go to plugins" : "Actvate"}
+//         </LoadingButton>
+
+//         {/* <Stack direction="row" justifyContent="flex-end">
+//           <Typography
+//             className="text-secondary"
+//             sx={{
+//               mr: "2px",
+//               fontWeight: "bold",
+//               fontFamily: "FractulAltBold",
+//               fontSize: "12px"
+//             }}
+//           >
+//             {plugin?.metadata?.name}
+//           </Typography>
+//         </Stack> */}
+//       </CardContent>
+//     </GridCard>
+//   );
+// };
 
 export default memo(PluginCard);

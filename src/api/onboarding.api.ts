@@ -129,34 +129,34 @@ const activateOnboarding = async (
   { quests, pluginAddress, userAddress },
   api: BaseQueryApi
 ) => {
-  const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
+  // const sdk = AutSDK.getInstance();
+  // let questOnboarding: QuestOnboarding = sdk.questOnboarding;
 
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      pluginAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
+  // if (!questOnboarding) {
+  //   questOnboarding = sdk.initService<QuestOnboarding>(
+  //     QuestOnboarding,
+  //     pluginAddress
+  //   );
+  //   sdk.questOnboarding = questOnboarding;
+  // }
 
-  const response = await questOnboarding.activateOnboarding(quests);
+  // // const response = await questOnboarding.activateOnboarding(quests);
 
-  if (!response.isSuccess) {
-    return {
-      error: response.errorMessage
-    };
-  }
+  // if (!response.isSuccess) {
+  //   return {
+  //     error: response.errorMessage
+  //   };
+  // }
 
-  try {
-    const cache = await getCache(CacheTypes.UserPhases);
-    cache.list[2].status = 1; // complete phase 3
-    await updateCache(cache);
-  } catch (error) {
-    console.log(error);
-  }
+  // try {
+  //   const cache = await getCache(CacheTypes.UserPhases);
+  //   cache.list[2].status = 1; // complete phase 3
+  //   await updateCache(cache);
+  // } catch (error) {
+  //   console.log(error);
+  // }
   return {
-    data: response.data
+    data: null
   };
 };
 

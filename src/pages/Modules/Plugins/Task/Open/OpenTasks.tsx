@@ -5,25 +5,52 @@ import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { FormHelperText } from "@components/Fields";
 import { StepperButton } from "@components/Stepper";
-import { Box, Button, Container, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Container,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Stack,
+  Typography
+} from "@mui/material";
+import { AutSelectField } from "@theme/field-select-styles";
 import { AutTextField } from "@theme/field-text-styles";
 import { pxToRem } from "@utils/text-size";
-import { memo } from "react";
+import { memo, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import { dateToUnix } from "@utils/date-format";
 import { addMinutes } from "date-fns";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import LinkWithQuery from "@components/LinkWithQuery";
+import { countWords } from "@utils/helpers";
 
 const errorTypes = {
-  maxWords: `Words cannot be more than 3`,
+  maxWords: `Words cannot be more than 6`,
   maxNameChars: `Characters cannot be more than 24`,
-  maxLength: `Characters cannot be more than 280`
+  maxLength: `Characters cannot be more than 257`
 };
 
+const AttachmentTypes = [
+  {
+    value: "url",
+    label: "URL"
+  },
+  {
+    value: "text",
+    label: "Text"
+  },
+  {
+    value: "image",
+    label: "Image"
+  }
+];
 interface PluginParams {
   plugin: PluginDefinition;
 }
@@ -98,11 +125,13 @@ addMinutes(endDatetime, 45);
 
 const OpenTasks = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const { control, handleSubmit, getValues, formState } = useForm({
     mode: "onChange",
     defaultValues: {
       title: "",
-      description: ""
+      description: "",
+      attachmentType: ""
     }
   });
 
@@ -123,7 +152,9 @@ const OpenTasks = ({ plugin }: PluginParams) => {
         metadata: {
           name: values.title,
           description: values.description,
-          properties: {}
+          properties: {
+            attachmentType: values.attachmentType
+          }
         },
         startDate: dateToUnix(new Date()),
         endDate: dateToUnix(endDatetime)
@@ -131,155 +162,275 @@ const OpenTasks = ({ plugin }: PluginParams) => {
     });
   };
 
-  return (
-    <>
-      {isSuccess ? (
-        <TaskSuccess reset={reset} pluginId={data?.taskId} />
-      ) : (
-        <Container
-          sx={{ py: "20px", display: "flex", flexDirection: "column" }}
-          maxWidth="lg"
-          component="form"
-          autoComplete="off"
-          onSubmit={handleSubmit(onSubmit)}
-        >
-          <ErrorDialog
-            handleClose={() => reset()}
-            open={isError}
-            message={error}
-          />
-          <LoadingDialog open={isLoading} message="Creating task..." />
+  useEffect(() => {
+    if (isSuccess) {
+      navigate({
+        pathname: `/aut-dashboard/modules/OnboardingStrategy/QuestOnboardingPlugin/${+searchParams.get(
+          RequiredQueryParams.QuestId
+        )}`
+      });
+    }
+  }, [isSuccess]);
 
-          <Box
+  return (
+    <Container
+      sx={{ py: "20px", display: "flex", flexDirection: "column" }}
+      maxWidth="lg"
+      component="form"
+      autoComplete="off"
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
+      <LoadingDialog open={isLoading} message="Creating task..." />
+
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          position: "relative",
+          flex: 1,
+          mb: 4,
+          mx: "auto",
+          width: "100%"
+        }}
+      >
+        <Stack alignItems="center" justifyContent="center">
+          <Button
+            startIcon={<ArrowBackIosNewIcon />}
+            color="offWhite"
             sx={{
-              display: "flex",
-              flexDirection: "column",
-              position: "relative",
-              flex: 1,
-              mb: 4,
-              mx: "auto",
-              width: "100%"
-            }}
-          >
-            <Stack alignItems="center" justifyContent="center">
-              <Button
-                startIcon={<ArrowBackIcon />}
-                color="offWhite"
-                sx={{
-                  position: {
-                    sm: "absolute"
-                  },
-                  left: {
-                    sm: "0"
-                  }
-                }}
-                to={searchParams.get("returnUrl")}
-                component={Link}
-              >
-                {searchParams.get("returnUrlLinkName") || "Back"}
-              </Button>
-              <Typography textAlign="center" color="white" variant="h3">
-                Creating Open task
-              </Typography>
-            </Stack>
-            <Typography
-              sx={{
-                width: {
-                  xs: "100%",
-                  sm: "600px",
-                  xxl: "800px"
-                }
-              }}
-              className="text-secondary"
-              mt={2}
-              mx="auto"
-              textAlign="center"
-              color="white"
-              variant="body1"
-            >
-              Create an Open Task which will require you to approve or dismiss
-              submissions. This Task type is designed to give you freedom on the
-              nature and requirements of the Task.
-            </Typography>
-          </Box>
-          <Stack
-            direction="column"
-            gap={4}
-            sx={{
-              margin: "0 auto",
-              width: {
-                xs: "100%",
-                sm: "400px",
-                xxl: "800px"
+              position: {
+                sm: "absolute"
+              },
+              left: {
+                sm: "0"
               }
             }}
+            to={searchParams.get("returnUrl")}
+            component={Link}
           >
-            <Controller
-              name="title"
-              control={control}
-              rules={{
-                required: true
-              }}
-              render={({ field: { name, value, onChange } }) => {
-                return (
-                  <AutTextField
-                    variant="standard"
-                    color="offWhite"
-                    required
-                    autoFocus
+            {/* {searchParams.get("returnUrlLinkName") || "Back"} */}
+            <Typography color="white" variant="body">
+              Back
+            </Typography>
+          </Button>
+          <Typography textAlign="center" color="white" variant="h3">
+            Create an Open Task
+          </Typography>
+        </Stack>
+        <Typography
+          sx={{
+            width: {
+              xs: "100%",
+              sm: "700px",
+              xxl: "1000px"
+            }
+          }}
+          mt={2}
+          mx="auto"
+          textAlign="center"
+          color="white"
+          variant="body"
+        >
+          Create an Open Task which will require you to approve or dismiss
+          submissions. This Task type is designed to give you freedom on the
+          nature and requirements of the Task.
+        </Typography>
+      </Box>
+      <Stack
+        direction="column"
+        gap={8}
+        sx={{
+          margin: "0 auto",
+          width: {
+            xs: "100%",
+            sm: "650px",
+            xxl: "800px"
+          }
+        }}
+      >
+        <Controller
+          name="title"
+          control={control}
+          rules={{
+            required: true,
+            validate: {
+              maxWords: (v: string) => countWords(v) <= 6
+            }
+          }}
+          render={({ field: { name, value, onChange } }) => {
+            return (
+              <AutTextField
+                variant="standard"
+                color="offWhite"
+                required
+                autoFocus
+                name={name}
+                value={value || ""}
+                onChange={onChange}
+                placeholder="Title"
+                helperText={
+                  <FormHelperText
+                    errorTypes={errorTypes}
+                    value={value}
                     name={name}
-                    value={value || ""}
-                    onChange={onChange}
-                    placeholder="Title"
-                    helperText={
-                      <FormHelperText
-                        errorTypes={errorTypes}
-                        value={value}
-                        name={name}
-                        errors={formState.errors}
-                      />
-                    }
-                  />
-                );
-              }}
-            />
+                    errors={formState.errors}
+                  >
+                    <Typography color="white" variant="caption">
+                      {6 - countWords(value)} Words left
+                    </Typography>
+                  </FormHelperText>
+                }
+              />
+            );
+          }}
+        />
 
-            <Controller
-              name="description"
-              control={control}
-              rules={{
-                required: true
-              }}
-              render={({ field: { name, value, onChange } }) => {
-                return (
-                  <AutTextField
+        <Controller
+          name="description"
+          control={control}
+          rules={{
+            required: true,
+            maxLength: 257
+          }}
+          render={({ field: { name, value, onChange } }) => {
+            return (
+              <AutTextField
+                name={name}
+                value={value || ""}
+                onChange={onChange}
+                variant="outlined"
+                color="offWhite"
+                required
+                multiline
+                rows={5}
+                placeholder="Describe the requirements of the task including instructions on what to submit. I.e. a link to an artwork or plain text."
+                helperText={
+                  <FormHelperText
+                    errorTypes={errorTypes}
+                    value={value}
                     name={name}
-                    value={value || ""}
-                    onChange={onChange}
-                    variant="outlined"
-                    color="offWhite"
-                    required
-                    multiline
-                    rows={5}
-                    placeholder="Describe the requirements of the task including instructions on what to submit. I.e. a link to an artwork or plain text."
-                    helperText={
-                      <FormHelperText
-                        errorTypes={errorTypes}
-                        value={value}
-                        name={name}
-                        errors={formState.errors}
-                      />
-                    }
-                  />
-                );
-              }}
-            />
+                    errors={formState.errors}
+                  >
+                    <Typography color="white" variant="caption">
+                      {257 - (value?.length || 0)} of 257 characters left
+                    </Typography>
+                  </FormHelperText>
+                }
+              />
+            );
+          }}
+        />
 
-            <StepperButton label="Create Task" disabled={!formState.isValid} />
-          </Stack>
-        </Container>
-      )}
-    </>
+        <Stack
+          direction="row"
+          gap={4}
+          sx={{
+            margin: "0 auto",
+            display: "flex",
+            alignItems: "center",
+            width: {
+              xs: "100%",
+              sm: "650px",
+              xxl: "800px"
+            }
+          }}
+        >
+          <Typography color="white" variant="body" component="div">
+            Attachment Type
+          </Typography>
+          <Controller
+            name="attachmentType"
+            control={control}
+            rules={{
+              validate: {
+                selected: (v) => !!v
+              }
+            }}
+            render={({ field: { name, value, onChange } }) => {
+              return (
+                <AutSelectField
+                  variant="standard"
+                  color="offWhite"
+                  renderValue={(selected) => {
+                    if (!selected) {
+                      return "Type" as any;
+                    }
+                    const type = AttachmentTypes.find(
+                      (t) => t.value === selected
+                    );
+                    return type?.label || selected;
+                  }}
+                  name={name}
+                  value={value || ""}
+                  displayEmpty
+                  required
+                  onChange={onChange}
+                >
+                  {AttachmentTypes.map((type) => {
+                    return (
+                      <MenuItem key={`role-${type.value}`} value={type.value}>
+                        {type.label}
+                      </MenuItem>
+                    );
+                  })}
+                </AutSelectField>
+              );
+            }}
+          />
+          {/* <Controller
+            name="attachmentType"
+            control={control}
+            rules={{
+              required: true
+            }}
+            render={({ field: { name, value, onChange } }) => {
+              return (
+                <AutTextField
+                  sx={{
+                    width: "150px",
+                    ".MuiSvgIcon-root ": {
+                      fill: "white !important"
+                    }
+                  }}
+                  id="attachmentType"
+                  value={value}
+                  name={name}
+                  color="offWhite"
+                  onChange={onChange}
+                  label="Type"
+                  size="small"
+                  select
+                  InputLabelProps={{
+                    style: { color: "white" }
+                  }}
+                  SelectProps={{
+                    style: { color: "white" }
+                  }}
+                ></AutTextField>
+              );
+            }}
+          /> */}
+        </Stack>
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            mb: 4,
+            justifyContent: {
+              xs: "center",
+              sm: "flex-end"
+            }
+          }}
+        >
+          <StepperButton
+            label="Confirm"
+            disabled={!formState.isValid}
+            sx={{ width: "250px" }}
+          />
+        </Box>
+      </Stack>
+    </Container>
   );
 };
 

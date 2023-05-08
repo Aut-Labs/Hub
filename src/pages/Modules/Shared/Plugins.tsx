@@ -22,6 +22,8 @@ import { IsAdmin } from "@store/Community/community.reducer";
 import { Link, useSearchParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AutLoading from "@components/AutLoading";
+import { useGetAllOnboardingQuestsQuery } from "@api/onboarding.api";
+import { RequiredQueryParams } from "@api/RequiredQueryParams";
 
 const GridBox = styled(Box)(({ theme }) => {
   return {
@@ -67,9 +69,23 @@ const Plugins = ({ definition }: StackParams) => {
     return plugins.filter((p) => p.pluginAddress);
   }, [showInstalled, plugins]);
 
+  const { quest, isLoading: isLoadingPlugins } = useGetAllOnboardingQuestsQuery(
+    searchParams.get(RequiredQueryParams.OnboardingQuestAddress),
+    {
+      selectFromResult: ({ data, isLoading, isFetching }) => ({
+        isLoading: isLoading || isFetching,
+        quest: (data || []).find(
+          (q) => q.questId === +searchParams.get(RequiredQueryParams.QuestId)
+        )
+      })
+    }
+  );
+
+  console.log("quest: ", quest);
+
   return (
     <>
-      <LoadingProgressBar isLoading={isFetching} />
+      <LoadingProgressBar isLoading={isFetching || isLoadingPlugins} />
       <Container maxWidth="lg" sx={{ py: "20px" }}>
         <Box
           sx={{
@@ -95,7 +111,7 @@ const Plugins = ({ definition }: StackParams) => {
               </Button>
             )}
             <Typography textAlign="center" color="white" variant="h3">
-              {definition.properties.module.title}
+              {definition.properties.module.title} Plugins
               <Tooltip title="Refresh plugins">
                 <IconButton
                   size="medium"
@@ -111,6 +127,18 @@ const Plugins = ({ definition }: StackParams) => {
                 </IconButton>
               </Tooltip>
             </Typography>
+
+            {quest?.tasksCount === 0 && (
+              <Typography
+                mt={2}
+                textAlign="center"
+                color="white"
+                variant="body"
+              >
+                Your Quest is ready to go - add 1 or more tasks to start
+                onboarding {quest?.metadata?.name}
+              </Typography>
+            )}
           </Stack>
 
           {!!plugins?.length && (
@@ -147,7 +175,7 @@ const Plugins = ({ definition }: StackParams) => {
                   plugin={plugin}
                 />
               ))}
-              <EmptyPluginCard />
+              <EmptyPluginCard type={definition.properties.module.title} />
             </GridBox>
           </>
         )}

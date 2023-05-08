@@ -3,8 +3,12 @@ import React, { lazy } from "react";
 import { Route } from "react-router-dom";
 import { SidebarMenuItem } from "@components/Sidebar/MenuItems";
 import ExtensionIcon from "@mui/icons-material/Extension";
-import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
+import {
+  ModuleDefinition,
+  PluginDefinitionType
+} from "@aut-labs-private/sdk/dist/models/plugin";
 import { ReactComponent as SubStackIcon } from "@assets/aut/sub-stack.svg";
+import Submissions from "../Plugins/Task/Shared/Submissions";
 
 const Plugins = lazy(() => import("./Plugins"));
 
@@ -50,46 +54,60 @@ const CreateTransactionTask = lazy(
 
 export const pluginRoutes = (
   plugins: PluginDefinition[],
+  modules: ModuleDefinition[],
   isAdmin: boolean
 ): {
   menuItems: SidebarMenuItem[];
   allRoutes: React.ReactElement[];
 } => {
+  if (!modules.length || !plugins.length) {
+    return {
+      menuItems: [],
+      allRoutes: []
+    };
+  }
+
   return plugins.reduce(
     (prev, plugin) => {
       if (!plugin?.metadata?.properties) return prev;
-      const stackType = plugin.metadata.properties.module.type;
-      const stack = `modules/${stackType}`;
+      const moduleType = plugin.metadata.properties.module.type;
+      const modulePath = `modules/${moduleType}`;
+      const moduleDefinition = modules.find(
+        (m) => m.metadata.properties.type === moduleType
+      );
 
-      if (!prev.taskTypesMainMenu[stackType]) {
+      if (!moduleDefinition.isActivated) return prev;
+
+      if (!prev.taskTypesMainMenu[moduleType]) {
         prev.allRoutes.push(
           <Route
-            key={stack}
-            path={stack}
+            key={modulePath}
+            path={modulePath}
             element={<Plugins definition={plugin.metadata} />}
           />
         );
 
-        if (stackType === "Onboarding") {
+        if (moduleDefinition.id === 1) {
           // for now we will ignore Task module menu
           const mainMenu = {
             title: plugin.metadata.properties.module.title,
-            route: stack,
+            route: modulePath,
             icon: SubStackIcon,
             exact: true,
             children: []
           };
           prev.menuItems.push(mainMenu);
-          prev.taskTypesMainMenu[stackType] = mainMenu;
+          prev.taskTypesMainMenu[moduleType] = mainMenu;
         }
       }
       if (!plugin.pluginAddress) return prev;
 
       if (plugin.pluginAddress) {
-        const mainMenu = prev.taskTypesMainMenu[stackType];
-        const path = `${stack}/${
+        const mainMenu = prev.taskTypesMainMenu[moduleType];
+        const path = `${modulePath}/${
           PluginDefinitionType[plugin.pluginDefinitionId]
         }`;
+
         if (mainMenu) {
           const childMenuItem: SidebarMenuItem = {
             icon: ExtensionIcon,
@@ -144,6 +162,11 @@ export const pluginRoutes = (
                 key={`${path}/:taskId`}
                 path={`${path}/:taskId`}
                 element={<OpenTask plugin={plugin} />}
+              />,
+              <Route
+                key={`${path}/:taskId/submissions`}
+                path={`${path}/:taskId/submissions`}
+                element={<Submissions plugin={plugin} />}
               />
             );
 

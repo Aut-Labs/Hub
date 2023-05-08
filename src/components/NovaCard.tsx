@@ -40,6 +40,7 @@ import { LoadingButton } from "@mui/lab";
 import { useConfirmDialog } from "react-mui-confirm";
 import { useEthers } from "@usedapp/core";
 import { isAfter, addDays, set } from "date-fns";
+import { ApplyOrWithdrawFromQuest } from "./ApplyOrWithdrawFromQuest";
 
 const getRoleName = (daoData, quest) => {
   const role = daoData.properties.rolesSets[0].roles.find(
@@ -56,6 +57,24 @@ const AutCardFront = styled("div")({
   height: "100%",
   border: "1px"
 });
+
+const SeeQuestButton = styled(Button)(({ theme }) => ({
+  [theme.breakpoints.up("xs")]: {
+    width: "300px"
+  },
+  [theme.breakpoints.up("sm")]: {
+    width: "300px"
+  },
+  [theme.breakpoints.up("md")]: {
+    width: "300px"
+  },
+  [theme.breakpoints.up("xl")]: {
+    width: "330px"
+  },
+  [theme.breakpoints.up("xxl")]: {
+    width: "380px"
+  }
+}));
 
 const AutCardContainer = styled("div")(({ theme }) => ({
   [theme.breakpoints.up("xs")]: {
@@ -118,240 +137,15 @@ const Countdown = styled("div")({
   }
 });
 
-const ApplyOrWithdrawFromQuest = ({ daoData, quest, onUpdateCache, cache }) => {
-  const [hasUserCompletedQuest, { data: isQuestComplete }] =
-    useLazyHasUserCompletedQuestQuery();
-  // const [cache, setCache] = useState<CacheModel>(null);
-  const confirm = useConfirmDialog();
-  const { account } = useEthers();
-  const isOwner = useMemo(() => {
-    return !!account && daoData?.admin === account;
-  }, [account, daoData]);
-
-  const hasQuestStarted = useMemo(() => {
-    if (!quest?.startDate) return false;
-    return isAfter(new Date(), new Date(quest.startDate));
-  }, [quest]);
-
-  const hasQuestEnded = useMemo(() => {
-    if (!quest?.startDate) return false;
-    return isAfter(
-      new Date(),
-      addDays(new Date(quest.startDate), quest.durationInDays)
-    );
-  }, [quest]);
-  // Use this stuff
-  const canApplyForAQuest = useMemo(() => {
-    console.log("isOwner", isOwner);
-    console.log("cache", cache);
-    console.log("hasQuestStarted", hasQuestStarted);
-    console.log("hasQuestEnded", hasQuestEnded);
-    return !isOwner && !cache && !!hasQuestStarted && !hasQuestEnded;
-  }, [cache, hasQuestStarted, hasQuestEnded, isOwner]);
-
-  const hasAppliedForQuest = useMemo(() => {
-    return (
-      !!cache &&
-      cache?.onboardingQuestAddress == daoData.onboardingQuestAddress &&
-      cache?.questId === quest.questId
-    );
-  }, [cache, hasQuestStarted, hasQuestEnded]);
-
-  const [
-    withdraw,
-    {
-      isLoading: isWithdrawing,
-      isError: isWithdrawError,
-      error: withdrawError,
-      reset: withdrawReset,
-      isSuccess: withdrawIsSuccess
-    }
-  ] = useWithdrawFromAQuestMutation();
-
-  const confimWithdrawal = () =>
-    confirm({
-      title: "Are you sure you want to withdraw from quest?",
-      confirmButtonText: "Withdraw",
-      onConfirm: async () => {
-        withdraw({
-          onboardingQuestAddress: daoData.onboardingQuestAddress,
-          questId: +quest.questId
-        });
-      }
-    });
-
-  useEffect(() => {
-    if (isQuestComplete) {
-      const start = async () => {
-        try {
-          const cacheResult = await getCache(CacheTypes.UserPhases);
-          cacheResult.list[1].status = 1;
-          await updateCache(cacheResult);
-          onUpdateCache(cacheResult);
-          // setCache(cacheResult);
-        } catch (error) {
-          console.log(error);
-        }
-      };
-      start();
-    }
-  }, [isQuestComplete]);
-
-  useEffect(() => {
-    if (withdrawIsSuccess) {
-      const start = async () => {
-        try {
-          await deleteCache(CacheTypes.UserPhases);
-          onUpdateCache(null);
-          // setCache(null);
-          withdrawReset();
-        } catch (error) {
-          console.log(error);
-        }
-      };
-      start();
-    }
-  }, [withdrawIsSuccess]);
-
-  useEffect(() => {
-    if (isSuccess) {
-      const start = async () => {
-        try {
-          const updatedCache = await updateCache({
-            ...(cache || {}),
-            cacheKey: CacheTypes.UserPhases,
-            address: account,
-            questId: quest.questId,
-            onboardingQuestAddress: daoData.onboardingQuestAddress,
-            daoAddress: daoData.daoAddress,
-            list: [
-              {
-                phase: 1,
-                status: 1
-              },
-              {
-                phase: 2,
-                status: 0
-              },
-              {
-                phase: 3,
-                status: 0
-              }
-            ]
-          });
-          // setCache(updatedCache);
-          onUpdateCache(updatedCache);
-          reset();
-        } catch (error) {
-          console.log(error);
-        }
-      };
-      start();
-    }
-  }, [isSuccess]);
-
-  useEffect(() => {
-    const start = async () => {
-      try {
-        const cacheResult = await getCache(CacheTypes.UserPhases);
-        // setCache(cacheResult);
-        onUpdateCache(cacheResult);
-        if (
-          !!cache &&
-          cache?.onboardingQuestAddress &&
-          daoData.onboardingQuestAddress &&
-          cache?.questId === +quest.questId
-        ) {
-          hasUserCompletedQuest({
-            questId: +quest.questId,
-            userAddress: account,
-            onboardingQuestAddress: daoData.onboardingQuestAddress,
-            daoAddress: daoData.daoAddress
-          });
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    start();
-  }, []);
-  return (
-    <>
-      {hasAppliedForQuest && (
-        <LoadingButton
-          onClick={(e) => {
-            e.stopPropagation();
-            confimWithdrawal();
-          }}
-          disabled={isWithdrawing}
-          loadingIndicator={
-            <Stack direction="row" gap={1} alignItems="center">
-              <CircularProgress size="20px" color="offWhite" />
-            </Stack>
-          }
-          loading={isWithdrawing}
-          size="small"
-          color="error"
-          variant="outlined"
-        >
-          Withdraw
-        </LoadingButton>
-      )}
-      {canApplyForAQuest && (
-        <LoadingButton
-          onClick={(e) => {
-            e.stopPropagation();
-            apply({
-              onboardingQuestAddress: daoData.onboardingQuestAddress,
-              questId: +quest.questId
-            });
-          }}
-          disabled={isApplying}
-          loadingIndicator={
-            <Stack direction="row" gap={1} alignItems="center">
-              <CircularProgress size="20px" color="offWhite" />
-            </Stack>
-          }
-          loading={isApplying}
-          size="small"
-          color="primary"
-          variant="outlined"
-        >
-          Apply
-        </LoadingButton>
-      )}
-      {!canApplyForAQuest && !hasAppliedForQuest && (
-        <Tooltip
-          title={
-            !hasQuestStarted
-              ? "Quest hasn't started yet"
-              : "Already applied to another quest"
-          }
-        >
-          <Button
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-            disabled={false}
-            size="small"
-            color="primary"
-            variant="outlined"
-          >
-            Apply
-          </Button>
-        </Tooltip>
-      )}
-    </>
-  );
-};
-
 export const NovaCard = ({
   daoData,
   highlightData,
   onUpdateCache,
   cache,
   onQuestSelected,
-  onApplyForQuest
+  onApplyForQuest,
+  questToApplyFor,
+  isApplying
 }: {
   daoData: any;
   highlightData: any;
@@ -359,40 +153,25 @@ export const NovaCard = ({
   cache: any;
   onQuestSelected: any;
   onApplyForQuest: any;
+  questToApplyFor: any;
+  isApplying: boolean;
 }) => {
-  const [
-    apply,
-    { data, isLoading: isApplying, isError, error, reset, isSuccess }
-  ] = useApplyForQuestMutation();
   const [isFlipped, setFlipped] = useState(false);
-  const confirm = useConfirmDialog();
 
-  const [
-    withdraw,
-    {
-      isLoading: isWithdrawing,
-      isError: isWithdrawError,
-      error: withdrawError,
-      reset: withdrawReset,
-      isSuccess: withdrawIsSuccess
-    }
-  ] = useWithdrawFromAQuestMutation();
-
-  useEffect(() => {
-    if (withdrawIsSuccess) {
-      const start = async () => {
-        try {
-          await deleteCache(CacheTypes.UserPhases);
-          onUpdateCache(null);
-          // setCache(null);
-          withdrawReset();
-        } catch (error) {
-          console.log(error);
-        }
-      };
-      start();
-    }
-  }, [withdrawIsSuccess]);
+  const questStartTime = useMemo(() => {
+    console.log(
+      new Date(
+        daoData?.properties?.quests.find(
+          (q) => q.questId === highlightData?.questId
+        )?.startDate
+      )
+    );
+    return new Date(
+      daoData?.properties?.quests.find(
+        (q) => q.questId === highlightData?.questId
+      )?.startDate
+    );
+  }, [highlightData, daoData]);
 
   const questDetails = async (e, quest) => {
     e.stopPropagation();
@@ -566,13 +345,23 @@ export const NovaCard = ({
                         Details
                       </Link>
                     </div>
-
-                    <ApplyOrWithdrawFromQuest
-                      daoData={daoData}
-                      quest={quest}
-                      cache={cache}
-                      onUpdateCache={onUpdateCache}
-                    ></ApplyOrWithdrawFromQuest>
+                    <div
+                      style={{
+                        display: "flex-end",
+                        justifyContent: "center",
+                        width: "120px"
+                      }}
+                    >
+                      <ApplyOrWithdrawFromQuest
+                        daoData={daoData}
+                        quest={quest}
+                        cache={cache}
+                        onUpdateCache={onUpdateCache}
+                        onApplyForQuest={onApplyForQuest}
+                        questToApplyFor={questToApplyFor}
+                        isApplying={isApplying}
+                      ></ApplyOrWithdrawFromQuest>
+                    </div>
 
                     {/* <Button
                       onClick={(e) => applyForQuest(e, quest)}
@@ -618,7 +407,7 @@ export const NovaCard = ({
           </AutCardContainer>
         </AutCardBack>
       </Flipcard>
-      {(daoData as boolean) ? (
+      {highlightData.highlighted && questStartTime > new Date() ? (
         <Countdown>
           <Typography
             width="100%"
@@ -644,19 +433,23 @@ export const NovaCard = ({
               size: "4px"
             }}
             // next line should have a date thats 10 minutes from now
-            to={new Date(Date.now() + 600000)}
+            to={questStartTime}
           />
         </Countdown>
       ) : (
-        <Button
-          sx={{ width: "100%", mt: "45px" }}
-          variant="outlined"
-          size="normal"
-          color="offWhite"
-          onClick={flipCard}
+        <div
+          style={{ width: "100%", display: "flex", justifyContent: "center" }}
         >
-          SEE QUESTS
-        </Button>
+          <SeeQuestButton
+            sx={{ width: "100%", mt: "45px" }}
+            variant="outlined"
+            size="normal"
+            color="offWhite"
+            onClick={flipCard}
+          >
+            SEE QUESTS
+          </SeeQuestButton>
+        </div>
       )}
     </div>
   );
