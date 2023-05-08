@@ -2,8 +2,8 @@ version: '3.7'
 
 services:
 
-  aut_dashboard_dev:
-    container_name: aut_dashboard_dev
+  nova_showcase_dev:
+    container_name: nova_showcase_dev
     build:
       context: .
       dockerfile: Dockerfile
@@ -11,4 +11,4 @@ services:
       - '.:/app'
       - '/app/node_modules'
     ports:
-      - '3333:80'
+      - '4002:80'
