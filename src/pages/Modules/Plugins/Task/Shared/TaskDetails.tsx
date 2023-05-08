@@ -9,8 +9,7 @@ import {
   Tooltip,
   Typography
 } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { memo } from "react";
 import OverflowTooltip from "@components/OverflowTooltip";
 import { Link, useSearchParams } from "react-router-dom";
@@ -26,19 +25,7 @@ const TaskDetails = ({ task }: TaskDetailsParams) => {
   const isLoading = false;
 
   return (
-    <Container
-      maxWidth="lg"
-      sx={{
-        py: "20px",
-        display: "flex",
-        flexDirection: "column",
-        position: "relative",
-        marginBottom: {
-          xs: "20px",
-          xxl: "30px"
-        }
-      }}
-    >
+    <>
       {isLoading ? (
         <CircularProgress className="spinner-center" size="60px" />
       ) : (
@@ -46,14 +33,15 @@ const TaskDetails = ({ task }: TaskDetailsParams) => {
           sx={{
             display: "flex",
             flexDirection: "column",
-            alignItems: "center",
-            gap: 1,
-            position: "relative"
+            mb: 4,
+            position: "relative",
+            mx: "auto",
+            width: "100%"
           }}
         >
           <Stack alignItems="center" justifyContent="center">
             <Button
-              startIcon={<ArrowBackIcon />}
+              startIcon={<ArrowBackIosNewIcon />}
               color="offWhite"
               sx={{
                 position: {
@@ -66,84 +54,42 @@ const TaskDetails = ({ task }: TaskDetailsParams) => {
               to={searchParams.get("returnUrl")}
               component={Link}
             >
-              {searchParams.get("returnUrlLinkName") || "Back"}
+              {/* {searchParams.get("returnUrlLinkName") || "Back"} */}
+              <Typography color="white" variant="body">
+                Back
+              </Typography>
             </Button>
             <Typography textAlign="center" color="white" variant="h3">
               {task?.metadata?.name}
             </Typography>
           </Stack>
 
-          <Typography textAlign="center" color="white" variant="body">
-            {taskTypes[task?.taskType]?.label}
+          <Typography
+            mt={2}
+            mx="auto"
+            textAlign="center"
+            color="white"
+            sx={{
+              width: {
+                xs: "100%",
+                sm: "700px",
+                xxl: "1000px"
+              }
+            }}
+            variant="body"
+          >
+            {task?.metadata?.description}
           </Typography>
 
           {/* <OverflowTooltip
-            typography={{
-              maxWidth: "400px"
-            }}
-            text={task?.metadata?.description}
-          /> */}
-
-          <Box
-            sx={{
-              display: "grid",
-              alignItems: "center",
-              mx: "auto",
-              gridTemplateColumns: "1fr 1fr 1fr 1fr"
-            }}
-          >
-            <Stack direction="column" alignItems="center" sx={{ mr: "10px" }}>
-              <Typography
-                fontFamily="FractulAltBold"
-                color="white"
-                variant="subtitle2"
-              >
-                {new Date(task?.startDate).toDateString()}
-              </Typography>
-              <Typography variant="caption" className="text-secondary">
-                Start date
-              </Typography>
-            </Stack>
-            <Stack direction="column" alignItems="center">
-              <Typography
-                fontFamily="FractulAltBold"
-                color="white"
-                variant="subtitle2"
-              >
-                {new Date(task?.endDate)?.toDateString()}
-              </Typography>
-              <Typography variant="caption" className="text-secondary">
-                End date
-              </Typography>
-            </Stack>
-            <Stack direction="column" alignItems="center">
-              <Typography
-                fontFamily="FractulAltBold"
-                variant="subtitle2"
-                color={`${taskStatuses[task?.status]?.color}.main`}
-              >
-                {taskStatuses[task?.status]?.label}
-              </Typography>
-              <Typography variant="caption" className="text-secondary">
-                Status
-              </Typography>
-            </Stack>
-            <Stack direction="column" alignItems="center">
-              <Typography
-                fontFamily="FractulAltBold"
-                color="white"
-                variant="subtitle2"
-              >
-                {new Date(task?.createdOn * 1000).toDateString()}
-              </Typography>
-              <Typography variant="caption" className="text-secondary">
-                Created On
-              </Typography>
-            </Stack>
-          </Box>
+          typography={{
+            maxWidth: "400px"
+          }}
+          text={task?.metadata?.description}
+        /> */}
         </Box>
       )}
-    </Container>
+    </>
   );
 };
 

@@ -160,7 +160,7 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
 
   return (
     <Container
-      sx={{ py: "20px", display: "flex", flexDirection: "column" }}
+      sx={{ py: "30px", display: "flex", flexDirection: "column" }}
       maxWidth="lg"
       component="form"
       autoComplete="off"
@@ -177,7 +177,6 @@ const JoinDiscordTasks = ({ plugin }: PluginParams) => {
         sx={{
           display: "flex",
           flexDirection: "column",
-          flex: 1,
           mb: 4,
           position: "relative",
           mx: "auto",

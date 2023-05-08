@@ -5,26 +5,11 @@ import {
 import { PluginDefinition } from "@aut-labs-private/sdk";
 import AutLoading from "@components/AutLoading";
 import { StepperButton } from "@components/Stepper";
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Container,
-  Stack,
-  Typography
-} from "@mui/material";
-import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import { Container, Stack } from "@mui/material";
 import { IsAdmin } from "@store/Community/community.reducer";
-import { memo } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { memo, useState } from "react";
 import { useSelector } from "react-redux";
-import {
-  Link,
-  useLocation,
-  useParams,
-  useSearchParams
-} from "react-router-dom";
+import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import TaskDetails from "../Shared/TaskDetails";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { taskTypes } from "../Shared/Tasks";
@@ -32,11 +17,6 @@ import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
 import { useEthers } from "@usedapp/core";
 import { useOAuth } from "@components/Oauth2/oauth2";
-import {
-  getServerDetails,
-  verifyDiscordServerOwnership
-} from "@api/discord.api";
-import { useAppDispatch } from "@store/store.model";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 
@@ -48,10 +28,10 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const params = useParams();
-  const dispatch = useAppDispatch();
   const { account: userAddress } = useEthers();
   const isAdmin = useSelector(IsAdmin);
-  const { getAuth, authenticating } = useOAuth();
+  const { getAuth } = useOAuth();
+  const [joinClicked, setJoinClicked] = useState(false);
 
   const { task } = useGetAllTasksPerQuestQuery(
     {
@@ -77,21 +57,10 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
     }
   );
 
-  const { control, handleSubmit, getValues, setValue, formState } = useForm({
-    mode: "onChange",
-    defaultValues: {
-      inviteClicked: false
-    }
-  });
-  const values = useWatch({
-    name: "inviteClicked",
-    control
-  });
-
   const [submitJoinDiscordTask, { error, isError, isLoading, reset }] =
     useSubmitJoinDiscordTaskMutation();
 
-  const onSubmit = async (values) => {
+  const onSubmit = async () => {
     await getAuth(
       async (data) => {
         const { access_token } = data;
@@ -105,24 +74,16 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
         });
       },
       () => {
-        // setLoading(false);
+        setJoinClicked(false);
       }
     );
   };
-
-  const setButtonClicked = () => {
-    setValue("inviteClicked", true);
-  };
-
-  if (task) {
-    console.log("TASK DISCORD:", task);
-  }
 
   return (
     <Container
       maxWidth="lg"
       sx={{
-        py: 4,
+        py: "30px",
         height: "100%",
         flex: 1,
         display: "flex",
@@ -136,165 +97,89 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
       {task ? (
         <>
           <TaskDetails task={task} />
-
-          {isAdmin ? (
+          <Stack
+            direction="column"
+            gap={8}
+            sx={{
+              flex: 1,
+              justifyContent: "space-between",
+              margin: "0 auto",
+              width: {
+                xs: "100%",
+                sm: "650px",
+                xxl: "800px"
+              }
+            }}
+          >
             <Stack
-              direction="column"
-              gap={4}
               sx={{
-                flex: 1,
-                justifyContent: "space-between",
                 margin: "0 auto",
                 width: {
                   xs: "100%",
                   sm: "400px",
-                  xxl: "800px"
+                  xxl: "500px"
                 }
               }}
             >
-              <Card
-                sx={{
-                  bgcolor: "nightBlack.main",
-                  borderColor: "divider",
-                  borderRadius: "16px",
-                  boxShadow: 3
-                }}
-              >
-                <CardContent
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column"
-                  }}
-                >
-                  <Stack direction="column" alignItems="center" mb="15px">
-                    <Typography
-                      color="white"
-                      variant="body"
-                      textAlign="center"
-                      p="5px"
-                    >
-                      {task?.metadata?.description}
-                    </Typography>
-                    <Typography variant="caption" className="text-secondary">
-                      Task Description
-                    </Typography>
-                  </Stack>
-
-                  <Stack direction="column" alignItems="center">
-                    <Typography
-                      color="white"
-                      variant="body"
-                      textAlign="center"
-                      component={Link}
-                      target="_blank"
-                      to={(task as any)?.metadata?.properties?.inviteUrl}
-                      p="5px"
-                    >
-                      {(task as any)?.metadata?.properties?.inviteUrl}
-                    </Typography>
-                    <Typography variant="caption" className="text-secondary">
-                      Invite URL
-                    </Typography>
-                  </Stack>
-
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center"
-                    }}
-                  ></Box>
-                </CardContent>
-              </Card>
-            </Stack>
-          ) : (
-            <Stack
-              direction="column"
-              gap={4}
-              sx={{
-                flex: 1,
-                justifyContent: "space-between",
-                margin: "0 auto",
-                width: {
-                  xs: "100%",
-                  sm: "400px",
-                  xxl: "800px"
-                }
-              }}
-            >
-              <Card
-                sx={{
-                  bgcolor: "nightBlack.main",
-                  borderColor: "divider",
-                  borderRadius: "16px",
-                  boxShadow: 3
-                }}
-              >
-                <CardContent
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column"
-                  }}
-                >
-                  <Typography
-                    color="white"
-                    variant="body"
-                    textAlign="center"
-                    p="20px"
-                  >
-                    {task?.metadata?.description}
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center"
-                    }}
-                  >
-                    <Button
-                      startIcon={<OpenInNewIcon></OpenInNewIcon>}
-                      sx={{
-                        width: "200px",
-                        height: "50px"
-                      }}
-                      type="button"
-                      color="offWhite"
-                      disabled={
-                        task?.status === TaskStatus.Submitted ||
-                        task?.status === TaskStatus.Finished
-                      }
-                      variant="outlined"
-                      component={Link}
-                      target="_blank"
-                      to={(task as any)?.metadata?.properties?.inviteUrl}
-                      onClick={setButtonClicked}
-                    >
-                      Join Discord
-                    </Button>
-                  </Box>
-                </CardContent>
-              </Card>
-              {task?.status === TaskStatus.Created ||
-              task?.status === TaskStatus.Taken ? (
-                <Stack
-                  sx={{
-                    margin: "0 auto",
-                    width: {
-                      xs: "100%",
-                      sm: "400px",
-                      xxl: "800px"
-                    }
-                  }}
-                >
-                  <StepperButton
-                    label="Submit"
-                    onClick={handleSubmit(onSubmit)}
-                    // disabled={!values}
-                  />
-                </Stack>
-              ) : (
-                <Box sx={{ mb: "20px" }}></Box>
+              {joinClicked && (
+                <StepperButton
+                  label="Confirm"
+                  disabled={task?.status !== TaskStatus.Created}
+                  onClick={() => onSubmit()}
+                  sx={{ width: "250px", margin: "0 auto" }}
+                />
               )}
+              {!joinClicked && (
+                <StepperButton
+                  label="Join"
+                  disabled={task?.status !== TaskStatus.Created}
+                  onClick={() => {
+                    setJoinClicked(true);
+                    window.open(
+                      task.metadata.properties["inviteUrl"],
+                      "_blank"
+                    );
+                  }}
+                  sx={{ width: "250px", margin: "0 auto" }}
+                />
+              )}
+              {/* <Button
+                startIcon={<OpenInNewIcon />}
+                sx={{
+                  textTransform: "uppercase"
+                }}
+                type="button"
+                size="medium"
+                color="offWhite"
+                disabled={task?.status !== TaskStatus.Created}
+                variant="outlined"
+                component={Link}
+                target="_blank"
+                to={(task as any)?.metadata?.properties?.inviteUrl}
+                onClick={setButtonClicked}
+              >
+                Join Discord
+              </Button> */}
             </Stack>
-          )}
+            {/* <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                mb: 4,
+                justifyContent: {
+                  xs: "center",
+                  sm: "flex-end"
+                }
+              }}
+            >
+              <StepperButton
+                label="Confirm"
+                disabled={task?.status !== TaskStatus.Created}
+                onClick={handleSubmit(onSubmit)}
+                sx={{ width: "250px" }}
+              />
+            </Box> */}
+          </Stack>
         </>
       ) : (
         <AutLoading></AutLoading>

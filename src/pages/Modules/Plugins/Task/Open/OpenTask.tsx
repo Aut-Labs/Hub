@@ -4,7 +4,7 @@ import {
   useGetAllTasksPerQuestQuery,
   useSubmitOpenTaskMutation
 } from "@api/onboarding.api";
-import { PluginDefinition, Task } from "@aut-labs-private/sdk";
+import AutSDK, { PluginDefinition, Task } from "@aut-labs-private/sdk";
 import AutLoading from "@components/AutLoading";
 import { StepperButton } from "@components/Stepper";
 import {
@@ -29,6 +29,9 @@ import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { useEthers } from "@usedapp/core";
 import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
+import { ipfsCIDToHttpUrl } from "@api/storage.api";
+import AFileUpload, { TaskFileUpload } from "@components/FileUpload";
+import { toBase64 } from "@utils/to-base-64";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -51,7 +54,8 @@ const UserSubmitContent = ({
   const { control, handleSubmit, formState, setValue } = useForm({
     mode: "onChange",
     defaultValues: {
-      openTask: null
+      openTask: null,
+      file: null
     }
   });
 
@@ -66,6 +70,8 @@ const UserSubmitContent = ({
     useSubmitOpenTaskMutation();
 
   const onSubmit = async (values) => {
+    const sdk = AutSDK.getInstance();
+    const fileUri = await sdk.client.storeAsBlob(values.file);
     submitTask({
       task: {
         ...task,
@@ -73,7 +79,8 @@ const UserSubmitContent = ({
           name: "Open task submission",
           description: values.openTask,
           properties: {
-            submitter: userAddress
+            submitter: userAddress,
+            fileUri: fileUri
           }
         }
       },
@@ -143,6 +150,7 @@ const UserSubmitContent = ({
                       task.status === TaskStatus.Finished
                     }
                     value={value || ""}
+                    sx={{ mb: "20px" }}
                     onChange={onChange}
                     variant="outlined"
                     color="offWhite"
@@ -151,6 +159,42 @@ const UserSubmitContent = ({
                     rows={5}
                     placeholder="Enter your answer here..."
                   />
+                );
+              }}
+            />
+            <Typography
+              color="white"
+              variant="body"
+              textAlign="center"
+              p="20px"
+            >
+              Upload a file
+            </Typography>
+            <Controller
+              name="file"
+              control={control}
+              rules={{
+                required: true
+              }}
+              render={({ field: { onChange } }) => {
+                return (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column"
+                    }}
+                  >
+                    <TaskFileUpload
+                      color="offWhite"
+                      fileChange={async (file) => {
+                        if (file) {
+                          onChange(await toBase64(file));
+                        } else {
+                          onChange(null);
+                        }
+                      }}
+                    />
+                  </div>
                 );
               }}
             />
