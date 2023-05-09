@@ -81,7 +81,7 @@ const UserSubmitContent = ({
           properties: {
             submitter: userAddress,
             fileUri: fileUri
-          }
+          } as any
         }
       },
       onboardingQuestAddress: searchParams.get(
