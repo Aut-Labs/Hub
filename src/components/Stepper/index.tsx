@@ -161,8 +161,8 @@ export const StepperButton = ({
       }}
       type="submit"
       variant="outlined"
-      size="normal"
-      color="primary"
+      size="large"
+      color="offWhite"
       {...props}
     >
       {label}
