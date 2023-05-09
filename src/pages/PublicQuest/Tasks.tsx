@@ -160,29 +160,6 @@ const TaskCard = ({
           subheaderTypographyProps={{
             color: "white"
           }}
-          action={
-            <IconButton
-              onClick={() => {
-                navigate({
-                  pathname: `/quest/${path}/${row.taskId}`,
-                  search: new URLSearchParams({
-                    questId: searchParams.get(RequiredQueryParams.QuestId),
-                    onboardingQuestAddress: searchParams.get(
-                      RequiredQueryParams.OnboardingQuestAddress
-                    ),
-                    daoAddress: searchParams.get(
-                      RequiredQueryParams.DaoAddress
-                    ),
-                    returnUrlLinkName: "Back to quest",
-                    returnUrl: `${location?.pathname}${location?.search}`
-                  }).toString()
-                });
-              }}
-              color="offWhite"
-            >
-              <EditIcon />
-            </IconButton>
-          }
           title={plugin?.metadata?.properties?.title}
         />
         <CardContent
