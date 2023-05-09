@@ -1,13 +1,14 @@
-version: '3.9'
-services:
-  nova_showcase_dev: 
-    container_name: nova_showcase_dev
-    image: nova_showcase_dev
-    build: ./
+version: '3.7'
 
-  nova_showcase_nginx_dev:
-    container_name: nova_showcase_nginx_dev
-    image: nova_showcase_nginx_dev
-    build: ./nginx/dev
+services:
+
+  nova_showcase_dev:
+    container_name: nova_showcase_dev
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - '.:/app'
+      - '/app/node_modules'
     ports:
-      - 4002:9080
+      - '4002:80'

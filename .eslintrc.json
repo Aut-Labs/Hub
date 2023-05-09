@@ -1,6 +1,67 @@
 {
-  "extends": "next/core-web-vitals",
-  "rules": {
-    "react-hooks/exhaustive-deps": "off"
+    "env": {
+      "browser": true,
+      "node": true
+    },
+    "parser": "@typescript-eslint/parser",
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/eslint-recommended",
+      "plugin:@typescript-eslint/recommended",
+      "prettier"
+    ],
+    "plugins": ["@typescript-eslint", "prettier"],
+    "ignorePatterns": ["node_modules", "build", "dist", "public", ".js"],
+    "settings": {
+      "import/parsers": {
+        "@typescript-eslint/parser": [".ts", ".tsx"]
+      },
+      "import/resolver": {
+        "typescript": {
+          "alwaysTryTypes": true,
+          "paths": "./tsconfig.json"
+        }
+      }
+    },
+    "rules": {
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-var-requires": "off",
+      "comma-dangle": 0,
+      "no-useless-constructor": "off",
+      "prettier/prettier": ["error", { "singleQuote": false }],
+      "eslint/no-useless-constructor": "off",
+      "@typescript-eslint/no-useless-constructor": "off",
+      "no-underscore-dangle": "off",
+      "consistent-return": "off",
+      "no-await-in-loop": "off",
+      "no-restricted-syntax": "off",
+      "@typescript-eslint/explicit-module-boundary-types": "off",
+      "import/no-extraneous-dependencies": "off",
+      "jsx-a11y/click-events-have-key-events": "off",
+      "no-use-before-define": "off",
+      "quotes": "off",
+      "import/no-named-as-default": "off",
+      "@typescript-eslint/ban-ts-comment": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-shadow": "off",
+      "@typescript-eslint/explicit-function-return-type": "off",
+      "max-classes-per-file": "off",
+      "no-extra-boolean-cast": "off",
+      "max-len": [
+        "warn",
+        {
+          "code": 140
+        }
+      ],
+      "no-shadow": "off",
+      "no-undef": "off",
+      "no-console": "off",
+      "import/prefer-default-export": "off",
+      "no-nested-ternary": "off",
+      "no-unused-vars": "off",
+      "import/no-unresolved": "off",
+      "no-debugger": "off",
+      "no-param-reassign": "off"
+    }
   }
-}
+  

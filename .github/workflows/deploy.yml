@@ -20,9 +20,18 @@ jobs:
           script: |
             #!/usr/bin/env bash
 
+            # REPO_URL=$REPO_URL
+            # REPO_NAME=$REPO_NAME
+            # # Get name of repo and use it for directory name ex: owner/repo-name becomes -> repo-name
+            # DIR_NAME=$(echo "$REPO_NAME" | cut -d '/' -f 2-)
             DIR_NAME='nova-showcase'
             TARGET='dev'
 
+
+            # if [ ! -d $DIR_NAME ]
+            # then
+            #     sudo git clone $REPO_URL
+            # fi
 
             cd ~/$DIR_NAME || exit
             sudo chmod -R a+rwX .
@@ -52,6 +61,7 @@ jobs:
             fi
 
             # If that's not the case, we pull the latest changes and we build a new image
+
             sudo git pull origin dev;
 
             # Docker

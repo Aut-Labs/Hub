@@ -1,0 +1,40 @@
+.sw-task-roles-wrapper {
+  width: 100%;
+
+  .sw-roles-options {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    grid-gap: 20px;
+  }
+
+  .form-fields {
+    display: flex;
+    justify-content: center;
+  }
+
+  .sw-form-field-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    grid-gap: 20px;
+
+    .MuiFormControl-root {
+      flex: 1;
+    }
+
+    .MuiInputBase-root {
+      color: $primary-color;
+
+      input {
+        height: inherit;
+        box-sizing: border-box;
+      }
+
+      &::before,
+      &::after {
+        border-bottom: 2px solid $primary-color;
+      }
+    }
+  }
+}

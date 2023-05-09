@@ -1,13 +1,5 @@
-.git/
-.gitignore
-**/.gitkeep
-**/.DS_Store
-.next/
+node_modules
+build
 .dockerignore
 Dockerfile
-docker-compose.yml
-node_modules/
-server/
-nginx/
-deprecated/
-README.md
+Dockerfile.prod
