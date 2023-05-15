@@ -59,7 +59,7 @@ const DiscordIntegration = () => {
             Create Tasks and let your community contribute - directly on
             Discord!
             <br />
-            Aut’s Discord Bot is a bridge between Web2 and Web3
+            Āut’s Discord Bot is a bridge between Web2 and Web3
             <br />- to track like a wizard, and react like a witch.
           </>
         }

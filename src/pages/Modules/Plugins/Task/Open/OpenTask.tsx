@@ -70,9 +70,8 @@ const UserSubmitContent = ({
     useSubmitOpenTaskMutation();
 
   const onSubmit = async (values) => {
-    const sdk = AutSDK.getInstance();
-    const fileUri = await sdk.client.storeAsBlob(values.file);
     submitTask({
+      file: values.file,
       task: {
         ...task,
         submission: {
@@ -80,7 +79,7 @@ const UserSubmitContent = ({
           description: values.openTask,
           properties: {
             submitter: userAddress,
-            fileUri: fileUri
+            fileUri: ""
           } as any
         }
       },

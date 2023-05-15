@@ -22,7 +22,7 @@ import QuestInfo from "./QuestInfo";
 import AutLoading from "@components/AutLoading";
 import { RequiredQueryParams } from "../../api/RequiredQueryParams";
 import { useEthers } from "@usedapp/core";
-import { useGetCommunityQuery } from "@api/community.api";
+import { useGetAllNovasQuery } from "@api/community.api";
 import { CacheModel } from "@api/cache.api";
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
@@ -60,9 +60,12 @@ const PublicQuest = () => {
     }
   );
 
-  const { data: communityData } = useGetCommunityQuery(null, {
-    refetchOnMountOrArgChange: false,
-    skip: false
+  const { data: communityData } = useGetAllNovasQuery(null, {
+    selectFromResult: ({ data }) => ({
+      data: (data?.daos || []).find(
+        (d) => d.daoAddress === searchParams.get(RequiredQueryParams.DaoAddress)
+      )
+    })
   });
 
   const isOwner = useMemo(() => {
@@ -74,14 +77,6 @@ const PublicQuest = () => {
     return isAfter(new Date(), new Date(quest.startDate));
   }, [quest]);
 
-  const hasQuestEnded = useMemo(() => {
-    if (!quest?.startDate) return false;
-    return isAfter(
-      new Date(),
-      addDays(new Date(quest.startDate), quest.durationInDays)
-    );
-  }, [quest]);
-
   const hasAppliedForQuest = useMemo(() => {
     return (
       !isOwner &&
@@ -90,7 +85,7 @@ const PublicQuest = () => {
         searchParams.get(RequiredQueryParams.OnboardingQuestAddress) &&
       cache?.questId === +searchParams.get(RequiredQueryParams.QuestId)
     );
-  }, [cache, hasQuestStarted, hasQuestEnded, isOwner]);
+  }, [cache, isOwner]);
 
   const {
     data: tasksAndSubmissions,
@@ -238,6 +233,7 @@ const PublicQuest = () => {
 
           <Tasks
             questId={quest?.questId}
+            canSubmitTask={hasQuestStarted && hasAppliedForQuest}
             onboardingQuestAddress={searchParams.get(
               RequiredQueryParams.OnboardingQuestAddress
             )}

@@ -14,7 +14,6 @@ import { memo, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import DescriptionIcon from "@mui/icons-material/Description";
-import { useGetCommunityQuery } from "@api/community.api";
 import { NetworksConfig } from "@store/WalletProvider/WalletProvider";
 import { useEthers } from "@usedapp/core";
 import { useSelector } from "react-redux";
@@ -24,6 +23,7 @@ import { ReactComponent as LensfrensIcon } from "@assets/SocialIcons/LensfrensIc
 import { ReactComponent as TelegramIcon } from "@assets/SocialIcons/TelegramIcon.svg";
 import { ReactComponent as TwitterIcon } from "@assets/SocialIcons/TwitterIcon.svg";
 import { RequiredQueryParams } from "../../api/RequiredQueryParams";
+import { useGetAllNovasQuery } from "@api/community.api";
 
 const socialIcons = {
   discord: DiscordIcon,
@@ -50,9 +50,11 @@ const CommunityInfo = () => {
     }
   }, [selectedNetworkConfig]);
 
-  const { data } = useGetCommunityQuery(null, {
+  const { data } = useGetAllNovasQuery(null, {
     selectFromResult: ({ data }) => ({
-      data
+      data: (data?.daos || []).find(
+        (d) => d.daoAddress === searchParams.get(RequiredQueryParams.DaoAddress)
+      )
     })
   });
 
@@ -80,8 +82,8 @@ const CommunityInfo = () => {
         <Stack direction="column">
           <Typography color="white" variant="subtitle1">
             <Stack direction="row" alignItems="center">
-              {data?.community?.name}
-              <Tooltip title={data?.community?.description}>
+              {data?.name}
+              <Tooltip title={data?.description}>
                 <DescriptionIcon
                   sx={{
                     color: "offWhite.main",
@@ -116,7 +118,7 @@ const CommunityInfo = () => {
                 border: "1px solid white"
               }}
               aria-label="community-avatar"
-              src={ipfsCIDToHttpUrl(data?.community?.image as string)}
+              src={ipfsCIDToHttpUrl(data?.image as string)}
             />
             <Stack gap={2}>
               <Stack direction="row" alignItems="center">
@@ -137,7 +139,7 @@ const CommunityInfo = () => {
                 </Tooltip>
               </Stack>
               <Stack direction="row">
-                {data?.community?.properties.socials.map((social, index) => {
+                {data?.properties.socials.map((social, index) => {
                   const AutIcon = socialIcons[Object.keys(socialIcons)[index]];
 
                   return (

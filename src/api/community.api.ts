@@ -355,12 +355,10 @@ const getMembers = async (body, api: BaseQueryApi) => {
 
   const sdk = AutSDK.getInstance();
 
-  if (!sdk.daoExpander) {
-    sdk.daoExpander = sdk.initService<DAOExpander>(
-      DAOExpander,
-      selectedCommunityAddress
-    );
-  }
+  sdk.daoExpander = sdk.initService<DAOExpander>(
+    DAOExpander,
+    selectedCommunityAddress
+  );
 
   const members: DAOMember[] = [];
   const membersResponse =
@@ -411,6 +409,7 @@ const getMembers = async (body, api: BaseQueryApi) => {
 
 const getCommunity = async (daoAddress: string, api: BaseQueryApi) => {
   const sdk = AutSDK.getInstance();
+  sdk.daoExpander = sdk.initService<DAOExpander>(DAOExpander, daoAddress);
 
   const response = await sdk.daoExpander.contract.metadata.getMetadataUri();
 
@@ -426,10 +425,9 @@ const getCommunity = async (daoAddress: string, api: BaseQueryApi) => {
   );
 
   const adminResponse = await sdk.daoExpander.contract.admins.getAdmins();
-  const community = new Community(metadata);
   return {
     data: {
-      community,
+      community: new Community(metadata),
       admin: adminResponse.data[0]
     }
   };
@@ -458,6 +456,7 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
       await fetchMetadata(dao.daoMetadataUri, environment.nftStorageUrl);
     const daoModel = metadata;
     (daoModel as any).daoAddress = dao.daoAddress;
+    (daoModel as any).admin = dao.admin;
     (daoModel as any).onboardingQuestAddress = dao.onboardingQuestAddress;
     (daoModel as any).properties.quests = [];
 
@@ -520,7 +519,7 @@ export const communityApi = createApi({
         community: Community;
         admin: string;
       },
-      void
+      string
     >({
       query: (body) => {
         return {

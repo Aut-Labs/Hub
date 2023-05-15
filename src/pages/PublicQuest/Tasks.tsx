@@ -83,6 +83,7 @@ interface TasksParams {
   tasks: Task[];
   canDelete?: boolean;
   isAdmin: boolean;
+  canSubmitTask: boolean;
   onboardingQuestAddress: string;
   questId: number;
 }
@@ -91,12 +92,14 @@ const TaskCard = ({
   row,
   isAdmin,
   canDelete,
+  canSubmitTask,
   onboardingQuestAddress,
   questId
 }: {
   row: Task;
   isAdmin: boolean;
   canDelete: boolean;
+  canSubmitTask: boolean;
   onboardingQuestAddress: string;
   questId: number;
 }) => {
@@ -160,7 +163,7 @@ const TaskCard = ({
           subheaderTypographyProps={{
             color: "white"
           }}
-          title={plugin?.metadata?.properties?.title}
+          title={row?.metadata?.name}
         />
         <CardContent
           sx={{
@@ -196,6 +199,7 @@ const TaskCard = ({
                 mb: 4,
                 mx: "auto"
               }}
+              disabled={!canSubmitTask}
               onClick={() => {
                 navigate({
                   pathname: `/quest/${path}/${row.taskId}`,
@@ -257,6 +261,7 @@ const Tasks = ({
   isAdmin,
   canDelete,
   onboardingQuestAddress,
+  canSubmitTask,
   questId
 }: TasksParams) => {
   return (
@@ -269,6 +274,7 @@ const Tasks = ({
             <GridBox sx={{ flexGrow: 1, mt: 4 }}>
               {tasks.map((row, index) => (
                 <TaskCard
+                  canSubmitTask={canSubmitTask}
                   onboardingQuestAddress={onboardingQuestAddress}
                   questId={questId}
                   isAdmin={isAdmin}

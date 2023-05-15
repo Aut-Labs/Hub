@@ -28,9 +28,8 @@ import { useAppDispatch } from "@store/store.model";
 import { useApplyForQuestMutation } from "@api/onboarding.api";
 import { useEthers } from "@usedapp/core";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
-import { el } from "date-fns/locale";
-import { set } from "date-fns";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
+import { resetState } from "@store/store";
 
 const TOOLBAR_HEIGHT = 84;
 
@@ -164,6 +163,10 @@ export const DaoList = () => {
     setQuestToApply(quest);
   };
 
+  useEffect(() => {
+    dispatch(resetState);
+  }, []);
+
   // useEffect(() => {
   //   if (questToApply && connectStatus === "disconnected") {
   //     setQuestToApply(null);
@@ -288,7 +291,7 @@ export const DaoList = () => {
           </Typography>
         </Box>
 
-        {!isLoading && !data.daos?.length && (
+        {!isLoading && !(data?.daos || [])?.length && (
           <Box
             sx={{
               display: "flex",
@@ -323,7 +326,7 @@ export const DaoList = () => {
         ) : (
           <>
             <GridBox sx={{ flexGrow: 1, mt: 4 }}>
-              {data.daos.map((dao, index) => (
+              {(data?.daos || []).map((dao, index) => (
                 <NovaCard
                   key={`nova-card-${index}`}
                   onUpdateCache={setCache}

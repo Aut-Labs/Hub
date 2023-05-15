@@ -1,5 +1,5 @@
 export function getOwnerPhases() {
-  const phaseOneStartDate = new Date("2023-04-13T07:00:00.000Z");
+  const phaseOneStartDate = new Date("2023-05-16T07:00:00.000Z");
   // set the time zone to CET
   phaseOneStartDate.setUTCHours(7);
   phaseOneStartDate.setMinutes(0);

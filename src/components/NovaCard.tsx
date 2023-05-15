@@ -159,13 +159,6 @@ export const NovaCard = ({
   const [isFlipped, setFlipped] = useState(false);
 
   const questStartTime = useMemo(() => {
-    console.log(
-      new Date(
-        daoData?.properties?.quests.find(
-          (q) => q.questId === highlightData?.questId
-        )?.startDate
-      )
-    );
     return new Date(
       daoData?.properties?.quests.find(
         (q) => q.questId === highlightData?.questId

@@ -253,7 +253,7 @@ export const ToolbarConnector = () => {
           onClick={() => {
             navigate("/");
           }}
-          alt="Aut Logo"
+          alt="Āut Logo"
         />
         {/* <AppTitle
           sx={{

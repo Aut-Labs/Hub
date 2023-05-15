@@ -27,7 +27,7 @@ export const sendDiscordNotification = createAsyncThunk(
         },
         message,
         footer: {
-          text: `${community.name}@Aut`,
+          text: `${community.name}@Āut`,
           image: community.image as string
         }
       });
@@ -60,7 +60,7 @@ export const sendDiscordPoll = createAsyncThunk(
         },
         message: input.message,
         footer: {
-          text: `${community.name}@Aut`,
+          text: `${community.name}@Āut`,
           image: community.image as string
         }
       });

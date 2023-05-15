@@ -451,6 +451,7 @@ const removeTaskFromQuest = async (
 
 const submitOpenTask = async (
   body: {
+    file: any;
     task: Task;
     pluginAddress: string;
     onboardingQuestAddress: string;
@@ -460,6 +461,9 @@ const submitOpenTask = async (
 ) => {
   const sdk = AutSDK.getInstance();
   let questOnboarding: QuestOnboarding = sdk.questOnboarding;
+
+  const fileUri = await sdk.client.storeAsBlob(body.file);
+  body.task.submission.properties["fileUri"] = fileUri;
 
   if (!questOnboarding) {
     questOnboarding = sdk.initService<QuestOnboarding>(
@@ -906,6 +910,7 @@ export const onboardingApi = createApi({
     submitOpenTask: builder.mutation<
       Task,
       {
+        file: any;
         task: Task;
         pluginAddress: string;
         onboardingQuestAddress: string;

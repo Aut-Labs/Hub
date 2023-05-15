@@ -25,7 +25,7 @@ const AutCommunityShare = () => {
     dispatch(setTitle(`Share with your friends`));
   }, [dispatch]);
 
-  const shareMessage = `Hey there! We've just deployed ${community?.name} on Aut - choose your Role in our Community, pick your Skills, and let's build something great together!`;
+  const shareMessage = `Hey there! We've just deployed ${community?.name} on Āut - choose your Role in our Community, pick your Skills, and let's build something great together!`;
 
   return (
     <>
@@ -44,7 +44,7 @@ const AutCommunityShare = () => {
           description="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. "
           twitterProps={{
             title: shareMessage,
-            hashtags: ["Aut", "DAO", "Blockchain"]
+            hashtags: ["Āut", "DAO", "Blockchain"]
           }}
           hideCloseBtn
           rightSide={

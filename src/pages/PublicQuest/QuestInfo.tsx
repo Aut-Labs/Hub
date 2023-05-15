@@ -31,7 +31,8 @@ import {
 } from "@api/cache.api";
 import BetaCountdown from "@components/BetaCountdown";
 import { RequiredQueryParams } from "../../api/RequiredQueryParams";
-import { useGetCommunityQuery } from "@api/community.api";
+import { useGetAllNovasQuery } from "@api/community.api";
+import { getMemberPhases } from "@utils/beta-phases";
 
 const QuestInfo = ({
   onUpdateCache
@@ -64,14 +65,21 @@ const QuestInfo = ({
     }
   );
 
-  const { data: communityData } = useGetCommunityQuery(null, {
-    refetchOnMountOrArgChange: false,
-    skip: false
+  const { data: communityData } = useGetAllNovasQuery(null, {
+    selectFromResult: ({ data }) => ({
+      data: (data?.daos || []).find(
+        (d) => d.daoAddress === searchParams.get(RequiredQueryParams.DaoAddress)
+      )
+    })
   });
 
   const isOwner = useMemo(() => {
     return communityData?.admin === account;
   }, [account, communityData]);
+
+  const hasMemberPhaseOneStarted = useMemo(() => {
+    return isAfter(new Date(), new Date(getMemberPhases().phaseOneStartDate));
+  }, [quest]);
 
   const hasQuestStarted = useMemo(() => {
     if (!quest?.startDate) return false;
@@ -85,10 +93,10 @@ const QuestInfo = ({
       addDays(new Date(quest.startDate), quest.durationInDays)
     );
   }, [quest]);
-  // Use this stuff
+
   const canApplyForAQuest = useMemo(() => {
-    return !isOwner && !cache && !!hasQuestStarted && !hasQuestEnded;
-  }, [cache, hasQuestStarted, hasQuestEnded, isOwner]);
+    return !isOwner && !cache && !!hasMemberPhaseOneStarted && !hasQuestEnded;
+  }, [cache, hasMemberPhaseOneStarted, hasQuestEnded, isOwner]);
 
   const hasAppliedForQuest = useMemo(() => {
     return (
@@ -97,7 +105,7 @@ const QuestInfo = ({
         searchParams.get(RequiredQueryParams.OnboardingQuestAddress) &&
       cache?.questId === +searchParams.get(RequiredQueryParams.QuestId)
     );
-  }, [cache, hasQuestStarted, hasQuestEnded]);
+  }, [cache]);
 
   const [
     withdraw,
@@ -287,7 +295,7 @@ const QuestInfo = ({
             {canApplyForAQuest && (
               <Badge
                 badgeContent={
-                  <Tooltip title="You can only apply to one quest, but you can withdraw before it starts.">
+                  <Tooltip title="You can only apply to one quest.">
                     <InfoIcon
                       sx={{
                         fontSize: "16px",

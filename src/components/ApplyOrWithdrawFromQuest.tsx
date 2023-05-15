@@ -7,6 +7,7 @@ import { isAuthenticated } from "@auth/auth.reducer";
 import { LoadingButton } from "@mui/lab";
 import { Stack, CircularProgress, Tooltip, Button } from "@mui/material";
 import { useEthers } from "@usedapp/core";
+import { getMemberPhases } from "@utils/beta-phases";
 import { isAfter, addDays } from "date-fns";
 import { useMemo, useEffect } from "react";
 import { useConfirmDialog } from "react-mui-confirm";
@@ -32,10 +33,12 @@ export const ApplyOrWithdrawFromQuest = ({
   }, [account, daoData]);
 
   const hasQuestStarted = useMemo(() => {
-    // check this
-    return true;
     if (!quest?.startDate) return false;
     return isAfter(new Date(), new Date(quest.startDate));
+  }, [quest]);
+
+  const hasMemberPhaseOneStarted = useMemo(() => {
+    return isAfter(new Date(), new Date(getMemberPhases().phaseOneStartDate));
   }, [quest]);
 
   const hasQuestEnded = useMemo(() => {
@@ -47,8 +50,8 @@ export const ApplyOrWithdrawFromQuest = ({
   }, [quest]);
 
   const canApplyForAQuest = useMemo(() => {
-    return !isOwner && !cache && !!hasQuestStarted && !hasQuestEnded;
-  }, [cache, hasQuestStarted, hasQuestEnded, isOwner]);
+    return !isOwner && !cache && !!hasMemberPhaseOneStarted && !hasQuestEnded;
+  }, [cache, hasMemberPhaseOneStarted, hasQuestEnded, isOwner]);
 
   const hasAppliedForQuest = useMemo(() => {
     return (
@@ -56,7 +59,7 @@ export const ApplyOrWithdrawFromQuest = ({
       cache?.onboardingQuestAddress == daoData.onboardingQuestAddress &&
       cache?.questId === quest.questId
     );
-  }, [cache, hasQuestStarted, hasQuestEnded]);
+  }, [cache]);
 
   const [
     withdraw,
