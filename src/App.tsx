@@ -18,6 +18,7 @@ import ErrorPage from "@components/ErrorPage";
 import { ToolbarConnector } from "./pages/PublicQuest/ToolbarConnector";
 import QuestDetails from "./pages/PublicQuest/QuestDetails";
 import { DaoList } from "./pages/PublicQuest/DaoList";
+import Callback from "./pages/Oauth2Callback/Callback";
 
 const generateConfig = (networks: NetworkConfig[]): Config => {
   const enabled_networks = networks.filter((n) => !n.disabled);
@@ -113,6 +114,7 @@ function App() {
               <ToolbarConnector />
               <Routes>
                 <Route path="/" element={<DaoList />} />
+                <Route path="callback" element={<Callback />} />
                 {!isAutheticated && (
                   <Route path="*" element={<Navigate to="/" />} />
                 )}
