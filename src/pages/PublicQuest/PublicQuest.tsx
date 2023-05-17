@@ -162,7 +162,10 @@ const PublicQuest = () => {
             position: "relative"
           }}
         >
-          <QuestInfo onUpdateCache={setCache} />
+          <QuestInfo
+            tasksCompleted={completedTasks / tasks.length === 1}
+            onUpdateCache={setCache}
+          />
           <CommunityInfo />
         </Box>
       )}

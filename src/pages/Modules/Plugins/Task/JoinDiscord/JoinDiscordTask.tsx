@@ -6,10 +6,15 @@ import { PluginDefinition } from "@aut-labs-private/sdk";
 import AutLoading from "@components/AutLoading";
 import { StepperButton } from "@components/Stepper";
 import { Container, Stack } from "@mui/material";
-import { IsAdmin } from "@store/Community/community.reducer";
-import { memo, useState } from "react";
+import { CommunityData, IsAdmin } from "@store/Community/community.reducer";
+import { memo, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useLocation, useParams, useSearchParams } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams
+} from "react-router-dom";
 import TaskDetails from "../Shared/TaskDetails";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { taskTypes } from "../Shared/Tasks";
@@ -19,6 +24,7 @@ import { useEthers } from "@usedapp/core";
 import { useOAuth } from "@components/Oauth2/oauth2";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
+import SuccessDialog from "@components/Dialog/SuccessPopup";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -32,6 +38,9 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
   const isAdmin = useSelector(IsAdmin);
   const { getAuth } = useOAuth();
   const [joinClicked, setJoinClicked] = useState(false);
+  const [openSubmitSuccess, setOpenSubmitSuccess] = useState(false);
+  const navigate = useNavigate();
+  const daoData = useSelector(CommunityData);
 
   const { task } = useGetAllTasksPerQuestQuery(
     {
@@ -57,8 +66,10 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
     }
   );
 
-  const [submitJoinDiscordTask, { error, isError, isLoading, reset }] =
-    useSubmitJoinDiscordTaskMutation();
+  const [
+    submitJoinDiscordTask,
+    { isSuccess, error, isError, isLoading, reset }
+  ] = useSubmitJoinDiscordTaskMutation();
 
   const onSubmit = async () => {
     await getAuth(
@@ -79,6 +90,12 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
     );
   };
 
+  useEffect(() => {
+    if (isSuccess) {
+      setOpenSubmitSuccess(true);
+    }
+  }, [isSuccess]);
+
   return (
     <Container
       maxWidth="lg"
@@ -93,6 +110,24 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
     >
       <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
       <LoadingDialog open={isLoading} message="Submitting task..." />
+      <SuccessDialog
+        open={openSubmitSuccess}
+        message="Congrats!"
+        titleVariant="h2"
+        subtitle="You successfully submitted the task!"
+        subtitleVariant="subtitle1"
+        handleClose={() => {
+          setOpenSubmitSuccess(false);
+          navigate({
+            pathname: "/quest",
+            search: `?questId=${+searchParams.get(
+              RequiredQueryParams.QuestId
+            )}&onboardingQuestAddress=${searchParams.get(
+              RequiredQueryParams.OnboardingQuestAddress
+            )}&daoAddress=${daoData.properties.address}`
+          });
+        }}
+      ></SuccessDialog>
 
       {task ? (
         <>

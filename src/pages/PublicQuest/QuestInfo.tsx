@@ -6,7 +6,10 @@ import {
   Tooltip,
   Chip,
   Badge,
-  CircularProgress
+  CircularProgress,
+  Button,
+  ButtonProps,
+  styled
 } from "@mui/material";
 import { addDays, isAfter } from "date-fns";
 import { memo, useEffect, useMemo, useState } from "react";
@@ -34,10 +37,32 @@ import { RequiredQueryParams } from "../../api/RequiredQueryParams";
 import { useGetAllNovasQuery } from "@api/community.api";
 import { getMemberPhases } from "@utils/beta-phases";
 
+const ButtonWithPulse = styled<ButtonProps<any, any>>(Button)`
+  &:not(.Mui-disabled) {
+    box-shadow: 0 0 0 0 rgba(37, 107, 176, 1);
+    animation: pulse 1.5s infinite;
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(37, 107, 176, 0.7);
+      }
+
+      70% {
+        box-shadow: 0 0 0 15px rgba(37, 107, 176, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(37, 107, 176, 0);
+      }
+    }
+  }
+`;
+
 const QuestInfo = ({
-  onUpdateCache
+  onUpdateCache,
+  tasksCompleted
 }: {
   onUpdateCache: (cache: CacheModel) => void;
+  tasksCompleted: boolean;
 }) => {
   const [searchParams] = useSearchParams();
   const { account } = useEthers();
@@ -80,6 +105,8 @@ const QuestInfo = ({
   const hasMemberPhaseOneStarted = useMemo(() => {
     return isAfter(new Date(), new Date(getMemberPhases().phaseOneStartDate));
   }, [quest]);
+
+  // const hasMemberPhaseOneStarted = true;
 
   const hasQuestStarted = useMemo(() => {
     if (!quest?.startDate) return false;
@@ -359,17 +386,35 @@ const QuestInfo = ({
           {
             // Also rip that off
           }
-          <BetaCountdown
-            textAlign="left"
-            hasStarted={hasQuestStarted}
-            to={
-              new Date(
-                hasQuestStarted
-                  ? addDays(quest?.startDate, quest?.durationInDays)
-                  : quest?.startDate
-              )
-            }
-          />
+          {tasksCompleted ? (
+            <ButtonWithPulse
+              sx={{
+                mt: 6,
+                mb: 4,
+                mx: "auto"
+              }}
+              onClick={() => {
+                window.open(`https://try-aut-internal-test.aut.id/`, "_blank");
+              }}
+              size="large"
+              variant="outlined"
+              color="offWhite"
+            >
+              Go back to Try Āut
+            </ButtonWithPulse>
+          ) : (
+            <BetaCountdown
+              textAlign="left"
+              hasStarted={hasQuestStarted}
+              to={
+                new Date(
+                  hasQuestStarted
+                    ? addDays(quest?.startDate, quest?.durationInDays)
+                    : quest?.startDate
+                )
+              }
+            />
+          )}
         </Box>
       </Box>
     </>

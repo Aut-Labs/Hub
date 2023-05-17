@@ -115,6 +115,7 @@ const hasUserCompletedQuest = async (
         userAddress,
         +questId
       );
+    //update cache straight away here
     return {
       data: hasCompletedAQuest
     };

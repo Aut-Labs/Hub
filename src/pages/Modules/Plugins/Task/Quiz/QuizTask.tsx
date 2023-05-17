@@ -19,17 +19,18 @@ import {
   styled,
   Typography
 } from "@mui/material";
-import { IsAdmin } from "@store/Community/community.reducer";
+import { CommunityData, IsAdmin } from "@store/Community/community.reducer";
 import { memo, useEffect, useState } from "react";
 import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { useSelector } from "react-redux";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import TaskDetails from "../Shared/TaskDetails";
 import { GridBox } from "./QuestionsAndAnswers";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import { taskTypes } from "../Shared/Tasks";
 import { useEthers } from "@usedapp/core";
+import SuccessDialog from "@components/Dialog/SuccessPopup";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -163,6 +164,9 @@ const QuizTask = ({ plugin }: PluginParams) => {
   const { account: userAddress } = useEthers();
   const params = useParams();
   const [initialized, setInitialized] = useState(false);
+  const navigate = useNavigate();
+  const daoData = useSelector(CommunityData);
+  const [openSubmitSuccess, setOpenSubmitSuccess] = useState(false);
 
   const { task, isLoading: isLoadingPlugins } = useGetAllTasksPerQuestQuery(
     {
@@ -243,6 +247,24 @@ const QuizTask = ({ plugin }: PluginParams) => {
     >
       <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
       <LoadingDialog open={isLoading} message="Submitting task..." />
+      <SuccessDialog
+        open={openSubmitSuccess}
+        message="Congrats!"
+        titleVariant="h2"
+        subtitle="You successfully submitted the task!"
+        subtitleVariant="subtitle1"
+        handleClose={() => {
+          setOpenSubmitSuccess(false);
+          navigate({
+            pathname: "/quest",
+            search: `?questId=${+searchParams.get(
+              RequiredQueryParams.QuestId
+            )}&onboardingQuestAddress=${searchParams.get(
+              RequiredQueryParams.OnboardingQuestAddress
+            )}&daoAddress=${daoData.properties.address}`
+          });
+        }}
+      ></SuccessDialog>
       {task ? (
         <>
           <TaskDetails task={task} />

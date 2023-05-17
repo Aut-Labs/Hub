@@ -14,11 +14,16 @@ import {
   Stack,
   Typography
 } from "@mui/material";
-import { IsAdmin } from "@store/Community/community.reducer";
-import { memo, useMemo } from "react";
+import { CommunityData, IsAdmin } from "@store/Community/community.reducer";
+import { memo, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useSelector } from "react-redux";
-import { useSearchParams, useParams, Link } from "react-router-dom";
+import {
+  useSearchParams,
+  useParams,
+  Link,
+  useNavigate
+} from "react-router-dom";
 import TaskDetails from "../Shared/TaskDetails";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
@@ -28,6 +33,7 @@ import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { InteractionNetworks } from "@utils/transaction-networks";
+import SuccessDialog from "@components/Dialog/SuccessPopup";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -37,6 +43,9 @@ const TransactionTask = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
   const isAdmin = useSelector(IsAdmin);
   const { account: userAddress } = useEthers();
+  const navigate = useNavigate();
+  const daoData = useSelector(CommunityData);
+  const [openSubmitSuccess, setOpenSubmitSuccess] = useState(false);
 
   const params = useParams();
   const { task } = useGetAllTasksPerQuestQuery(
@@ -111,6 +120,24 @@ const TransactionTask = ({ plugin }: PluginParams) => {
     >
       <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
       <LoadingDialog open={isLoading} message="Submitting task..." />
+      <SuccessDialog
+        open={openSubmitSuccess}
+        message="Congrats!"
+        titleVariant="h2"
+        subtitle="You successfully submitted the task!"
+        subtitleVariant="subtitle1"
+        handleClose={() => {
+          setOpenSubmitSuccess(false);
+          navigate({
+            pathname: "/quest",
+            search: `?questId=${+searchParams.get(
+              RequiredQueryParams.QuestId
+            )}&onboardingQuestAddress=${searchParams.get(
+              RequiredQueryParams.OnboardingQuestAddress
+            )}&daoAddress=${daoData.properties.address}`
+          });
+        }}
+      ></SuccessDialog>
       {task ? (
         <>
           <TaskDetails task={task} />

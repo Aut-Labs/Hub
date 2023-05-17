@@ -91,7 +91,6 @@ const QuestDetails = () => {
         flexDirection: "column"
       }}
     >
-      {/* Move this scrlbr to the app tsx */}
       <>
         {!plugins?.length ? (
           <AutLoading width="130px" height="130px" />

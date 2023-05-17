@@ -156,6 +156,14 @@ export const GridBox = styled(Box)(({ theme }) => ({
   [theme.breakpoints.up("sm")]: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr"
+  },
+  [theme.breakpoints.up("md")]: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr 1fr"
+  },
+  [theme.breakpoints.up("xxl")]: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr 1fr 1fr"
   }
 }));
 

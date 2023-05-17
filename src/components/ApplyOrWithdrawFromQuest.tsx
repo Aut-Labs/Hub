@@ -22,8 +22,6 @@ export const ApplyOrWithdrawFromQuest = ({
   questToApplyFor,
   isApplying
 }) => {
-  const [hasUserCompletedQuest, { data: isQuestComplete }] =
-    useLazyHasUserCompletedQuestQuery();
   // const [cache, setCache] = useState<CacheModel>(null);
   const authenticated = useSelector(isAuthenticated);
   const confirm = useConfirmDialog();
@@ -40,6 +38,7 @@ export const ApplyOrWithdrawFromQuest = ({
   const hasMemberPhaseOneStarted = useMemo(() => {
     return isAfter(new Date(), new Date(getMemberPhases().phaseOneStartDate));
   }, [quest]);
+  // const hasMemberPhaseOneStarted = true;
 
   const hasQuestEnded = useMemo(() => {
     if (!quest?.startDate) return false;
@@ -99,54 +98,6 @@ export const ApplyOrWithdrawFromQuest = ({
       start();
     }
   }, [withdrawIsSuccess]);
-
-  useEffect(() => {
-    // is authoirzied
-    if (isQuestComplete) {
-      const start = async () => {
-        try {
-          const cacheResult = await getCache(CacheTypes.UserPhases);
-          cacheResult.list[1].status = 1;
-          await updateCache(cacheResult);
-          onUpdateCache(cacheResult);
-          // setCache(cacheResult);
-        } catch (error) {
-          console.log(error);
-        }
-      };
-      if (authenticated) {
-        start();
-      }
-    }
-  }, [isQuestComplete]);
-
-  useEffect(() => {
-    const start = async () => {
-      try {
-        const cacheResult = await getCache(CacheTypes.UserPhases);
-        // setCache(cacheResult);
-        onUpdateCache(cacheResult);
-        if (
-          !!cache &&
-          cache?.onboardingQuestAddress &&
-          daoData.onboardingQuestAddress &&
-          cache?.questId === +quest.questId
-        ) {
-          hasUserCompletedQuest({
-            questId: +quest.questId,
-            userAddress: account,
-            onboardingQuestAddress: daoData.onboardingQuestAddress,
-            daoAddress: daoData.daoAddress
-          });
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    if (authenticated) {
-      start();
-    }
-  }, []);
 
   return (
     <>
