@@ -146,7 +146,7 @@ const CommunityInfo = () => {
                     <Link
                       key={`social-icon-${index}`}
                       {...(!!social.link && {
-                        color: "offwhite.main",
+                        color: "#FFF",
                         component: "a",
                         href: social.link,
                         target: "_blank"

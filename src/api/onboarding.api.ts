@@ -14,6 +14,8 @@ import {
   finaliseQuizTask,
   finaliseTransactionTask
 } from "./tasks.api";
+import { debug } from "console";
+import { id } from "date-fns/locale";
 
 const getAllOnboardingQuests = async (
   pluginAddress: any,
@@ -313,6 +315,23 @@ const getAllTasksPerQuest = async (
         environment.nftStorageUrl
       )
     });
+  }
+  try {
+    const hasCompletedAQuest =
+      await questOnboarding.questPlugin.functions.hasCompletedAQuest(
+        userAddress,
+        +questId
+      );
+    if (hasCompletedAQuest) {
+      debugger;
+      const cacheResult = await getCache(CacheTypes.UserPhases);
+      if (cacheResult.list[1].status !== 1) {
+        cacheResult.list[1].status = 1;
+        await updateCache(cacheResult);
+      }
+    }
+  } catch (error) {
+    console.log(error);
   }
   return {
     data: {

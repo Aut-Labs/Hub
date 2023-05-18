@@ -282,10 +282,20 @@ export const DaoList = () => {
             position: "relative"
           }}
         >
-          <Typography textAlign="center" color="white" variant="h1">
+          <Typography
+            fontFamily="FractulAltLight"
+            textAlign="center"
+            color="white"
+            variant="h1"
+          >
             Nova Showcase
           </Typography>
-          <Typography textAlign="center" color="white" variant="h4">
+          <Typography
+            fontFamily="FractulAltLight"
+            textAlign="center"
+            color="white"
+            variant="h4"
+          >
             Pick a Nova, complete their onboarding quest and join their
             community to help them rise up the Nova leaderboard
           </Typography>

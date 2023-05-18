@@ -11,7 +11,10 @@ import {
   CardHeader,
   IconButton,
   Stack,
-  Button
+  Button,
+  Icon,
+  SvgIcon,
+  Tooltip
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import { memo, useMemo } from "react";
@@ -21,6 +24,7 @@ import {
   useLocation,
   useParams
 } from "react-router-dom";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import { TaskStatus, TaskType } from "@aut-labs-private/sdk/dist/models/task";
 import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
@@ -31,6 +35,7 @@ import ErrorDialog from "@components/Dialog/ErrorPopup";
 import { differenceInDays } from "date-fns";
 import { useConfirmDialog } from "react-mui-confirm";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
+import { ReactComponent as CheckMark } from "@assets/check_mark.svg";
 
 export const taskStatuses: any = {
   [TaskStatus.Created]: {
@@ -164,6 +169,12 @@ const TaskCard = ({
             color: "white"
           }}
           title={row?.metadata?.name}
+          avatar={
+            row.status === TaskStatus.Finished ||
+            row.status === TaskStatus.Submitted ? (
+              <CheckCircleIcon sx={{ color: "#2e7d32" }} />
+            ) : null
+          }
         />
         <CardContent
           sx={{
@@ -199,7 +210,7 @@ const TaskCard = ({
                 mb: 4,
                 mx: "auto"
               }}
-              disabled={!canSubmitTask}
+              disabled={!canSubmitTask || row.status !== TaskStatus.Created}
               onClick={() => {
                 navigate({
                   pathname: `/quest/${path}/${row.taskId}`,

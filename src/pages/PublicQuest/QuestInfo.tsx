@@ -68,8 +68,8 @@ const QuestInfo = ({
   const { account } = useEthers();
   const [cache, setCache] = useState<CacheModel>(null);
   const confirm = useConfirmDialog();
-  const [hasUserCompletedQuest, { data: isQuestComplete }] =
-    useLazyHasUserCompletedQuestQuery();
+  // const [hasUserCompletedQuest, { data: isQuestComplete }] =
+  //   useLazyHasUserCompletedQuestQuery();
   const [
     apply,
     { data, isLoading: isApplying, isError, error, reset, isSuccess }
@@ -89,6 +89,7 @@ const QuestInfo = ({
       })
     }
   );
+  debugger;
 
   const { data: communityData } = useGetAllNovasQuery(null, {
     selectFromResult: ({ data }) => ({
@@ -116,8 +117,8 @@ const QuestInfo = ({
   const hasQuestEnded = useMemo(() => {
     if (!quest?.startDate) return false;
     return isAfter(
-      new Date(),
-      addDays(new Date(quest.startDate), quest.durationInDays)
+      addDays(new Date(quest.startDate), quest.durationInDays),
+      new Date()
     );
   }, [quest]);
 
@@ -159,22 +160,22 @@ const QuestInfo = ({
       }
     });
 
-  useEffect(() => {
-    if (isQuestComplete) {
-      const start = async () => {
-        try {
-          const cacheResult = await getCache(CacheTypes.UserPhases);
-          cacheResult.list[1].status = 1;
-          await updateCache(cacheResult);
-          onUpdateCache(cacheResult);
-          setCache(cacheResult);
-        } catch (error) {
-          console.log(error);
-        }
-      };
-      start();
-    }
-  }, [isQuestComplete]);
+  // useEffect(() => {
+  //   if (isQuestComplete) {
+  //     const start = async () => {
+  //       try {
+  //         const cacheResult = await getCache(CacheTypes.UserPhases);
+  //         cacheResult.list[1].status = 1;
+  //         await updateCache(cacheResult);
+  //         onUpdateCache(cacheResult);
+  //         setCache(cacheResult);
+  //       } catch (error) {
+  //         console.log(error);
+  //       }
+  //     };
+  //     start();
+  //   }
+  // }, [isQuestComplete]);
 
   useEffect(() => {
     if (withdrawIsSuccess) {
@@ -231,33 +232,33 @@ const QuestInfo = ({
     }
   }, [isSuccess]);
 
-  useEffect(() => {
-    const start = async () => {
-      try {
-        const cacheResult = await getCache(CacheTypes.UserPhases);
-        setCache(cacheResult);
-        onUpdateCache(cacheResult);
-        if (
-          !!cache &&
-          cache?.onboardingQuestAddress &&
-          searchParams.get(RequiredQueryParams.OnboardingQuestAddress) &&
-          cache?.questId === +searchParams.get(RequiredQueryParams.QuestId)
-        ) {
-          hasUserCompletedQuest({
-            questId: +searchParams.get(RequiredQueryParams.QuestId),
-            userAddress: account,
-            onboardingQuestAddress: searchParams.get(
-              RequiredQueryParams.OnboardingQuestAddress
-            ),
-            daoAddress: searchParams.get(RequiredQueryParams.DaoAddress)
-          });
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    start();
-  }, []);
+  // useEffect(() => {
+  //   const start = async () => {
+  //     try {
+  //       const cacheResult = await getCache(CacheTypes.UserPhases);
+  //       setCache(cacheResult);
+  //       onUpdateCache(cacheResult);
+  //       if (
+  //         !!cache &&
+  //         cache?.onboardingQuestAddress &&
+  //         searchParams.get(RequiredQueryParams.OnboardingQuestAddress) &&
+  //         cache?.questId === +searchParams.get(RequiredQueryParams.QuestId)
+  //       ) {
+  //         hasUserCompletedQuest({
+  //           questId: +searchParams.get(RequiredQueryParams.QuestId),
+  //           userAddress: account,
+  //           onboardingQuestAddress: searchParams.get(
+  //             RequiredQueryParams.OnboardingQuestAddress
+  //           ),
+  //           daoAddress: searchParams.get(RequiredQueryParams.DaoAddress)
+  //         });
+  //       }
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+  //   start();
+  // }, []);
   return (
     <>
       <ErrorDialog
@@ -409,7 +410,7 @@ const QuestInfo = ({
               to={
                 new Date(
                   hasQuestStarted
-                    ? addDays(quest?.startDate, quest?.durationInDays)
+                    ? addDays(new Date(quest?.startDate), quest?.durationInDays)
                     : quest?.startDate
                 )
               }

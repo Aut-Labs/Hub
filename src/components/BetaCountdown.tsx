@@ -18,6 +18,10 @@ const Countdown = styled("div")({
   }
 });
 
+const hasNotPassed = (date: Date) => {
+  return date.getTime() > Date.now();
+};
+
 const BetaCountdown = ({
   to,
   textAlign = "center",
@@ -29,7 +33,7 @@ const BetaCountdown = ({
 }) => {
   return (
     <>
-      {isValid(to) && (
+      {isValid(to) && hasNotPassed(to) ? (
         <Countdown>
           <Typography
             width="100%"
@@ -38,7 +42,7 @@ const BetaCountdown = ({
             mb={1}
             className="text-secondary"
           >
-            {hasStarted ? "Beta ends in" : "Beta starts in"}
+            {hasStarted ? "Quest ends in" : "Quest starts in"}
           </Typography>
           <FlipClockCountdown
             digitBlockStyle={{
@@ -56,6 +60,18 @@ const BetaCountdown = ({
             }}
             to={to?.toUTCString()}
           />
+        </Countdown>
+      ) : (
+        <Countdown>
+          <Typography
+            width="100%"
+            textAlign={textAlign as any}
+            variant="subtitle2"
+            mb={1}
+            className="text-secondary"
+          >
+            Quest has ended
+          </Typography>
         </Countdown>
       )}
     </>
