@@ -12,6 +12,7 @@ import {
   CardContent,
   Chip,
   Container,
+  Link,
   Stack,
   Typography
 } from "@mui/material";
@@ -105,7 +106,7 @@ const UserSubmitContent = ({
         margin: "0 auto",
         width: {
           xs: "100%",
-          sm: "400px",
+          sm: "600px",
           xxl: "800px"
         }
       }}
@@ -263,10 +264,23 @@ const UserSubmitContent = ({
                 textAlign="center"
                 p="5px"
               >
-                {task?.submission?.description}
+                <Link
+                  color="primary"
+                  sx={{
+                    mt: 1,
+                    cursor: "pointer"
+                  }}
+                  variant="body"
+                  target="_blank"
+                  href={ipfsCIDToHttpUrl(
+                    task?.submission?.properties["fileUri"]
+                  )}
+                >
+                  Open attachment
+                </Link>
               </Typography>
               <Typography variant="caption" className="text-secondary">
-                My Submission
+                Attachment File
               </Typography>
             </Stack>
           </CardContent>
@@ -278,7 +292,7 @@ const UserSubmitContent = ({
           margin: "0 auto",
           width: {
             xs: "100%",
-            sm: "400px",
+            sm: "600px",
             xxl: "800px"
           }
         }}

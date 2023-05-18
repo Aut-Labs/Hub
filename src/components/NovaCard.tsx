@@ -97,13 +97,20 @@ const AutCardContainer = styled("div")(({ theme }) => ({
     width: "380px",
     height: "430px"
   },
-  boxShadow: "10px 10px 10px black",
+  boxShadow:
+    "0px 4px 5px -2px rgba(0,0,0,0.2), 0px 7px 10px 1px rgba(0,0,0,0.14), 0px 2px 16px 1px rgba(0,0,0,0.12)",
+  // boxShadow: "10px 10px 10px black",
   backgroundColor: "#262626",
   borderColor: "#3f3f40",
   borderStyle: "solid",
   borderWidth: "3px",
   padding: "0px 5px",
   overflow: "hidden",
+  borderRadius: "16px",
+  // borderTopLeftRadius: "16px",
+  // borderTopRightRadius: "16px",
+  // borderBottomLeftRadius: "0",
+  // borderBottomRightRadius: "0",
   display: "flex",
   justifyContent: "flex-start",
   alignItems: "center",
@@ -140,8 +147,6 @@ const Countdown = styled("div")({
 export const NovaCard = ({
   daoData,
   highlightData,
-  onUpdateCache,
-  cache,
   onQuestSelected,
   onApplyForQuest,
   questToApplyFor,
@@ -149,8 +154,6 @@ export const NovaCard = ({
 }: {
   daoData: any;
   highlightData: any;
-  onUpdateCache: any;
-  cache: any;
   onQuestSelected: any;
   onApplyForQuest: any;
   questToApplyFor: any;
@@ -348,8 +351,6 @@ export const NovaCard = ({
                       <ApplyOrWithdrawFromQuest
                         daoData={daoData}
                         quest={quest}
-                        cache={cache}
-                        onUpdateCache={onUpdateCache}
                         onApplyForQuest={onApplyForQuest}
                         questToApplyFor={questToApplyFor}
                         isApplying={isApplying}
@@ -434,7 +435,16 @@ export const NovaCard = ({
           style={{ width: "100%", display: "flex", justifyContent: "center" }}
         >
           <SeeQuestButton
-            sx={{ width: "100%", mt: "45px" }}
+            sx={{
+              width: "100%",
+              mt: "24px",
+              // borderTopLeftRadius: "0 !important",
+              // borderTopRightRadius: "0 !important",
+              // borderBottomLeftRadius: "16px !important",
+              // borderBottomRightRadius: "16px !important",
+              boxShadow:
+                "0px 4px 5px -2px rgba(0,0,0,0.2), 0px 7px 10px 1px rgba(0,0,0,0.14), 0px 2px 16px 1px rgba(0,0,0,0.12)"
+            }}
             variant="outlined"
             size="normal"
             color="offWhite"

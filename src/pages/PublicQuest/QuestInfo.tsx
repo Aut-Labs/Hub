@@ -12,12 +12,14 @@ import {
   styled
 } from "@mui/material";
 import { addDays, isAfter } from "date-fns";
-import { memo, useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo } from "react";
 import DescriptionIcon from "@mui/icons-material/Description";
 import {
   useApplyForQuestMutation,
+  useDeletePhasesCacheMutation,
   useGetOnboardingQuestByIdQuery,
-  useLazyHasUserCompletedQuestQuery,
+  useGetPhasesCacheQuery,
+  useUpdatePhasesCacheMutation,
   useWithdrawFromAQuestMutation
 } from "@api/onboarding.api";
 import { useEthers } from "@usedapp/core";
@@ -25,13 +27,7 @@ import ErrorDialog from "@components/Dialog/ErrorPopup";
 import { useSearchParams } from "react-router-dom";
 import InfoIcon from "@mui/icons-material/Info";
 import { useConfirmDialog } from "react-mui-confirm";
-import {
-  CacheModel,
-  CacheTypes,
-  deleteCache,
-  getCache,
-  updateCache
-} from "@api/cache.api";
+import { CacheTypes } from "@api/cache.api";
 import BetaCountdown from "@components/BetaCountdown";
 import { RequiredQueryParams } from "../../api/RequiredQueryParams";
 import { useGetAllNovasQuery } from "@api/community.api";
@@ -57,23 +53,26 @@ const ButtonWithPulse = styled<ButtonProps<any, any>>(Button)`
   }
 `;
 
-const QuestInfo = ({
-  onUpdateCache,
-  tasksCompleted
-}: {
-  onUpdateCache: (cache: CacheModel) => void;
-  tasksCompleted: boolean;
-}) => {
+const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
   const [searchParams] = useSearchParams();
   const { account } = useEthers();
-  const [cache, setCache] = useState<CacheModel>(null);
   const confirm = useConfirmDialog();
-  // const [hasUserCompletedQuest, { data: isQuestComplete }] =
-  //   useLazyHasUserCompletedQuestQuery();
-  const [
-    apply,
-    { data, isLoading: isApplying, isError, error, reset, isSuccess }
-  ] = useApplyForQuestMutation();
+
+  const { cache } = useGetPhasesCacheQuery(CacheTypes.UserPhases, {
+    selectFromResult: ({ data }) => ({
+      cache: data
+    })
+  });
+
+  const [apply, { isLoading: isApplying, isError, error, reset, isSuccess }] =
+    useApplyForQuestMutation();
+
+  const [deletePhasesCache] = useDeletePhasesCacheMutation({
+    fixedCacheKey: "PhasesCache"
+  });
+  const [updatePhasesCache] = useUpdatePhasesCacheMutation({
+    fixedCacheKey: "PhasesCache"
+  });
 
   const { data: quest } = useGetOnboardingQuestByIdQuery(
     {
@@ -89,7 +88,6 @@ const QuestInfo = ({
       })
     }
   );
-  debugger;
 
   const { data: communityData } = useGetAllNovasQuery(null, {
     selectFromResult: ({ data }) => ({
@@ -106,8 +104,6 @@ const QuestInfo = ({
   const hasMemberPhaseOneStarted = useMemo(() => {
     return isAfter(new Date(), new Date(getMemberPhases().phaseOneStartDate));
   }, [quest]);
-
-  // const hasMemberPhaseOneStarted = true;
 
   const hasQuestStarted = useMemo(() => {
     if (!quest?.startDate) return false;
@@ -160,30 +156,11 @@ const QuestInfo = ({
       }
     });
 
-  // useEffect(() => {
-  //   if (isQuestComplete) {
-  //     const start = async () => {
-  //       try {
-  //         const cacheResult = await getCache(CacheTypes.UserPhases);
-  //         cacheResult.list[1].status = 1;
-  //         await updateCache(cacheResult);
-  //         onUpdateCache(cacheResult);
-  //         setCache(cacheResult);
-  //       } catch (error) {
-  //         console.log(error);
-  //       }
-  //     };
-  //     start();
-  //   }
-  // }, [isQuestComplete]);
-
   useEffect(() => {
     if (withdrawIsSuccess) {
       const start = async () => {
         try {
-          await deleteCache(CacheTypes.UserPhases);
-          onUpdateCache(null);
-          setCache(null);
+          deletePhasesCache(CacheTypes.UserPhases);
           withdrawReset();
         } catch (error) {
           console.log(error);
@@ -197,7 +174,7 @@ const QuestInfo = ({
     if (isSuccess) {
       const start = async () => {
         try {
-          const updatedCache = await updateCache({
+          updatePhasesCache({
             ...(cache || {}),
             cacheKey: CacheTypes.UserPhases,
             address: account,
@@ -221,8 +198,6 @@ const QuestInfo = ({
               }
             ]
           });
-          setCache(updatedCache);
-          onUpdateCache(updatedCache);
           reset();
         } catch (error) {
           console.log(error);
@@ -232,33 +207,6 @@ const QuestInfo = ({
     }
   }, [isSuccess]);
 
-  // useEffect(() => {
-  //   const start = async () => {
-  //     try {
-  //       const cacheResult = await getCache(CacheTypes.UserPhases);
-  //       setCache(cacheResult);
-  //       onUpdateCache(cacheResult);
-  //       if (
-  //         !!cache &&
-  //         cache?.onboardingQuestAddress &&
-  //         searchParams.get(RequiredQueryParams.OnboardingQuestAddress) &&
-  //         cache?.questId === +searchParams.get(RequiredQueryParams.QuestId)
-  //       ) {
-  //         hasUserCompletedQuest({
-  //           questId: +searchParams.get(RequiredQueryParams.QuestId),
-  //           userAddress: account,
-  //           onboardingQuestAddress: searchParams.get(
-  //             RequiredQueryParams.OnboardingQuestAddress
-  //           ),
-  //           daoAddress: searchParams.get(RequiredQueryParams.DaoAddress)
-  //         });
-  //       }
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-  //   start();
-  // }, []);
   return (
     <>
       <ErrorDialog

@@ -124,7 +124,7 @@ function Web3DautConnect({
   };
 
   const onDisconnected = () => {
-    dispatch(resetState);
+    // dispatch(resetState);
     localStorage.removeItem(AUTH_TOKEN_KEY);
   };
 

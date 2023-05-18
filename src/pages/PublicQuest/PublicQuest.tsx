@@ -1,6 +1,7 @@
 import {
   useGetAllTasksPerQuestQuery,
-  useGetOnboardingQuestByIdQuery
+  useGetOnboardingQuestByIdQuery,
+  useGetPhasesCacheQuery
 } from "@api/onboarding.api";
 import {
   Container,
@@ -11,11 +12,11 @@ import {
   styled
 } from "@mui/material";
 import { useSearchParams } from "react-router-dom";
-import { memo, useMemo, useState } from "react";
+import { memo, useMemo } from "react";
 import LoadingProgressBar from "@components/LoadingProgressBar";
 import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
-import { addDays, isAfter } from "date-fns";
+import { isAfter } from "date-fns";
 import Tasks from "./Tasks";
 import CommunityInfo from "./CommunityInfo";
 import QuestInfo from "./QuestInfo";
@@ -23,7 +24,7 @@ import AutLoading from "@components/AutLoading";
 import { RequiredQueryParams } from "../../api/RequiredQueryParams";
 import { useEthers } from "@usedapp/core";
 import { useGetAllNovasQuery } from "@api/community.api";
-import { CacheModel } from "@api/cache.api";
+import { CacheTypes } from "@api/cache.api";
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   height: 30,
@@ -40,7 +41,6 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
 const PublicQuest = () => {
   const { account: userAddress } = useEthers();
   const [searchParams] = useSearchParams();
-  const [cache, setCache] = useState<CacheModel>();
 
   const {
     data: quest,
@@ -55,7 +55,7 @@ const PublicQuest = () => {
       daoAddress: searchParams.get(RequiredQueryParams.DaoAddress)
     },
     {
-      refetchOnMountOrArgChange: false,
+      refetchOnMountOrArgChange: true,
       skip: false
     }
   );
@@ -65,6 +65,12 @@ const PublicQuest = () => {
       data: (data?.daos || []).find(
         (d) => d.daoAddress === searchParams.get(RequiredQueryParams.DaoAddress)
       )
+    })
+  });
+
+  const { cache } = useGetPhasesCacheQuery(CacheTypes.UserPhases, {
+    selectFromResult: ({ data }) => ({
+      cache: data
     })
   });
 
@@ -101,7 +107,7 @@ const PublicQuest = () => {
       )
     },
     {
-      refetchOnMountOrArgChange: false,
+      refetchOnMountOrArgChange: true,
       skip: false
     }
   );
@@ -127,6 +133,8 @@ const PublicQuest = () => {
       return prev;
     }, 0);
   }, [tasks]);
+
+  console.log("completedTasks:", tasks);
 
   return (
     <Container
@@ -162,10 +170,7 @@ const PublicQuest = () => {
             position: "relative"
           }}
         >
-          <QuestInfo
-            tasksCompleted={completedTasks / tasks.length === 1}
-            onUpdateCache={setCache}
-          />
+          <QuestInfo tasksCompleted={completedTasks / tasks.length === 1} />
           <CommunityInfo />
         </Box>
       )}

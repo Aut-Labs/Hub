@@ -1,47 +1,11 @@
-import { Suspense, lazy, memo, useEffect, useMemo, useState } from "react";
-import {
-  ConnectorTypes,
-  NetworksConfig,
-  setWallet
-} from "@store/WalletProvider/WalletProvider";
-import { useSelector } from "react-redux";
-import AutSDK from "@aut-labs-private/sdk";
-import { ethers } from "ethers";
-import { useEthers } from "@usedapp/core";
+import { Suspense, lazy, memo, useMemo } from "react";
 import AutLoading from "@components/AutLoading";
-import DialogWrapper from "@components/Dialog/DialogWrapper";
-import {
-  Box,
-  Button,
-  Container,
-  Link,
-  Stack,
-  Toolbar,
-  Typography,
-  styled,
-  useMediaQuery,
-  useTheme
-} from "@mui/material";
-import AppTitle from "@components/AppTitle";
-import { NetworkConfig } from "@api/ProviderFactory/network.config";
-import ConnectorBtn from "@api/ProviderFactory/components/ConnectorBtn";
+import { useMediaQuery, useTheme } from "@mui/material";
 import PublicQuest from "./PublicQuest";
-import { Route, Routes, useNavigate, useSearchParams } from "react-router-dom";
-import { communityUpdateState } from "@store/Community/community.reducer";
-import { useAppDispatch } from "@store/store.model";
+import { Route, Routes } from "react-router-dom";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import {
-  useGetAllPluginDefinitionsByDAOQuery,
-  useLazyGetAllPluginDefinitionsByDAOQuery
-} from "@api/plugin-registry.api";
+import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
-import BubbleTopRight from "@assets/bubble.svg";
-import BubbleBottomLeft from "@assets/bubble2.svg";
-import { RequiredQueryParams } from "../../api/RequiredQueryParams";
-import { useAutWalletConnect } from "./use-aut-wallet-connect";
-import ErrorDialog from "@components/Dialog/ErrorPopup";
-import { resetState } from "@store/store";
-import { AUTH_TOKEN_KEY } from "@api/auth.api";
 
 const TOOLBAR_HEIGHT = 84;
 

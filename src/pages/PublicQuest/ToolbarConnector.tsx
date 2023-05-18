@@ -151,7 +151,7 @@ export const ToolbarConnector = () => {
       })
     );
     // exclude the rest of the app data (main page)
-    dispatch(resetState);
+    // dispatch(resetState);
     localStorage.removeItem(AUTH_TOKEN_KEY);
   };
 

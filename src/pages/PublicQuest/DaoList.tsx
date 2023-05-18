@@ -3,99 +3,92 @@ import {
   Container,
   Box,
   Typography,
-  Tooltip,
-  IconButton,
   Button,
   useMediaQuery,
-  useTheme
+  useTheme,
+  styled
 } from "@mui/material";
-import { GridBox } from "../Modules/Plugins/Task/Quiz/QuestionsAndAnswers";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { useEffect, useState } from "react";
-import { useGetAllNovasQuery } from "@api/community.api";
 import NovaCard from "@components/NovaCard";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import {
   ConnectStatus,
-  changeConnectStatus,
-  isAuthenticated
+  IsAuthenticated,
+  changeConnectStatus
 } from "@auth/auth.reducer";
-import { CacheModel, CacheTypes, getCache, updateCache } from "@api/cache.api";
+import { CacheTypes } from "@api/cache.api";
 import { communityUpdateState } from "@store/Community/community.reducer";
 import { useAppDispatch } from "@store/store.model";
-import { useApplyForQuestMutation } from "@api/onboarding.api";
+import {
+  useApplyForQuestMutation,
+  useGetPhasesCacheQuery,
+  useUpdatePhasesCacheMutation
+} from "@api/onboarding.api";
 import { useEthers } from "@usedapp/core";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
-import { resetState } from "@store/store";
+import { useGetAllNovasQuery } from "@api/community.api";
 
 const TOOLBAR_HEIGHT = 84;
 
+export const GridBox = styled(Box)(({ theme }) => ({
+  boxSizing: "border-box",
+  display: "flex",
+  flexDirection: "column",
+  gridGap: "20px",
+  marginTop: "20px",
+  [theme.breakpoints.up("sm")]: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr"
+  },
+  [theme.breakpoints.up("md")]: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr 1fr"
+  }
+}));
+
 export const DaoList = () => {
-  //
-  const connectStatus = useSelector(ConnectStatus);
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [selectedQuest, setSelectedQuest] = useState(null);
   const [questToApply, setQuestToApply] = useState(null);
-  const navigate = useNavigate();
-  //apply
+  const [alreadyApplied, setAlreadyApplied] = useState(false);
+  const [openApplySuccess, setOpenApplySuccess] = useState(false);
+  const [searchParams] = useSearchParams();
+  const connectStatus = useSelector(ConnectStatus);
+  const isAuthenticated = useSelector(IsAuthenticated);
+  const theme = useTheme();
+  const { account } = useEthers();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const { data, isLoading, isFetching, refetch } = useGetAllNovasQuery(null, {
+    refetchOnMountOrArgChange: false,
+    skip: false
+  });
+
+  const { data: cache, refetch: refetchCache } = useGetPhasesCacheQuery(
+    CacheTypes.UserPhases,
+    {
+      refetchOnMountOrArgChange: true,
+      skip: false
+    }
+  );
 
   const [apply, { isLoading: isApplying, isError, error, reset, isSuccess }] =
     useApplyForQuestMutation();
-  //
-  const [searchParams, setSearchParams] = useSearchParams();
-  const authenticated = useSelector(isAuthenticated);
-  const theme = useTheme();
-  const account = useEthers().account;
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const { data, isLoading, isFetching, refetch } = useGetAllNovasQuery(null, {
-    refetchOnMountOrArgChange: true,
-    skip: false
+
+  const [updatePhasesCache] = useUpdatePhasesCacheMutation({
+    fixedCacheKey: "PhasesCache"
   });
-  const [alreadyApplied, setAlreadyApplied] = useState(false);
-  const [openApplySuccess, setOpenApplySuccess] = useState(false);
-
-  const [cache, setCache] = useState<CacheModel>(null);
 
   useEffect(() => {
-    console.log(data);
-  }, [data]);
-
-  useEffect(() => {
-    const fetchCache = async () => {
-      const cache = await getCache(CacheTypes.UserPhases);
-      setCache(cache);
-    };
-    if (authenticated) {
-      fetchCache();
-    } else {
-      setCache(null);
+    if (isAuthenticated) {
+      refetchCache();
     }
-  }, [authenticated]);
-
-  // useEffect(() => {
-  //   console.log("authenticated", authenticated);
-  //   if (!authenticated) {
-  //     console.log("reset cache");
-  //     setCache(null);
-  //   }
-  // }, [authenticated]);
-
-  // const checkIsHighlighted = (daoAddress) => {
-  //   let highlightedDaoCache;
-  //   if (highlightedDaoCache?.daoAddress) {
-  //     return {
-  //       highlighted: highlightedDaoCache?.daoAddress === daoAddress,
-  //       questId: highlightedDaoCache.questId
-  //     };
-  //   }
-  //   return {
-  //     highlighted: searchParams.get("dao") === daoAddress,
-  //     questId: null
-  //   };
-  // };
+  }, [isAuthenticated]);
 
   const highlightData = (daoAddress) => {
     if (cache && cache.daoAddress && cache.questId) {
@@ -145,7 +138,11 @@ export const DaoList = () => {
       );
       navigate({
         pathname: "/quest",
-        search: `?questId=${selectedQuest.questId}&onboardingQuestAddress=${selectedQuest.onboardingQuestAddress}&daoAddress=${selectedQuest.daoAddress}`
+        search: new URLSearchParams({
+          questId: selectedQuest.questId,
+          onboardingQuestAddress: selectedQuest.onboardingQuestAddress,
+          daoAddress: selectedQuest.daoAddress
+        }).toString()
       });
       setSelectedQuest(null);
     };
@@ -158,14 +155,14 @@ export const DaoList = () => {
     };
     start();
   }, [connectStatus, selectedQuest]);
-  //apply
+
   const applyForQuest = async (quest) => {
     setQuestToApply(quest);
   };
 
-  useEffect(() => {
-    dispatch(resetState);
-  }, []);
+  // useEffect(() => {
+  //   dispatch(resetState);
+  // }, []);
 
   // useEffect(() => {
   //   if (questToApply && connectStatus === "disconnected") {
@@ -190,7 +187,6 @@ export const DaoList = () => {
     };
     const start = async () => {
       if (questToApply && connectStatus === "connected") {
-        const cache = await getCache(CacheTypes.UserPhases);
         if (cache && cache.questId) {
           setAlreadyApplied(true);
         } else {
@@ -201,14 +197,14 @@ export const DaoList = () => {
       }
     };
     start();
-  }, [connectStatus, questToApply]);
+  }, [connectStatus, questToApply, cache]);
 
   useEffect(() => {
     if (isSuccess) {
       setOpenApplySuccess(true);
       const start = async () => {
         try {
-          const updatedCache = await updateCache({
+          const updatedCache = {
             ...(cache || {}),
             cacheKey: CacheTypes.UserPhases,
             address: account,
@@ -229,9 +225,8 @@ export const DaoList = () => {
                 status: 0
               }
             ]
-          });
-          setCache(updatedCache);
-          // onUpdateCache(updatedCache);
+          };
+          updatePhasesCache(updatedCache);
           reset();
         } catch (error) {
           console.log(error);
@@ -324,7 +319,7 @@ export const DaoList = () => {
                 ml: 1
               }}
               disabled={isLoading || isFetching}
-              onClick={refetch}
+              // onClick={refetch}
             >
               Refresh
             </Button>
@@ -339,9 +334,7 @@ export const DaoList = () => {
               {(data?.daos || []).map((dao, index) => (
                 <NovaCard
                   key={`nova-card-${index}`}
-                  onUpdateCache={setCache}
                   daoData={dao}
-                  cache={cache}
                   highlightData={highlightData(dao.daoAddress)}
                   onQuestSelected={questDetails}
                   onApplyForQuest={applyForQuest}

@@ -1,6 +1,9 @@
 import { getCache, CacheTypes, updateCache, deleteCache } from "@api/cache.api";
 import {
+  useDeletePhasesCacheMutation,
+  useGetPhasesCacheQuery,
   useLazyHasUserCompletedQuestQuery,
+  useUpdatePhasesCacheMutation,
   useWithdrawFromAQuestMutation
 } from "@api/onboarding.api";
 import { isAuthenticated } from "@auth/auth.reducer";
@@ -16,8 +19,6 @@ import { useSelector } from "react-redux";
 export const ApplyOrWithdrawFromQuest = ({
   daoData,
   quest,
-  onUpdateCache,
-  cache,
   onApplyForQuest,
   questToApplyFor,
   isApplying
@@ -30,6 +31,16 @@ export const ApplyOrWithdrawFromQuest = ({
     return !!account && daoData?.admin === account;
   }, [account, daoData]);
 
+  const [deletePhasesCache] = useDeletePhasesCacheMutation({
+    fixedCacheKey: "PhasesCache"
+  });
+
+  const { cache } = useGetPhasesCacheQuery(CacheTypes.UserPhases, {
+    selectFromResult: ({ data }) => ({
+      cache: data
+    })
+  });
+
   const hasQuestStarted = useMemo(() => {
     if (!quest?.startDate) return false;
     return isAfter(new Date(), new Date(quest.startDate));
@@ -38,7 +49,6 @@ export const ApplyOrWithdrawFromQuest = ({
   const hasMemberPhaseOneStarted = useMemo(() => {
     return isAfter(new Date(), new Date(getMemberPhases().phaseOneStartDate));
   }, [quest]);
-  // const hasMemberPhaseOneStarted = true;
 
   const hasQuestEnded = useMemo(() => {
     if (!quest?.startDate) return false;
@@ -64,8 +74,6 @@ export const ApplyOrWithdrawFromQuest = ({
     withdraw,
     {
       isLoading: isWithdrawing,
-      isError: isWithdrawError,
-      error: withdrawError,
       reset: withdrawReset,
       isSuccess: withdrawIsSuccess
     }
@@ -87,9 +95,7 @@ export const ApplyOrWithdrawFromQuest = ({
     if (withdrawIsSuccess) {
       const start = async () => {
         try {
-          await deleteCache(CacheTypes.UserPhases);
-          onUpdateCache(null);
-          // setCache(null);
+          deletePhasesCache(CacheTypes.UserPhases);
           withdrawReset();
         } catch (error) {
           console.log(error);

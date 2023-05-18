@@ -14,7 +14,8 @@ import {
   Button,
   Icon,
   SvgIcon,
-  Tooltip
+  Tooltip,
+  Chip
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import { memo, useMemo } from "react";
@@ -47,7 +48,7 @@ export const taskStatuses: any = {
     color: "success"
   },
   [TaskStatus.Submitted]: {
-    label: "Submitted",
+    label: "Pending",
     color: "warning"
   },
   [TaskStatus.Taken]: {
@@ -186,6 +187,18 @@ const TaskCard = ({
         >
           <Stack flex={1} direction="column" gap={2}>
             <Typography variant="body" color="white">
+              Status:{" "}
+              <Chip
+                sx={{
+                  ml: 1
+                }}
+                label={taskStatuses[row.status].label}
+                color={taskStatuses[row.status].color}
+                size="small"
+              />
+            </Typography>
+
+            <Typography variant="body" color="white">
               Task type: {taskTypes[row.taskType]?.label}
             </Typography>
             <Typography variant="body" color="white">
@@ -210,7 +223,7 @@ const TaskCard = ({
                 mb: 4,
                 mx: "auto"
               }}
-              disabled={!canSubmitTask || row.status !== TaskStatus.Created}
+              disabled={!canSubmitTask}
               onClick={() => {
                 navigate({
                   pathname: `/quest/${path}/${row.taskId}`,

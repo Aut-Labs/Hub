@@ -7,30 +7,29 @@ import AutSDK, {
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { REHYDRATE } from "redux-persist";
 import { environment } from "./environment";
-import { CacheTypes, getCache, updateCache } from "./cache.api";
+import {
+  CacheModel,
+  CacheTypes,
+  deleteCache,
+  getCache,
+  updateCache
+} from "./cache.api";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import {
   finaliseJoinDiscordTask,
   finaliseQuizTask,
   finaliseTransactionTask
 } from "./tasks.api";
-import { debug } from "console";
-import { id } from "date-fns/locale";
 
 const getAllOnboardingQuests = async (
   pluginAddress: any,
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
-
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      pluginAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
+  const questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    pluginAddress
+  );
 
   const response = await questOnboarding.getAllQuests();
   if (response?.isSuccess) {
@@ -63,16 +62,11 @@ const fetchQuestById = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
   const { questId, onboardingQuestAddress } = body;
-
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      onboardingQuestAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
+  const questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    onboardingQuestAddress
+  );
 
   const response = await questOnboarding.getQuestById(+questId);
 
@@ -100,16 +94,11 @@ const hasUserCompletedQuest = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
   const { questId, onboardingQuestAddress, userAddress } = body;
-
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      onboardingQuestAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
+  const questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    onboardingQuestAddress
+  );
 
   try {
     const hasCompletedAQuest =
@@ -168,15 +157,10 @@ const deactivateOnboarding = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
-
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      pluginAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
+  const questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    pluginAddress
+  );
 
   const response = await questOnboarding.deactivateOnboarding(quests);
 
@@ -198,6 +182,25 @@ const deactivateOnboarding = async (
   };
 };
 
+const getPhasesCache = async (body, api: BaseQueryApi) => {
+  const cache = await getCache(CacheTypes.UserPhases);
+  return {
+    data: cache
+  };
+};
+
+const updatePhasesCache = async (body, api: BaseQueryApi) => {
+  return {
+    data: await updateCache(body)
+  };
+};
+
+const deletePhasesCache = async (body, api: BaseQueryApi) => {
+  return {
+    data: await deleteCache(CacheTypes.UserPhases)
+  };
+};
+
 const applyForQuest = async (
   body: {
     questId: number;
@@ -206,15 +209,10 @@ const applyForQuest = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
-
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      body.onboardingQuestAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
+  const questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    body.onboardingQuestAddress
+  );
 
   const response = await questOnboarding.applyForAQuest(body.questId);
 
@@ -236,15 +234,10 @@ const withdrawFromAQuest = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
-
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      body.onboardingQuestAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
+  const questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    body.onboardingQuestAddress
+  );
 
   const response = await questOnboarding.withdrawFromAQuest(body.questId);
 
@@ -263,15 +256,10 @@ const getAllTasksPerQuest = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
-
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      pluginAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
+  const questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    pluginAddress
+  );
 
   let tasks: Task[] = [];
   let submissions: Task[] = [];
@@ -323,7 +311,6 @@ const getAllTasksPerQuest = async (
         +questId
       );
     if (hasCompletedAQuest) {
-      debugger;
       const cacheResult = await getCache(CacheTypes.UserPhases);
       if (cacheResult.list[1].status !== 1) {
         cacheResult.list[1].status = 1;
@@ -346,15 +333,10 @@ const createQuest = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
-
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      body.pluginAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
+  const questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    body.pluginAddress
+  );
 
   const response = await questOnboarding.createQuest(body);
 
@@ -373,15 +355,10 @@ const updateQuest = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
-
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      body.pluginAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
+  const questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    body.pluginAddress
+  );
 
   const response = await questOnboarding.updateQuest(body);
 
@@ -406,15 +383,10 @@ const createTaskPerQuest = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
-
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      body.onboardingQuestAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
+  const questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    body.onboardingQuestAddress
+  );
 
   const response = await questOnboarding.createTask(
     body.task,
@@ -443,15 +415,10 @@ const removeTaskFromQuest = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
-
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      body.onboardingQuestAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
+  const questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    body.onboardingQuestAddress
+  );
 
   const response = await questOnboarding.removeTasks(
     [body.task],
@@ -480,18 +447,13 @@ const submitOpenTask = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
-
   const fileUri = await sdk.client.storeAsBlob(body.file);
   body.task.submission.properties["fileUri"] = fileUri;
 
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      body.onboardingQuestAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
+  const questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    body.onboardingQuestAddress
+  );
 
   const response = await questOnboarding.submitTask(
     body.task,
@@ -597,15 +559,10 @@ const finaliseOpenTask = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  let questOnboarding: QuestOnboarding = sdk.questOnboarding;
-
-  if (!questOnboarding) {
-    questOnboarding = sdk.initService<QuestOnboarding>(
-      QuestOnboarding,
-      body.onboardingQuestAddress
-    );
-    sdk.questOnboarding = questOnboarding;
-  }
+  const questOnboarding = sdk.initService<QuestOnboarding>(
+    QuestOnboarding,
+    body.onboardingQuestAddress
+  );
 
   const response = await questOnboarding.finalizeFor(
     body.task,
@@ -623,7 +580,7 @@ const finaliseOpenTask = async (
   };
 };
 
-const KEEP_DATA_UNUSED = 5 * 60;
+const KEEP_DATA_UNUSED = 30;
 
 export const onboardingApi = createApi({
   reducerPath: "onboardingApi",
@@ -687,6 +644,18 @@ export const onboardingApi = createApi({
       return submitOpenTask(body, api);
     }
 
+    if (url === "getPhasesCache") {
+      return getPhasesCache(body, api);
+    }
+
+    if (url === "updatePhasesCache") {
+      return updatePhasesCache(body, api);
+    }
+
+    if (url === "deletePhasesCache") {
+      return deletePhasesCache(body, api);
+    }
+
     if (url === "submitJoinDiscordTask") {
       return submitJoinDiscordTask(body, api);
     }
@@ -706,7 +675,7 @@ export const onboardingApi = createApi({
       data: "Test"
     };
   },
-  tagTypes: ["Quests", "Tasks", "Quest"],
+  tagTypes: ["Quests", "Tasks", "Quest", "PhasesCache"],
   endpoints: (builder) => ({
     getAllOnboardingQuests: builder.query<Quest[], string>({
       query: (body) => {
@@ -802,6 +771,39 @@ export const onboardingApi = createApi({
       },
       invalidatesTags: ["Quests", "Tasks"]
     }),
+    getPhasesCache: builder.query<CacheModel, any>({
+      query: (body) => {
+        return {
+          body,
+          url: "getPhasesCache"
+        };
+      },
+      providesTags: ["PhasesCache"]
+      // providesTags: (result, error, arg) => {
+      //   debugger;
+      //   return result
+      //     ? [{ type: "PhasesCache" as const, id: result["_id"] }, "PhasesCache"]
+      //     : ["PhasesCache"];
+      // }
+    }),
+    updatePhasesCache: builder.mutation<CacheModel, CacheModel>({
+      query: (body) => {
+        return {
+          body,
+          url: "updatePhasesCache"
+        };
+      },
+      invalidatesTags: ["PhasesCache"]
+    }),
+    deletePhasesCache: builder.mutation<void, string>({
+      query: (body) => {
+        return {
+          body,
+          url: "deletePhasesCache"
+        };
+      },
+      invalidatesTags: ["PhasesCache"]
+    }),
     applyForQuest: builder.mutation<
       number,
       {
@@ -815,7 +817,7 @@ export const onboardingApi = createApi({
           url: "applyForQuest"
         };
       },
-      invalidatesTags: ["Quest"]
+      invalidatesTags: ["Quest", "Tasks", "PhasesCache"]
     }),
     withdrawFromAQuest: builder.mutation<
       boolean,
@@ -830,7 +832,7 @@ export const onboardingApi = createApi({
           url: "withdrawFromAQuest"
         };
       },
-      invalidatesTags: ["Quest"]
+      invalidatesTags: ["Quest", "PhasesCache"]
     }),
     createQuest: builder.mutation<
       Quest,
@@ -943,7 +945,7 @@ export const onboardingApi = createApi({
           url: "submitOpenTask"
         };
       },
-      invalidatesTags: ["Tasks", "Quest"]
+      invalidatesTags: ["Tasks", "Quest", "PhasesCache"]
     }),
     submitJoinDiscordTask: builder.mutation<
       Task,
@@ -959,7 +961,7 @@ export const onboardingApi = createApi({
           url: "submitJoinDiscordTask"
         };
       },
-      invalidatesTags: ["Tasks", "Quest"]
+      invalidatesTags: ["Tasks", "Quest", "PhasesCache"]
     }),
     submitQuizTask: builder.mutation<
       Task,
@@ -977,7 +979,7 @@ export const onboardingApi = createApi({
           url: "submitQuizTask"
         };
       },
-      invalidatesTags: ["Tasks", "Quest"]
+      invalidatesTags: ["Tasks", "Quest", "PhasesCache"]
     }),
     submitTransactionTask: builder.mutation<
       Task,
@@ -994,7 +996,7 @@ export const onboardingApi = createApi({
           url: "submitTransactionTask"
         };
       },
-      invalidatesTags: ["Tasks", "Quest"]
+      invalidatesTags: ["Tasks", "Quest", "PhasesCache"]
     }),
     finaliseOpenTask: builder.mutation<
       Task,
@@ -1025,6 +1027,9 @@ export const {
   useFinaliseOpenTaskMutation,
   useSubmitOpenTaskMutation,
   useWithdrawFromAQuestMutation,
+  useGetPhasesCacheQuery,
+  useUpdatePhasesCacheMutation,
+  useDeletePhasesCacheMutation,
   useRemoveTaskFromQuestMutation,
   useLazyHasUserCompletedQuestQuery,
   useGetOnboardingQuestByIdQuery,
