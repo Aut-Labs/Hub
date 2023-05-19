@@ -34,6 +34,7 @@ import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import AFileUpload, { TaskFileUpload } from "@components/FileUpload";
 import { toBase64 } from "@utils/to-base-64";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
+import { FormHelperText } from "@components/Fields";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -45,6 +46,10 @@ interface UserSubmitContentProps {
   submission?: Task;
   plugin: PluginDefinition;
 }
+
+const errorTypes = {
+  pattern: "Invalid url."
+};
 
 const UserSubmitContent = ({
   task,
@@ -60,7 +65,7 @@ const UserSubmitContent = ({
     mode: "onChange",
     defaultValues: {
       openTask: null,
-      file: null
+      attatchment: null
     }
   });
 
@@ -160,7 +165,6 @@ const UserSubmitContent = ({
               name="openTask"
               control={control}
               rules={{
-                required: true,
                 maxLength: 257
               }}
               render={({ field: { name, value, onChange } }) => {
@@ -176,50 +180,103 @@ const UserSubmitContent = ({
                     onChange={onChange}
                     variant="outlined"
                     color="offWhite"
-                    required
                     multiline
                     rows={5}
-                    placeholder="Enter your answer here..."
+                    placeholder="Comments to task to go here not required..."
                   />
                 );
               }}
             />
-            <Typography
-              color="white"
-              variant="body"
-              textAlign="center"
-              p="20px"
-            >
-              Upload a file
-            </Typography>
-            <Controller
-              name="file"
-              control={control}
-              rules={{
-                required: true
-              }}
-              render={({ field: { onChange } }) => {
-                return (
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column"
-                    }}
+            {
+              // @ts-ignore
+              task.metadata.properties.attachmentType === "url" ? (
+                <>
+                  <Typography
+                    color="white"
+                    variant="body"
+                    textAlign="center"
+                    p="20px"
                   >
-                    <TaskFileUpload
-                      color="offWhite"
-                      fileChange={async (file) => {
-                        if (file) {
-                          onChange(await toBase64(file));
-                        } else {
-                          onChange(null);
-                        }
-                      }}
-                    />
-                  </div>
-                );
-              }}
-            />
+                    URL
+                  </Typography>
+                  <Controller
+                    name="attatchment"
+                    control={control}
+                    rules={{
+                      required: true,
+                      pattern:
+                        /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/
+                    }}
+                    render={({ field: { name, value, onChange } }) => {
+                      return (
+                        <AutTextField
+                          name={name}
+                          disabled={
+                            task.status === TaskStatus.Submitted ||
+                            task.status === TaskStatus.Finished
+                          }
+                          value={value || ""}
+                          sx={{ mt: "20px" }}
+                          onChange={onChange}
+                          variant="outlined"
+                          color="offWhite"
+                          required
+                          rows={1}
+                          placeholder="URL Link Here"
+                          helperText={
+                            <FormHelperText
+                              value={value}
+                              name={name}
+                              errors={formState.errors}
+                              errorTypes={errorTypes}
+                            />
+                          }
+                        />
+                      );
+                    }}
+                  />
+                </>
+              ) : (
+                <>
+                  <Typography
+                    color="white"
+                    variant="body"
+                    textAlign="center"
+                    p="20px"
+                  >
+                    Upload a file
+                  </Typography>
+                  <Controller
+                    name="attatchment"
+                    control={control}
+                    rules={{
+                      required: true
+                    }}
+                    render={({ field: { onChange } }) => {
+                      return (
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column"
+                          }}
+                        >
+                          <TaskFileUpload
+                            color="offWhite"
+                            fileChange={async (file) => {
+                              if (file) {
+                                onChange(await toBase64(file));
+                              } else {
+                                onChange(null);
+                              }
+                            }}
+                          />
+                        </div>
+                      );
+                    }}
+                  />
+                </>
+              )
+            }
           </CardContent>
         </Card>
       ) : (
