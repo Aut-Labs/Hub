@@ -447,8 +447,13 @@ const submitOpenTask = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  const fileUri = await sdk.client.storeAsBlob(body.file);
-  body.task.submission.properties["fileUri"] = fileUri;
+  // @ts-ignore
+  if (body.task.metadata.properties.attachmentType === "url") {
+    body.task.submission.properties["externalUrl"] = body.file;
+  } else {
+    const fileUri = await sdk.client.storeAsBlob(body.file);
+    body.task.submission.properties["fileUri"] = fileUri;
+  }
 
   const questOnboarding = sdk.initService<QuestOnboarding>(
     QuestOnboarding,

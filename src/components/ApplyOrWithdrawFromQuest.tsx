@@ -11,10 +11,15 @@ import { LoadingButton } from "@mui/lab";
 import { Stack, CircularProgress, Tooltip, Button } from "@mui/material";
 import { useEthers } from "@usedapp/core";
 import { getMemberPhases } from "@utils/beta-phases";
-import { isAfter, addDays } from "date-fns";
+import { addDays, isAfter, addMilliseconds } from "date-fns";
 import { useMemo, useEffect } from "react";
 import { useConfirmDialog } from "react-mui-confirm";
 import { useSelector } from "react-redux";
+
+const fractionToMiliseconds = (fraction: number) => {
+  const millisecondsInDay = 24 * 60 * 60 * 1000;
+  return fraction * millisecondsInDay;
+};
 
 export const ApplyOrWithdrawFromQuest = ({
   daoData,
@@ -54,7 +59,10 @@ export const ApplyOrWithdrawFromQuest = ({
     if (!quest?.startDate) return false;
     return isAfter(
       new Date(),
-      addDays(new Date(quest.startDate), quest.durationInDays)
+      addMilliseconds(
+        new Date(quest.startDate),
+        fractionToMiliseconds(quest?.durationInDays)
+      )
     );
   }, [quest]);
 

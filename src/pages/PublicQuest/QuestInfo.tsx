@@ -11,7 +11,7 @@ import {
   ButtonProps,
   styled
 } from "@mui/material";
-import { addDays, isAfter } from "date-fns";
+import { addDays, isAfter, addMilliseconds } from "date-fns";
 import { memo, useEffect, useMemo } from "react";
 import DescriptionIcon from "@mui/icons-material/Description";
 import {
@@ -52,6 +52,11 @@ const ButtonWithPulse = styled<ButtonProps<any, any>>(Button)`
     }
   }
 `;
+
+const fractionToMilliseconds = (fraction: number) => {
+  const millisecondsInDay = 24 * 60 * 60 * 1000;
+  return fraction * millisecondsInDay;
+};
 
 const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
   const [searchParams] = useSearchParams();
@@ -113,7 +118,10 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
   const hasQuestEnded = useMemo(() => {
     if (!quest?.startDate) return false;
     return isAfter(
-      addDays(new Date(quest.startDate), quest.durationInDays),
+      addMilliseconds(
+        new Date(quest.startDate),
+        fractionToMilliseconds(quest?.durationInDays)
+      ),
       new Date()
     );
   }, [quest]);
@@ -358,7 +366,10 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
               to={
                 new Date(
                   hasQuestStarted
-                    ? addDays(new Date(quest?.startDate), quest?.durationInDays)
+                    ? addMilliseconds(
+                        new Date(quest?.startDate),
+                        fractionToMilliseconds(quest?.durationInDays)
+                      )
                     : quest?.startDate
                 )
               }
