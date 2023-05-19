@@ -118,7 +118,10 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
   const hasQuestEnded = useMemo(() => {
     if (!quest?.startDate) return false;
     return isAfter(
-      addDays(new Date(quest.startDate), quest.durationInDays),
+      addMilliseconds(
+        new Date(quest.startDate),
+        fractionToMilliseconds(quest?.durationInDays)
+      ),
       new Date()
     );
   }, [quest]);
