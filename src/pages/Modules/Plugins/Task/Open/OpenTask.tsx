@@ -81,16 +81,13 @@ const UserSubmitContent = ({
 
   const onSubmit = async (values) => {
     submitTask({
-      file: values.file,
+      file: values.attatchment,
       task: {
         ...task,
         submission: {
           name: "Open task submission",
           description: values.openTask,
-          properties: {
-            submitter: userAddress,
-            fileUri: ""
-          } as any
+          properties: {} as any
         }
       },
       onboardingQuestAddress: searchParams.get(
