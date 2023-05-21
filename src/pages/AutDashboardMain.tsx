@@ -40,7 +40,7 @@ const AutDashboardMain = () => {
   return (
     <>
       {isLoading ? (
-        <AutLoading />
+        <AutLoading width="130px" height="130px" />
       ) : (
         <SidebarDrawer addonMenuItems={[]}>
           {/* <Suspense fallback={<AutLoading />}>

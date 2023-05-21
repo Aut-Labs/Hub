@@ -447,7 +447,6 @@ const submitOpenTask = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  // @ts-ignore
   if (body.task.metadata.properties.attachmentType === "url") {
     body.task.submission.properties["externalUrl"] = body.file;
   } else {
@@ -585,7 +584,7 @@ const finaliseOpenTask = async (
   };
 };
 
-const KEEP_DATA_UNUSED = 30;
+const KEEP_DATA_UNUSED = 5 * 60;
 
 export const onboardingApi = createApi({
   reducerPath: "onboardingApi",

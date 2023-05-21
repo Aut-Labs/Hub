@@ -31,7 +31,7 @@ const Callback = () => {
 
   return (
     <div>
-      <AutLoading />
+      <AutLoading width="130px" height="130px" />
     </div>
   );
 };

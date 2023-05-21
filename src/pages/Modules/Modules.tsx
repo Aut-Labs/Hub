@@ -67,7 +67,12 @@ const Modules = () => {
 
   return (
     <>
-      <LoadingProgressBar isLoading={isFetching} />
+      <LoadingProgressBar
+        isLoading={isFetching}
+        sx={{
+          zIndex: 99
+        }}
+      />
       <Container maxWidth="lg" sx={{ py: "20px" }}>
         <Box
           sx={{

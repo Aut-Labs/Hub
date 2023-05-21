@@ -39,7 +39,7 @@ import {
 } from "@auth/auth.reducer";
 import Logo from "@assets/logo.svg";
 
-const TOOLBAR_HEIGHT = 84;
+export const TOOLBAR_HEIGHT = 84;
 
 const DialogInnerContent = styled("div")({
   display: "flex",

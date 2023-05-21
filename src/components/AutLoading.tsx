@@ -21,6 +21,7 @@ const AutLoading = ({ width = "300px", height = "300px" }) => {
         position: "absolute",
         left: "50%",
         top: "50%",
+        zIndex: 1,
         transform: `translate(-50%, -50%)`
       }}
     >

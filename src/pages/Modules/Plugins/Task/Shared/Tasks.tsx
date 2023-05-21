@@ -38,7 +38,7 @@ export const taskStatuses: any = {
     color: "info"
   },
   [TaskStatus.Finished]: {
-    label: "Complete",
+    label: "Completed",
     color: "success"
   },
   [TaskStatus.Submitted]: {

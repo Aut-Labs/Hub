@@ -189,7 +189,12 @@ function Members() {
 
   return (
     <Container maxWidth="lg" sx={{ py: "20px" }}>
-      <LoadingProgressBar isLoading={isFetching} />
+      <LoadingProgressBar
+        isLoading={isFetching}
+        sx={{
+          zIndex: 99
+        }}
+      />
       <Box
         sx={{
           display: "flex",

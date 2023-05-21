@@ -64,8 +64,8 @@ export const DaoList = () => {
   const { account } = useEthers();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const { data, isLoading, isFetching, refetch } = useGetAllNovasQuery(null, {
-    refetchOnMountOrArgChange: false,
+  const { data, isLoading, isFetching } = useGetAllNovasQuery(null, {
+    refetchOnMountOrArgChange: true,
     skip: false
   });
 

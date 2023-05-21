@@ -41,7 +41,8 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
   const [openSubmitSuccess, setOpenSubmitSuccess] = useState(false);
   const navigate = useNavigate();
   const daoData = useSelector(CommunityData);
-  const { task } = useGetAllTasksPerQuestQuery(
+
+  const { task, isLoading: isLoadingTasks } = useGetAllTasksPerQuestQuery(
     {
       userAddress,
       isAdmin,
@@ -166,7 +167,9 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
               {!joinClicked && (
                 <StepperButton
                   label="Join"
-                  disabled={task?.status !== TaskStatus.Created}
+                  disabled={
+                    task?.status !== TaskStatus.Created || isLoadingTasks
+                  }
                   onClick={() => {
                     setJoinClicked(true);
                     window.open(
@@ -216,7 +219,7 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
           </Stack>
         </>
       ) : (
-        <AutLoading></AutLoading>
+        <AutLoading width="130px" height="130px"></AutLoading>
       )}
     </Container>
   );

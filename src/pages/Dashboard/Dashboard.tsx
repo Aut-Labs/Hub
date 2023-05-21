@@ -146,7 +146,12 @@ const Dashboard = () => {
         }
       }}
     >
-      <LoadingProgressBar isLoading={isFetching} />
+      <LoadingProgressBar
+        isLoading={isFetching}
+        sx={{
+          zIndex: 99
+        }}
+      />
       <Card
         sx={{
           width: "100%",

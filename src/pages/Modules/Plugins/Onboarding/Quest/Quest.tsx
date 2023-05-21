@@ -100,7 +100,12 @@ const Quest = ({ plugin }: PluginParams) => {
         position: "relative"
       }}
     >
-      <LoadingProgressBar isLoading={isFetching} />
+      <LoadingProgressBar
+        isLoading={isFetching}
+        sx={{
+          zIndex: 99
+        }}
+      />
       {isLoading ? (
         <AutLoading width="130px" height="130px" />
       ) : (
