@@ -187,17 +187,13 @@ export const DaoList = () => {
     };
     const start = async () => {
       if (questToApply && connectStatus === "connected") {
-        if (cache && cache.questId) {
-          setAlreadyApplied(true);
-        } else {
-          applyToQuest();
-        }
+        applyToQuest();
       } else if (questToApply && connectStatus === "initial") {
         dispatch(changeConnectStatus("start"));
       }
     };
     start();
-  }, [connectStatus, questToApply, cache]);
+  }, [connectStatus, questToApply]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -253,11 +249,9 @@ export const DaoList = () => {
     >
       <Container maxWidth="lg" sx={{ py: "20px" }}>
         <ErrorDialog
-          handleClose={() => {
-            setAlreadyApplied(false);
-          }}
-          open={alreadyApplied}
-          message={"You have already applied for a quest."}
+          handleClose={() => reset()}
+          open={isError}
+          message={error}
         />
         <SuccessDialog
           open={openApplySuccess}

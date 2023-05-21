@@ -29,7 +29,6 @@ export const ApplyOrWithdrawFromQuest = ({
   isApplying
 }) => {
   // const [cache, setCache] = useState<CacheModel>(null);
-  const authenticated = useSelector(isAuthenticated);
   const confirm = useConfirmDialog();
   const { account } = useEthers();
   const isOwner = useMemo(() => {
@@ -103,6 +102,7 @@ export const ApplyOrWithdrawFromQuest = ({
     if (withdrawIsSuccess) {
       const start = async () => {
         try {
+          onApplyForQuest(null);
           deletePhasesCache(CacheTypes.UserPhases);
           withdrawReset();
         } catch (error) {

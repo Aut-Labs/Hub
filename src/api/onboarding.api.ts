@@ -214,6 +214,13 @@ const applyForQuest = async (
     body.onboardingQuestAddress
   );
 
+  const cache = await getCache(CacheTypes.UserPhases);
+  if (cache && cache.questId) {
+    return {
+      error: "You have already applied for a quest."
+    };
+  }
+
   const response = await questOnboarding.applyForAQuest(body.questId);
 
   if (!response.isSuccess) {
