@@ -20,6 +20,7 @@ import {
   finaliseQuizTask,
   finaliseTransactionTask
 } from "./tasks.api";
+import { AUTH_TOKEN_KEY } from "./auth.api";
 
 const getAllOnboardingQuests = async (
   pluginAddress: any,

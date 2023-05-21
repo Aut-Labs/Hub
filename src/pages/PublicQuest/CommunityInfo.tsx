@@ -194,7 +194,7 @@ const CommunityInfo = () => {
           target="_blank"
           href={`https://my.aut.id/${data?.admin}`}
         >
-          {data?.admin === account ? "View profile" : "View owner"}
+          {data?.admin === account ? "View profile" : "View operator profile"}
         </Link>
       </Box>
     </Box>

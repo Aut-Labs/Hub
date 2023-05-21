@@ -39,11 +39,14 @@ export const ApplyOrWithdrawFromQuest = ({
     fixedCacheKey: "PhasesCache"
   });
 
-  const { cache } = useGetPhasesCacheQuery(CacheTypes.UserPhases, {
-    selectFromResult: ({ data }) => ({
-      cache: data
-    })
-  });
+  const { cache } = useGetPhasesCacheQuery(
+    { cacheKey: CacheTypes.UserPhases, account },
+    {
+      selectFromResult: ({ data }) => ({
+        cache: data
+      })
+    }
+  );
 
   const hasQuestStarted = useMemo(() => {
     if (!quest?.startDate) return false;
@@ -53,6 +56,7 @@ export const ApplyOrWithdrawFromQuest = ({
   const hasMemberPhaseOneStarted = useMemo(() => {
     return isAfter(new Date(), new Date(getMemberPhases().phaseOneStartDate));
   }, [quest]);
+  // const hasMemberPhaseOneStarted = true;
 
   const hasQuestEnded = useMemo(() => {
     if (!quest?.startDate) return false;
@@ -66,6 +70,7 @@ export const ApplyOrWithdrawFromQuest = ({
   }, [quest]);
 
   const canApplyForAQuest = useMemo(() => {
+    console.log("cache", cache);
     return !isOwner && !cache && !!hasMemberPhaseOneStarted && !hasQuestEnded;
   }, [cache, hasMemberPhaseOneStarted, hasQuestEnded, isOwner]);
 

@@ -45,6 +45,7 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
 const PublicQuest = () => {
   const { account: userAddress } = useEthers();
   const [searchParams] = useSearchParams();
+  const { account } = useEthers();
 
   const {
     data: quest,
@@ -72,11 +73,14 @@ const PublicQuest = () => {
     })
   });
 
-  const { cache } = useGetPhasesCacheQuery(CacheTypes.UserPhases, {
-    selectFromResult: ({ data }) => ({
-      cache: data
-    })
-  });
+  const { cache } = useGetPhasesCacheQuery(
+    { cacheKey: CacheTypes.UserPhases, account },
+    {
+      selectFromResult: ({ data }) => ({
+        cache: data
+      })
+    }
+  );
 
   const isOwner = useMemo(() => {
     return communityData?.admin === userAddress;

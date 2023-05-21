@@ -70,7 +70,7 @@ export const DaoList = () => {
   });
 
   const { data: cache, refetch: refetchCache } = useGetPhasesCacheQuery(
-    CacheTypes.UserPhases,
+    { cacheKey: CacheTypes.UserPhases, account },
     {
       refetchOnMountOrArgChange: true,
       skip: false

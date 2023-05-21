@@ -62,11 +62,14 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
   const { account } = useEthers();
   const confirm = useConfirmDialog();
 
-  const { cache } = useGetPhasesCacheQuery(CacheTypes.UserPhases, {
-    selectFromResult: ({ data }) => ({
-      cache: data
-    })
-  });
+  const { cache } = useGetPhasesCacheQuery(
+    { cacheKey: CacheTypes.UserPhases, account },
+    {
+      selectFromResult: ({ data }) => ({
+        cache: data
+      })
+    }
+  );
 
   const [apply, { isLoading: isApplying, isError, error, reset, isSuccess }] =
     useApplyForQuestMutation();
@@ -108,6 +111,7 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
   const hasMemberPhaseOneStarted = useMemo(() => {
     return isAfter(new Date(), new Date(getMemberPhases().phaseOneStartDate));
   }, [quest]);
+  // const hasMemberPhaseOneStarted = true;
 
   const hasQuestStarted = useMemo(() => {
     if (!quest?.startDate) return false;
@@ -117,15 +121,19 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
   const hasQuestEnded = useMemo(() => {
     if (!quest?.startDate) return false;
     return isAfter(
+      new Date(),
       addMilliseconds(
         new Date(quest.startDate),
         fractionToMilliseconds(quest?.durationInDays)
-      ),
-      new Date()
+      )
     );
   }, [quest]);
 
   const canApplyForAQuest = useMemo(() => {
+    console.log("isOwner", isOwner);
+    console.log("cache", cache);
+    console.log("hasMemberPhaseOneStarted", hasMemberPhaseOneStarted);
+    console.log("hasQuestEnded", hasQuestEnded);
     return !isOwner && !cache && !!hasMemberPhaseOneStarted && !hasQuestEnded;
   }, [cache, hasMemberPhaseOneStarted, hasQuestEnded, isOwner]);
 
@@ -339,9 +347,6 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
             gridTemplateColumns: "1fr 2fr"
           }}
         >
-          {
-            // Also rip that off
-          }
           {tasksCompleted ? (
             <ButtonWithPulse
               sx={{
