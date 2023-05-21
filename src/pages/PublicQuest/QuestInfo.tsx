@@ -249,14 +249,14 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
             <Typography color="white" variant="subtitle1">
               <Stack direction="row" alignItems="center">
                 {quest?.metadata?.name}
-                <Tooltip title={quest?.metadata?.description}>
+                {/* <Tooltip title={quest?.metadata?.description}>
                   <DescriptionIcon
                     sx={{
                       color: "offWhite.main",
                       ml: 1
                     }}
                   />
-                </Tooltip>
+                </Tooltip> */}
                 <Chip
                   sx={{
                     ml: 1
@@ -347,8 +347,8 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
             <ButtonWithPulse
               sx={{
                 mt: 6,
-                mb: 4,
-                mx: "auto"
+                mx: "auto",
+                minWidth: "230px"
               }}
               onClick={() => {
                 window.open(`https://try-aut-internal-test.aut.id/`, "_blank");

@@ -584,7 +584,7 @@ const finaliseOpenTask = async (
   };
 };
 
-const KEEP_DATA_UNUSED = 30;
+const KEEP_DATA_UNUSED = 5 * 60;
 
 export const onboardingApi = createApi({
   reducerPath: "onboardingApi",

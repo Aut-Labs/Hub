@@ -9,7 +9,9 @@ import {
   Typography,
   LinearProgress,
   linearProgressClasses,
-  styled
+  styled,
+  Tooltip,
+  IconButton
 } from "@mui/material";
 import { useSearchParams } from "react-router-dom";
 import { memo, useMemo } from "react";
@@ -25,6 +27,8 @@ import { RequiredQueryParams } from "../../api/RequiredQueryParams";
 import { useEthers } from "@usedapp/core";
 import { useGetAllNovasQuery } from "@api/community.api";
 import { CacheTypes } from "@api/cache.api";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import { TOOLBAR_HEIGHT } from "./ToolbarConnector";
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   height: 30,
@@ -96,7 +100,8 @@ const PublicQuest = () => {
   const {
     data: tasksAndSubmissions,
     isLoading: isLoadingTasks,
-    isFetching: isFetchingTasks
+    isFetching: isFetchingTasks,
+    refetch
   } = useGetAllTasksPerQuestQuery(
     {
       userAddress,
@@ -134,14 +139,11 @@ const PublicQuest = () => {
     }, 0);
   }, [tasks]);
 
-  console.log("completedTasks:", tasks);
-
   return (
     <Container
       maxWidth="lg"
       sx={{
         py: 4,
-        height: "100%",
         flex: 1,
         display: "flex",
         flexDirection: "column",
@@ -150,7 +152,8 @@ const PublicQuest = () => {
     >
       <LoadingProgressBar
         sx={{
-          top: "84px"
+          zIndex: 99,
+          top: `${TOOLBAR_HEIGHT}px`
         }}
         isLoading={isFetchingQuest || isFetchingTasks}
       />
@@ -237,11 +240,25 @@ const PublicQuest = () => {
             variant="subtitle1"
           >
             Quest tasks
+            <Tooltip title="Refresh tasks">
+              <IconButton
+                size="medium"
+                component="span"
+                color="offWhite"
+                sx={{
+                  ml: 1
+                }}
+                disabled={isLoadingTasks || isFetchingTasks}
+                onClick={refetch}
+              >
+                <RefreshIcon />
+              </IconButton>
+            </Tooltip>
           </Typography>
-
           <Tasks
             questId={quest?.questId}
-            canSubmitTask={hasQuestStarted && hasAppliedForQuest}
+            canSubmitTask
+            // canSubmitTask={hasQuestStarted && hasAppliedForQuest}
             onboardingQuestAddress={searchParams.get(
               RequiredQueryParams.OnboardingQuestAddress
             )}

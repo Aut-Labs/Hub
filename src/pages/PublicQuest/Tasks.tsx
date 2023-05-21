@@ -36,7 +36,6 @@ import ErrorDialog from "@components/Dialog/ErrorPopup";
 import { differenceInDays } from "date-fns";
 import { useConfirmDialog } from "react-mui-confirm";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
-import { ReactComponent as CheckMark } from "@assets/check_mark.svg";
 
 export const taskStatuses: any = {
   [TaskStatus.Created]: {
@@ -44,7 +43,7 @@ export const taskStatuses: any = {
     color: "info"
   },
   [TaskStatus.Finished]: {
-    label: "Complete",
+    label: "Completed",
     color: "success"
   },
   [TaskStatus.Submitted]: {

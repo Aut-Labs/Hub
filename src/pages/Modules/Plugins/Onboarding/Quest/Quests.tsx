@@ -118,7 +118,12 @@ const Quests = ({ plugin }: PluginParams) => {
 
   return (
     <Container maxWidth="lg" sx={{ py: "20px" }}>
-      <LoadingProgressBar isLoading={isFetching} />
+      <LoadingProgressBar
+        isLoading={isFetching}
+        sx={{
+          zIndex: 99
+        }}
+      />
       <ErrorDialog
         handleClose={() => activateReset()}
         open={activateIsError}

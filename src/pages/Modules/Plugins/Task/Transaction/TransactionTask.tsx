@@ -233,7 +233,7 @@ const TransactionTask = ({ plugin }: PluginParams) => {
           </Stack>
         </>
       ) : (
-        <AutLoading></AutLoading>
+        <AutLoading width="130px" height="130px"></AutLoading>
       )}
     </Container>
   );

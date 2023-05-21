@@ -85,7 +85,12 @@ const Plugins = ({ definition }: StackParams) => {
 
   return (
     <>
-      <LoadingProgressBar isLoading={isFetching || isLoadingPlugins} />
+      <LoadingProgressBar
+        isLoading={isFetching || isLoadingPlugins}
+        sx={{
+          zIndex: 99
+        }}
+      />
       <Container maxWidth="lg" sx={{ py: "20px" }}>
         <Box
           sx={{

@@ -1,13 +1,12 @@
-import { Suspense, lazy, memo, useMemo } from "react";
+import { Suspense, lazy, memo, useEffect, useMemo, useRef } from "react";
 import AutLoading from "@components/AutLoading";
 import { useMediaQuery, useTheme } from "@mui/material";
 import PublicQuest from "./PublicQuest";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
-
-const TOOLBAR_HEIGHT = 84;
+import { TOOLBAR_HEIGHT } from "./ToolbarConnector";
 
 const OpenTask = lazy(() => import("../Modules/Plugins/Task/Open/OpenTask"));
 
@@ -22,13 +21,10 @@ const TransactionTask = lazy(
 
 const QuestDetails = () => {
   const theme = useTheme();
+  const ps = useRef<HTMLElement>();
+  const { pathname } = useLocation();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const {
-    data: plugins,
-    isLoading,
-    isFetching,
-    refetch
-  } = useGetAllPluginDefinitionsByDAOQuery(null, {
+  const { data: plugins } = useGetAllPluginDefinitionsByDAOQuery(null, {
     refetchOnMountOrArgChange: false,
     skip: false
   });
@@ -40,8 +36,17 @@ const QuestDetails = () => {
     }, {});
   }, [plugins]);
 
+  useEffect(() => {
+    setTimeout(() => {
+      if (ps?.current) {
+        ps.current.scrollTop = 0;
+      }
+    }, 0);
+  }, [pathname]);
+
   return (
     <PerfectScrollbar
+      containerRef={(el) => (ps.current = el)}
       style={{
         ...(isMobile && {
           marginTop: `${TOOLBAR_HEIGHT + 70}px`,
