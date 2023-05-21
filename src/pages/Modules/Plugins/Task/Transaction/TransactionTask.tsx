@@ -15,7 +15,7 @@ import {
   Typography
 } from "@mui/material";
 import { CommunityData, IsAdmin } from "@store/Community/community.reducer";
-import { memo, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useSelector } from "react-redux";
 import {
@@ -83,8 +83,14 @@ const TransactionTask = ({ plugin }: PluginParams) => {
     control
   });
 
-  const [submitTask, { error, isError, isLoading, reset }] =
+  const [submitTask, { isSuccess, error, isError, isLoading, reset }] =
     useSubmitTransactionTaskMutation();
+
+  useEffect(() => {
+    if (isSuccess) {
+      setOpenSubmitSuccess(true);
+    }
+  }, [isSuccess]);
 
   const onSubmit = async () => {
     submitTask({

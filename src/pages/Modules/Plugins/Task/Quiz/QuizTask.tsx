@@ -211,8 +211,14 @@ const QuizTask = ({ plugin }: PluginParams) => {
     }
   }, [initialized, task]);
 
-  const [submitTask, { error, isError, isLoading, reset }] =
+  const [submitTask, { isSuccess, error, isError, isLoading, reset }] =
     useSubmitQuizTaskMutation();
+
+  useEffect(() => {
+    if (isSuccess) {
+      setOpenSubmitSuccess(true);
+    }
+  }, [isSuccess]);
 
   const onSubmit = async () => {
     const values = getValues();
