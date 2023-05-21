@@ -48,7 +48,7 @@ const TransactionTask = ({ plugin }: PluginParams) => {
   const [openSubmitSuccess, setOpenSubmitSuccess] = useState(false);
 
   const params = useParams();
-  const { task } = useGetAllTasksPerQuestQuery(
+  const { task, isLoading: isLoadingTasks } = useGetAllTasksPerQuestQuery(
     {
       userAddress,
       isAdmin,
@@ -225,7 +225,7 @@ const TransactionTask = ({ plugin }: PluginParams) => {
             >
               <StepperButton
                 label="Confirm"
-                disabled={task?.status !== TaskStatus.Created}
+                disabled={task?.status !== TaskStatus.Created || isLoadingTasks}
                 onClick={handleSubmit(onSubmit)}
                 sx={{ width: "250px" }}
               />

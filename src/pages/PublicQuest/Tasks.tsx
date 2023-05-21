@@ -109,27 +109,20 @@ const TaskCard = ({
   questId: number;
 }) => {
   const location = useLocation();
-  const params = useParams<{ questId: string }>();
   const navigate = useNavigate();
-  const confirm = useConfirmDialog();
   const [searchParams] = useSearchParams();
-  const [removeTask, { error, isError, isLoading, reset }] =
-    useRemoveTaskFromQuestMutation();
 
-  const { plugin, questOnboarding } = useGetAllPluginDefinitionsByDAOQuery(
-    null,
-    {
-      selectFromResult: ({ data }) => ({
-        questOnboarding: (data || []).find(
-          (p) =>
-            PluginDefinitionType.QuestOnboardingPlugin === p.pluginDefinitionId
-        ),
-        plugin: (data || []).find(
-          (p) => taskTypes[row.taskType].pluginType === p.pluginDefinitionId
-        )
-      })
-    }
-  );
+  const { plugin } = useGetAllPluginDefinitionsByDAOQuery(null, {
+    selectFromResult: ({ data }) => ({
+      questOnboarding: (data || []).find(
+        (p) =>
+          PluginDefinitionType.QuestOnboardingPlugin === p.pluginDefinitionId
+      ),
+      plugin: (data || []).find(
+        (p) => taskTypes[row.taskType].pluginType === p.pluginDefinitionId
+      )
+    })
+  });
 
   const path = useMemo(() => {
     if (!plugin) return;
@@ -138,7 +131,6 @@ const TaskCard = ({
 
   return (
     <>
-      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
       <GridCard
         sx={{
           bgcolor: "nightBlack.main",

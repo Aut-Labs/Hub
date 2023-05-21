@@ -257,8 +257,7 @@ const PublicQuest = () => {
           </Typography>
           <Tasks
             questId={quest?.questId}
-            canSubmitTask
-            // canSubmitTask={hasQuestStarted && hasAppliedForQuest}
+            canSubmitTask={hasQuestStarted && hasAppliedForQuest}
             onboardingQuestAddress={searchParams.get(
               RequiredQueryParams.OnboardingQuestAddress
             )}

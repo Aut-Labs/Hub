@@ -168,7 +168,7 @@ const QuizTask = ({ plugin }: PluginParams) => {
   const daoData = useSelector(CommunityData);
   const [openSubmitSuccess, setOpenSubmitSuccess] = useState(false);
 
-  const { task, isLoading: isLoadingPlugins } = useGetAllTasksPerQuestQuery(
+  const { task, isLoading: isLoadingTasks } = useGetAllTasksPerQuestQuery(
     {
       userAddress,
       isAdmin,
@@ -268,7 +268,6 @@ const QuizTask = ({ plugin }: PluginParams) => {
       {task ? (
         <>
           <TaskDetails task={task} />
-
           <Stack
             direction="column"
             gap={4}
@@ -329,7 +328,9 @@ const QuizTask = ({ plugin }: PluginParams) => {
               <StepperButton
                 label="Confirm"
                 disabled={
-                  !formState.isValid || task?.status !== TaskStatus.Created
+                  !formState.isValid ||
+                  task?.status !== TaskStatus.Created ||
+                  isLoadingTasks
                 }
                 onClick={handleSubmit(onSubmit)}
                 sx={{ width: "250px" }}
