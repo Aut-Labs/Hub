@@ -41,7 +41,6 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
   const [openSubmitSuccess, setOpenSubmitSuccess] = useState(false);
   const navigate = useNavigate();
   const daoData = useSelector(CommunityData);
-
   const { task } = useGetAllTasksPerQuestQuery(
     {
       userAddress,

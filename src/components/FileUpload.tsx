@@ -177,6 +177,7 @@ const AFileUpload = ({
 export default AFileUpload;
 
 export const TaskFileUpload = ({
+  attachmentType = null,
   fileChange = (file: File) => null,
   initialPreviewUrl = null,
   color = null
@@ -189,12 +190,16 @@ export const TaskFileUpload = ({
     noClick: true,
     multiple: false,
     noKeyboard: true,
-    accept: {
-      "image/jpeg": [".jpeg", ".jpg"],
-      "image/png": [".png"],
-      "application/pdf": [".pdf"],
-      "text/plain": [".txt"]
-    },
+    accept:
+      attachmentType === "text"
+        ? {
+            "application/pdf": [".pdf"],
+            "text/plain": [".txt"]
+          }
+        : {
+            "image/jpeg": [".jpeg", ".jpg"],
+            "image/png": [".png"]
+          },
     onDrop: ([file]) => {
       const url = URL.createObjectURL(file);
       setPreview(url);
