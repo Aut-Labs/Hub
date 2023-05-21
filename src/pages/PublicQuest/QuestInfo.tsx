@@ -9,7 +9,8 @@ import {
   CircularProgress,
   Button,
   ButtonProps,
-  styled
+  styled,
+  IconButton
 } from "@mui/material";
 import { isAfter, addMilliseconds } from "date-fns";
 import { memo, useEffect, useMemo } from "react";
@@ -31,6 +32,7 @@ import BetaCountdown from "@components/BetaCountdown";
 import { RequiredQueryParams } from "../../api/RequiredQueryParams";
 import { useGetAllNovasQuery } from "@api/community.api";
 import { getMemberPhases } from "@utils/beta-phases";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 const ButtonWithPulse = styled<ButtonProps<any, any>>(Button)`
   &:not(.Mui-disabled) {
@@ -78,7 +80,11 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
     fixedCacheKey: "PhasesCache"
   });
 
-  const { data: quest } = useGetOnboardingQuestByIdQuery(
+  const {
+    data: quest,
+    refetch,
+    isLoading
+  } = useGetOnboardingQuestByIdQuery(
     {
       questId: +searchParams.get(RequiredQueryParams.QuestId),
       onboardingQuestAddress: searchParams.get(
@@ -87,7 +93,8 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
       daoAddress: searchParams.get(RequiredQueryParams.DaoAddress)
     },
     {
-      selectFromResult: ({ data }) => ({
+      selectFromResult: ({ data, isLoading, isFetching }) => ({
+        isLoading: isLoading || isFetching,
         data
       })
     }
@@ -248,14 +255,20 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
             <Typography color="white" variant="subtitle1">
               <Stack direction="row" alignItems="center">
                 {quest?.metadata?.name}
-                {/* <Tooltip title={quest?.metadata?.description}>
-                  <DescriptionIcon
+                <Tooltip title="Refresh quest">
+                  <IconButton
+                    size="medium"
+                    component="span"
+                    color="offWhite"
                     sx={{
-                      color: "offWhite.main",
                       ml: 1
                     }}
-                  />
-                </Tooltip> */}
+                    disabled={isLoading}
+                    onClick={refetch}
+                  >
+                    <RefreshIcon />
+                  </IconButton>
+                </Tooltip>
                 <Chip
                   sx={{
                     ml: 1
