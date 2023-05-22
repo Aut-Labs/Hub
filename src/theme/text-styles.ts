@@ -67,11 +67,12 @@ export const textStyles = {
   },
   body: {
     fontSize: {
-      xs: "16px",
-      sm: "16px",
-      md: "16px",
-      lg: "16px",
-      xxl: "24px"
+      xs: "14px",
+      sm: "14px",
+      md: "14px",
+      lg: "14px",
+      xl: "16px",
+      xxl: "18px"
     },
     fontWeight: "normal",
     letterSpacing: "-0.008em",
