@@ -176,6 +176,8 @@ export const ApplyOrWithdrawFromQuest = ({
               ? "Quest has ended"
               : !hasQuestStarted
               ? "Quest hasn't started yet"
+              : !hasMemberPhaseOneStarted
+              ? "Member phase hasn't started yet."
               : "Already applied to another quest"
           }
         >

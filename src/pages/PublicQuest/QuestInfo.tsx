@@ -54,7 +54,7 @@ const ButtonWithPulse = styled<ButtonProps<any, any>>(Button)`
   }
 `;
 
-const fractionToMilliseconds = (fraction: number) => {
+export const fractionToMilliseconds = (fraction: number) => {
   const millisecondsInDay = 24 * 60 * 60 * 1000;
   return fraction * millisecondsInDay;
 };
@@ -137,10 +137,6 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
   }, [quest]);
 
   const canApplyForAQuest = useMemo(() => {
-    console.log("isOwner", isOwner);
-    console.log("cache", cache);
-    console.log("hasMemberPhaseOneStarted", hasMemberPhaseOneStarted);
-    console.log("hasQuestEnded", hasQuestEnded);
     return !isOwner && !cache && !!hasMemberPhaseOneStarted && !hasQuestEnded;
   }, [cache, hasMemberPhaseOneStarted, hasQuestEnded, isOwner]);
 
@@ -229,6 +225,26 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
     }
   }, [isSuccess]);
 
+  useEffect(() => {
+    const toDate = new Date(
+      hasQuestStarted
+        ? addMilliseconds(
+            new Date(quest?.startDate),
+            fractionToMilliseconds(quest?.durationInDays)
+          )
+        : quest?.startDate
+    );
+    const timeDifference = toDate.getTime() - new Date().getTime();
+
+    const refetchTimeout = setTimeout(() => {
+      refetch();
+    }, timeDifference);
+
+    return () => {
+      clearTimeout(refetchTimeout);
+    };
+  }, []);
+
   return (
     <>
       <ErrorDialog
@@ -291,10 +307,6 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
               Quest
             </Typography>
           </Stack>
-
-          {/* {!hasQuestStarted && (
-            
-          )} */}
           <>
             {canApplyForAQuest && (
               <Badge

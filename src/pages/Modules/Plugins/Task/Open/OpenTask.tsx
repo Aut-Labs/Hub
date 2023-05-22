@@ -61,7 +61,6 @@ const UserSubmitContent = ({
   const [searchParams] = useSearchParams();
   const [initialized, setInitialized] = useState(false);
   const navigate = useNavigate();
-  const daoData = useSelector(CommunityData);
   const [openSubmitSuccess, setOpenSubmitSuccess] = useState(false);
   const { control, handleSubmit, formState, setValue } = useForm({
     mode: "onChange",
@@ -142,7 +141,7 @@ const UserSubmitContent = ({
               RequiredQueryParams.QuestId
             )}&onboardingQuestAddress=${searchParams.get(
               RequiredQueryParams.OnboardingQuestAddress
-            )}&daoAddress=${daoData.properties.address}`
+            )}&daoAddress=${searchParams.get(RequiredQueryParams.DaoAddress)}`
           });
         }}
       ></SuccessDialog>

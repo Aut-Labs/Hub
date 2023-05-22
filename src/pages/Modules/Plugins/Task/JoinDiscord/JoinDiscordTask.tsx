@@ -40,7 +40,6 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
   const [joinClicked, setJoinClicked] = useState(false);
   const [openSubmitSuccess, setOpenSubmitSuccess] = useState(false);
   const navigate = useNavigate();
-  const daoData = useSelector(CommunityData);
 
   const { task, isLoading: isLoadingTasks } = useGetAllTasksPerQuestQuery(
     {
@@ -124,7 +123,7 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
               RequiredQueryParams.QuestId
             )}&onboardingQuestAddress=${searchParams.get(
               RequiredQueryParams.OnboardingQuestAddress
-            )}&daoAddress=${daoData.properties.address}`
+            )}&daoAddress=${searchParams.get(RequiredQueryParams.DaoAddress)}`
           });
         }}
       ></SuccessDialog>

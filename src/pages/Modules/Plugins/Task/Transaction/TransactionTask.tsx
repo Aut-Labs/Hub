@@ -44,7 +44,6 @@ const TransactionTask = ({ plugin }: PluginParams) => {
   const isAdmin = useSelector(IsAdmin);
   const { account: userAddress } = useEthers();
   const navigate = useNavigate();
-  const daoData = useSelector(CommunityData);
   const [openSubmitSuccess, setOpenSubmitSuccess] = useState(false);
 
   const params = useParams();
@@ -140,7 +139,7 @@ const TransactionTask = ({ plugin }: PluginParams) => {
               RequiredQueryParams.QuestId
             )}&onboardingQuestAddress=${searchParams.get(
               RequiredQueryParams.OnboardingQuestAddress
-            )}&daoAddress=${daoData.properties.address}`
+            )}&daoAddress=${searchParams.get(RequiredQueryParams.DaoAddress)}`
           });
         }}
       ></SuccessDialog>

@@ -165,7 +165,6 @@ const QuizTask = ({ plugin }: PluginParams) => {
   const params = useParams();
   const [initialized, setInitialized] = useState(false);
   const navigate = useNavigate();
-  const daoData = useSelector(CommunityData);
   const [openSubmitSuccess, setOpenSubmitSuccess] = useState(false);
 
   const { task, isLoading: isLoadingTasks } = useGetAllTasksPerQuestQuery(
@@ -267,7 +266,7 @@ const QuizTask = ({ plugin }: PluginParams) => {
               RequiredQueryParams.QuestId
             )}&onboardingQuestAddress=${searchParams.get(
               RequiredQueryParams.OnboardingQuestAddress
-            )}&daoAddress=${daoData.properties.address}`
+            )}&daoAddress=${searchParams.get(RequiredQueryParams.DaoAddress)}`
           });
         }}
       ></SuccessDialog>
