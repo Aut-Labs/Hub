@@ -7,7 +7,7 @@
     "deploy": "gh-pages -d build",
     "eject": "react-app-rewired eject",
     "lint:fix": "eslint --fix \"src/**/*.{js,jsx,ts,tsx}\"",
-    "start": "react-app-rewired  --max-old-space-size=5120 start",
+    "start": "react-app-rewired start",
     "test": "react-app-rewired test",
     "lint": "eslint --fix \"src/**/*.{js,jsx,ts,tsx}\"",
     "prettier-format": "prettier --config .prettierrc.json \"src/**/*.{js,jsx,ts,tsx}\" --write"
