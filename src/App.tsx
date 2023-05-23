@@ -37,6 +37,7 @@ const generateConfig = (networks: NetworkConfig[]): Config => {
   return {
     readOnlyUrls,
     notifications: {
+      checkInterval: 0,
       expirationPeriod: 0
     },
     autoConnect: false,

@@ -80,9 +80,7 @@ export const DaoList = () => {
   const [apply, { isLoading: isApplying, isError, error, reset, isSuccess }] =
     useApplyForQuestMutation();
 
-  const [updatePhasesCache] = useUpdatePhasesCacheMutation({
-    fixedCacheKey: "PhasesCache"
-  });
+  const [updatePhasesCache] = useUpdatePhasesCacheMutation();
 
   useEffect(() => {
     if (isAuthenticated) {

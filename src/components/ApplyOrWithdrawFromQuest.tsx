@@ -35,9 +35,7 @@ export const ApplyOrWithdrawFromQuest = ({
     return !!account && daoData?.admin === account;
   }, [account, daoData]);
 
-  const [deletePhasesCache] = useDeletePhasesCacheMutation({
-    fixedCacheKey: "PhasesCache"
-  });
+  const [deletePhasesCache] = useDeletePhasesCacheMutation();
 
   const { cache } = useGetPhasesCacheQuery(
     { cacheKey: CacheTypes.UserPhases, account },
@@ -70,7 +68,6 @@ export const ApplyOrWithdrawFromQuest = ({
   }, [quest]);
 
   const canApplyForAQuest = useMemo(() => {
-    console.log("cache", cache);
     return !isOwner && !cache && !!hasMemberPhaseOneStarted && !hasQuestEnded;
   }, [cache, hasMemberPhaseOneStarted, hasQuestEnded, isOwner]);
 

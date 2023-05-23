@@ -76,12 +76,8 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
   const [apply, { isLoading: isApplying, isError, error, reset, isSuccess }] =
     useApplyForQuestMutation();
 
-  const [deletePhasesCache] = useDeletePhasesCacheMutation({
-    fixedCacheKey: "PhasesCache"
-  });
-  const [updatePhasesCache] = useUpdatePhasesCacheMutation({
-    fixedCacheKey: "PhasesCache"
-  });
+  const [deletePhasesCache] = useDeletePhasesCacheMutation();
+  const [updatePhasesCache] = useUpdatePhasesCacheMutation();
 
   const {
     data: quest,
