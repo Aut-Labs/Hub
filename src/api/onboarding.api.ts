@@ -499,6 +499,7 @@ const submitQuizTask = async (
       body.pluginAddress,
       body.onboardingQuestAddress,
       body.task.taskId,
+      body.task.metadata.properties["uuid"],
       body.questionsAndAnswers
     );
 

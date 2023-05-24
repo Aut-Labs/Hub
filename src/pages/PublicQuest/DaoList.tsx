@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import AutLoading from "@components/AutLoading";
 import {
   Container,

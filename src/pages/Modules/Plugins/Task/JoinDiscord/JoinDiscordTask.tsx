@@ -4,7 +4,6 @@ import {
 } from "@api/onboarding.api";
 import { PluginDefinition } from "@aut-labs-private/sdk";
 import AutLoading from "@components/AutLoading";
-import { StepperButton } from "@components/Stepper";
 import { Container, Stack } from "@mui/material";
 import { CommunityData, IsAdmin } from "@store/Community/community.reducer";
 import { memo, useEffect, useState } from "react";
@@ -25,6 +24,7 @@ import { useOAuth } from "@components/Oauth2/oauth2";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
+import { StepperButton } from "@components/StepperButton";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -119,11 +119,7 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
           setOpenSubmitSuccess(false);
           navigate({
             pathname: "/quest",
-            search: `?questId=${+searchParams.get(
-              RequiredQueryParams.QuestId
-            )}&onboardingQuestAddress=${searchParams.get(
-              RequiredQueryParams.OnboardingQuestAddress
-            )}&daoAddress=${searchParams.get(RequiredQueryParams.DaoAddress)}`
+            search: searchParams.toString()
           });
         }}
       ></SuccessDialog>

@@ -276,18 +276,19 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
               <Stack direction="row" alignItems="center">
                 {quest?.metadata?.name}
                 <Tooltip title="Refresh quest">
-                  <IconButton
-                    size="medium"
-                    component="span"
-                    color="offWhite"
-                    sx={{
-                      ml: 1
-                    }}
-                    disabled={isLoading}
-                    onClick={refetch}
-                  >
-                    <RefreshIcon />
-                  </IconButton>
+                  <span>
+                    <IconButton
+                      size="medium"
+                      color="offWhite"
+                      sx={{
+                        ml: 1
+                      }}
+                      disabled={isLoading}
+                      onClick={() => refetch()}
+                    >
+                      <RefreshIcon />
+                    </IconButton>
+                  </span>
                 </Tooltip>
                 <Chip
                   sx={{

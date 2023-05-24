@@ -4,7 +4,6 @@ import {
 } from "@api/onboarding.api";
 import { PluginDefinition } from "@aut-labs-private/sdk";
 import AutLoading from "@components/AutLoading";
-import { StepperButton } from "@components/Stepper";
 import {
   Box,
   Button,
@@ -34,6 +33,7 @@ import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { InteractionNetworks } from "@utils/transaction-networks";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
+import { StepperButton } from "@components/StepperButton";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -135,11 +135,7 @@ const TransactionTask = ({ plugin }: PluginParams) => {
           setOpenSubmitSuccess(false);
           navigate({
             pathname: "/quest",
-            search: `?questId=${+searchParams.get(
-              RequiredQueryParams.QuestId
-            )}&onboardingQuestAddress=${searchParams.get(
-              RequiredQueryParams.OnboardingQuestAddress
-            )}&daoAddress=${searchParams.get(RequiredQueryParams.DaoAddress)}`
+            search: searchParams.toString()
           });
         }}
       ></SuccessDialog>

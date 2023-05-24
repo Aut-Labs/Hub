@@ -4,7 +4,6 @@ import { PluginDefinition, Task } from "@aut-labs-private/sdk";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { FormHelperText } from "@components/Fields";
-import { StepperButton } from "@components/Stepper";
 import { Box, Button, Container, Stack, Typography } from "@mui/material";
 import { AutTextField } from "@theme/field-text-styles";
 import { pxToRem } from "@utils/text-size";
@@ -22,6 +21,7 @@ import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { saveQestions } from "@api/tasks.api";
 import LinkWithQuery from "@components/LinkWithQuery";
 import { countWords } from "@utils/helpers";
+import { StepperButton } from "@components/StepperButton";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,

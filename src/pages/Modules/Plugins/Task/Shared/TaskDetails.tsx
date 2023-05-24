@@ -1,20 +1,14 @@
 import { Task } from "@aut-labs-private/sdk";
-import LoadingProgressBar from "@components/LoadingProgressBar";
 import {
   Box,
   Button,
   CircularProgress,
-  Container,
   Stack,
-  Tooltip,
   Typography
 } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { memo } from "react";
-import OverflowTooltip from "@components/OverflowTooltip";
 import { Link, useSearchParams } from "react-router-dom";
-import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
-import { taskStatuses, taskTypes } from "./Tasks";
 
 interface TaskDetailsParams {
   task: Task;

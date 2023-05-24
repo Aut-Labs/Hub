@@ -7,7 +7,6 @@ import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
 import AutLoading from "@components/AutLoading";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
-import { StepperButton } from "@components/Stepper";
 import {
   Box,
   Card,
@@ -31,6 +30,7 @@ import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
 import { taskTypes } from "../Shared/Tasks";
 import { useEthers } from "@usedapp/core";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
+import { StepperButton } from "@components/StepperButton";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -84,10 +84,10 @@ const Answers = memo(({ control, questionIndex, answers, taskStatus }: any) => {
                   </Typography>
                 </Stack>
                 <Controller
-                  name={`questions[${questionIndex}].answers[${index}].checked`}
+                  name={`questions[${questionIndex}].answers[${index}].correct`}
                   control={control}
                   rules={{
-                    required: !values?.some((v) => v.checked)
+                    required: !values?.some((v) => v.correct)
                   }}
                   render={({ field: { name, value, onChange } }) => {
                     return (
@@ -223,13 +223,7 @@ const QuizTask = ({ plugin }: PluginParams) => {
     const values = getValues();
     submitTask({
       task,
-      questionsAndAnswers: values.questions.map((q) => ({
-        ...q,
-        answers: q.answers.map((a) => ({
-          ...a,
-          correct: a.checked || false
-        }))
-      })),
+      questionsAndAnswers: values.questions,
       onboardingQuestAddress: searchParams.get(
         RequiredQueryParams.OnboardingQuestAddress
       ),
@@ -262,11 +256,7 @@ const QuizTask = ({ plugin }: PluginParams) => {
           setOpenSubmitSuccess(false);
           navigate({
             pathname: "/quest",
-            search: `?questId=${+searchParams.get(
-              RequiredQueryParams.QuestId
-            )}&onboardingQuestAddress=${searchParams.get(
-              RequiredQueryParams.OnboardingQuestAddress
-            )}&daoAddress=${searchParams.get(RequiredQueryParams.DaoAddress)}`
+            search: searchParams.toString()
           });
         }}
       ></SuccessDialog>

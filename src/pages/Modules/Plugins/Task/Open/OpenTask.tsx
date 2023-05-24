@@ -6,7 +6,6 @@ import {
 } from "@api/onboarding.api";
 import AutSDK, { PluginDefinition, Task } from "@aut-labs-private/sdk";
 import AutLoading from "@components/AutLoading";
-import { StepperButton } from "@components/Stepper";
 import {
   Card,
   CardContent,
@@ -35,6 +34,7 @@ import AFileUpload, { TaskFileUpload } from "@components/FileUpload";
 import { toBase64 } from "@utils/to-base-64";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
 import { FormHelperText } from "@components/Fields";
+import { StepperButton } from "@components/StepperButton";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -137,11 +137,7 @@ const UserSubmitContent = ({
           setOpenSubmitSuccess(false);
           navigate({
             pathname: "/quest",
-            search: `?questId=${+searchParams.get(
-              RequiredQueryParams.QuestId
-            )}&onboardingQuestAddress=${searchParams.get(
-              RequiredQueryParams.OnboardingQuestAddress
-            )}&daoAddress=${searchParams.get(RequiredQueryParams.DaoAddress)}`
+            search: searchParams.toString()
           });
         }}
       ></SuccessDialog>

@@ -267,18 +267,19 @@ const PublicQuest = () => {
           >
             Quest tasks
             <Tooltip title="Refresh tasks">
-              <IconButton
-                size="medium"
-                component="span"
-                color="offWhite"
-                sx={{
-                  ml: 1
-                }}
-                disabled={isLoadingTasks || isFetchingTasks}
-                onClick={refetch}
-              >
-                <RefreshIcon />
-              </IconButton>
+              <span>
+                <IconButton
+                  size="medium"
+                  color="offWhite"
+                  sx={{
+                    ml: 1
+                  }}
+                  disabled={isLoadingTasks || isFetchingTasks}
+                  onClick={() => refetch()}
+                >
+                  <RefreshIcon />
+                </IconButton>
+              </span>
             </Tooltip>
           </Typography>
           <Tasks

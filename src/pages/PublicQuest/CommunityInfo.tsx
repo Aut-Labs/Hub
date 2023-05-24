@@ -201,4 +201,4 @@ const CommunityInfo = () => {
   );
 };
 
-export default memo(CommunityInfo);
+export default CommunityInfo;

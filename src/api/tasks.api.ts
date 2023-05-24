@@ -42,6 +42,7 @@ export const finaliseQuizTask = async (
   taskAddress: string,
   onboardingPluginAddress: string,
   taskId: number,
+  uuid: string,
   questionsAndAnswers: any[]
 ): Promise<{
   isFinalized: boolean;
@@ -55,6 +56,7 @@ export const finaliseQuizTask = async (
       onboardingPluginAddress,
       questionsAndAnswers,
       taskAddress,
+      uuid,
       taskId
     },
     {
