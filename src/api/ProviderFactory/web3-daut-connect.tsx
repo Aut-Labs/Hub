@@ -2,7 +2,6 @@ import { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useAppDispatch } from "@store/store.model";
 import { resetAuthState, setAuthenticated } from "@auth/auth.reducer";
 import { AutID } from "@api/aut.model";
-import { Init } from "@aut-labs/d-aut";
 import { communityUpdateState } from "@store/Community/community.reducer";
 import {
   NetworksConfig,
@@ -17,8 +16,6 @@ import { debounce } from "@mui/material";
 import { useSearchParams } from "react-router-dom";
 import { AUTH_TOKEN_KEY } from "@api/auth.api";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
-import { IAutButtonConfig } from "@aut-labs/d-aut/build/components/AutButtonMenu/AutMenuUtils";
-import { resetState } from "@store/store";
 
 function Web3DautConnect({
   setLoading,
@@ -139,7 +136,7 @@ function Web3DautConnect({
     window.addEventListener("aut-onConnected", onAutLogin);
     window.addEventListener("aut-onDisconnected", onDisconnected);
 
-    const config: IAutButtonConfig = {
+    const config = {
       defaultText: "Connect Wallet",
       textAlignment: "right",
       menuTextAlignment: "left",
@@ -158,9 +155,9 @@ function Web3DautConnect({
       }
     };
 
-    Init({
-      config
-    });
+    // Init({
+    //   config
+    // });
 
     return () => {
       window.removeEventListener("aut_profile", onAutMenuProfile);
