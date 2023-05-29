@@ -207,7 +207,6 @@ export const ToolbarConnector = () => {
         </>
       </DialogWrapper>
       <Toolbar
-        className="toolbar"
         sx={{
           width: "100%",
           zIndex: 99,
