@@ -110,6 +110,11 @@ const UserSubmitContent = ({
     return task.metadata.properties.attachmentType;
   }, [task]);
 
+  const textRequired = useMemo(() => {
+    // @ts-ignore
+    return task.metadata.properties.textRequired;
+  }, [task]);
+
   return (
     <Stack
       direction="column"
@@ -170,6 +175,7 @@ const UserSubmitContent = ({
               name="openTask"
               control={control}
               rules={{
+                required: textRequired,
                 maxLength: 257
               }}
               render={({ field: { name, value, onChange } }) => {
@@ -187,12 +193,14 @@ const UserSubmitContent = ({
                     color="offWhite"
                     multiline
                     rows={5}
-                    placeholder="Comments to task to go here not required..."
+                    placeholder={`Enter text here ${
+                      textRequired ? "(required)" : "(not required)"
+                    }:`}
                   />
                 );
               }}
             />
-            {attachmentType === "url" ? (
+            {attachmentType === "url" && (
               <>
                 <Typography
                   color="white"
@@ -239,7 +247,8 @@ const UserSubmitContent = ({
                   }}
                 />
               </>
-            ) : (
+            )}
+            {(attachmentType === "image" || attachmentType === "text") && (
               <>
                 <Typography
                   color="white"
