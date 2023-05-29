@@ -112,7 +112,7 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
   }, [account, communityData]);
 
   const hasMemberPhaseOneStarted = useMemo(() => {
-    return true;
+    return isAfter(new Date(), new Date(getMemberPhases().phaseOneStartDate));
   }, [quest]);
   // const hasMemberPhaseOneStarted = true;
 
