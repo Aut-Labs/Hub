@@ -21,7 +21,6 @@ import {
   finaliseTransactionTask
 } from "./tasks.api";
 import { AUTH_TOKEN_KEY } from "./auth.api";
-import { isAuthenticated } from "@auth/auth.reducer";
 
 const getAllOnboardingQuests = async (
   pluginAddress: any,
