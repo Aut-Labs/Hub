@@ -1,20 +1,17 @@
-import { getCache, CacheTypes, updateCache, deleteCache } from "@api/cache.api";
+import { CacheTypes } from "@api/cache.api";
+import { NovaDAO } from "@api/community.model";
 import {
   useDeletePhasesCacheMutation,
   useGetPhasesCacheQuery,
-  useLazyHasUserCompletedQuestQuery,
-  useUpdatePhasesCacheMutation,
   useWithdrawFromAQuestMutation
 } from "@api/onboarding.api";
-import { isAuthenticated } from "@auth/auth.reducer";
+import { Quest } from "@aut-labs-private/sdk";
 import { LoadingButton } from "@mui/lab";
 import { Stack, CircularProgress, Tooltip, Button } from "@mui/material";
 import { useEthers } from "@usedapp/core";
-import { getMemberPhases } from "@utils/beta-phases";
-import { addDays, isAfter, addMilliseconds } from "date-fns";
+import { isAfter, addMilliseconds } from "date-fns";
 import { useMemo, useEffect } from "react";
 import { useConfirmDialog } from "react-mui-confirm";
-import { useSelector } from "react-redux";
 
 const fractionToMiliseconds = (fraction: number) => {
   const millisecondsInDay = 24 * 60 * 60 * 1000;
@@ -27,6 +24,12 @@ export const ApplyOrWithdrawFromQuest = ({
   onApplyForQuest,
   questToApplyFor,
   isApplying
+}: {
+  daoData: NovaDAO;
+  quest: Quest;
+  onApplyForQuest;
+  questToApplyFor;
+  isApplying: boolean;
 }) => {
   // const [cache, setCache] = useState<CacheModel>(null);
   const confirm = useConfirmDialog();
@@ -51,9 +54,25 @@ export const ApplyOrWithdrawFromQuest = ({
     return isAfter(new Date(), new Date(quest.startDate));
   }, [quest]);
 
-  const hasMemberPhaseOneStarted = useMemo(() => {
-    return isAfter(new Date(), new Date(getMemberPhases().phaseOneStartDate));
-  }, [quest]);
+  const hasAppliedForQuest = useMemo(() => {
+    return (
+      !!cache &&
+      cache?.onboardingQuestAddress == daoData.onboardingQuestAddress &&
+      cache?.questId === quest.questId
+    );
+  }, [cache]);
+
+  // const hasMemberPhaseOneStarted = useMemo(() => {
+  //   if (!daoData?.properties?.timestamp || !hasAppliedForQuest) return false;
+  //   return isAfter(
+  //     new Date(),
+  //     new Date(
+  //       getMemberPhases(
+  //         new Date(daoData?.properties.timestamp)
+  //       ).phaseOneStartDate
+  //     )
+  //   );
+  // }, [quest, daoData, hasAppliedForQuest]);
   // const hasMemberPhaseOneStarted = true;
 
   const hasQuestEnded = useMemo(() => {
@@ -68,16 +87,8 @@ export const ApplyOrWithdrawFromQuest = ({
   }, [quest]);
 
   const canApplyForAQuest = useMemo(() => {
-    return !isOwner && !cache && !!hasMemberPhaseOneStarted && !hasQuestEnded;
-  }, [cache, hasMemberPhaseOneStarted, hasQuestEnded, isOwner]);
-
-  const hasAppliedForQuest = useMemo(() => {
-    return (
-      !!cache &&
-      cache?.onboardingQuestAddress == daoData.onboardingQuestAddress &&
-      cache?.questId === quest.questId
-    );
-  }, [cache]);
+    return !isOwner && !cache && !hasQuestEnded;
+  }, [cache, hasQuestEnded, isOwner]);
 
   const [
     withdraw,
@@ -173,8 +184,6 @@ export const ApplyOrWithdrawFromQuest = ({
               ? "Quest has ended"
               : !hasQuestStarted
               ? "Quest hasn't started yet"
-              : !hasMemberPhaseOneStarted
-              ? "Member phase hasn't started yet."
               : "Already applied to another quest"
           }
         >

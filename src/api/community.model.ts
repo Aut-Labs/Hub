@@ -8,6 +8,7 @@ import {
 } from "@aut-labs-private/sdk/dist/models/dao";
 import { AutSocial } from "./api.model";
 import { socialUrls } from "./aut.model";
+import { Quest } from "@aut-labs-private/sdk";
 
 export const MarketTemplates = [
   {
@@ -108,6 +109,41 @@ export class Community extends BaseNFTModel<CommunityProperties> {
   constructor(data: Community = {} as Community) {
     super(data);
     this.properties = new CommunityProperties(data.properties);
+  }
+}
+
+export class NovaDAOProperties extends DAOProperties {
+  address?: string;
+
+  socials: AutSocial[];
+
+  quests: Quest[];
+
+  constructor(data: NovaDAOProperties) {
+    super(data);
+    if (!data) {
+      this.rolesSets = [];
+    } else {
+      this.market = MarketTemplates[data.market]?.title;
+      this.commitment = data.commitment;
+      this.rolesSets = data.rolesSets;
+      this.timestamp = data.timestamp;
+      this.socials = data.socials;
+      this.quests = data.quests;
+    }
+  }
+}
+export class NovaDAO extends BaseNFTModel<NovaDAOProperties> {
+  daoAddress: string;
+  admin: string;
+  onboardingQuestAddress: string;
+  daoMetadataUri: string;
+  constructor(data: NovaDAO = {} as NovaDAO) {
+    super(data);
+    this.daoAddress = data.daoAddress;
+    this.admin = data.admin;
+    this.onboardingQuestAddress = data.onboardingQuestAddress;
+    this.properties = new NovaDAOProperties(data.properties);
   }
 }
 

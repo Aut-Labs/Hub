@@ -111,9 +111,13 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
     return communityData?.admin === account;
   }, [account, communityData]);
 
-  const hasMemberPhaseOneStarted = useMemo(() => {
-    return isAfter(new Date(), new Date(getMemberPhases().phaseOneStartDate));
-  }, [quest]);
+  // const hasMemberPhaseOneStarted = useMemo(() => {
+  //   if (!cache?.createdAt) return false;
+  //   return isAfter(
+  //     new Date(),
+  //     new Date(getMemberPhases(new Date(cache?.createdAt)).phaseOneStartDate)
+  //   );
+  // }, [quest, cache]);
   // const hasMemberPhaseOneStarted = true;
 
   const hasQuestStarted = useMemo(() => {
@@ -133,8 +137,8 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
   }, [quest]);
 
   const canApplyForAQuest = useMemo(() => {
-    return !isOwner && !cache && !!hasMemberPhaseOneStarted && !hasQuestEnded;
-  }, [cache, hasMemberPhaseOneStarted, hasQuestEnded, isOwner]);
+    return !isOwner && !cache && !hasQuestEnded;
+  }, [cache, hasQuestEnded, isOwner]);
 
   const hasAppliedForQuest = useMemo(() => {
     return (
@@ -196,6 +200,7 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
             onboardingQuestAddress: searchParams.get(
               RequiredQueryParams.OnboardingQuestAddress
             ),
+            startDate: communityData?.properties?.timestamp,
             daoAddress: searchParams.get(RequiredQueryParams.DaoAddress),
             list: [
               {
