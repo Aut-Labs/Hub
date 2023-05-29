@@ -21,6 +21,7 @@ import {
   finaliseTransactionTask
 } from "./tasks.api";
 import { AUTH_TOKEN_KEY } from "./auth.api";
+import { isAuthenticated } from "@auth/auth.reducer";
 
 const getAllOnboardingQuests = async (
   pluginAddress: any,
@@ -184,7 +185,8 @@ const deactivateOnboarding = async (
 };
 
 const getPhasesCache = async (body, api: BaseQueryApi) => {
-  const cache = await getCache(CacheTypes.UserPhases);
+  const authenticated = (api.getState() as any)?.auth?.isAuthenticated;
+  const cache = await getCache(CacheTypes.UserPhases, authenticated);
   return {
     data: cache
   };

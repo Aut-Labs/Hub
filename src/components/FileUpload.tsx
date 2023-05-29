@@ -194,7 +194,10 @@ export const TaskFileUpload = ({
       attachmentType === "text"
         ? {
             "application/pdf": [".pdf"],
-            "text/plain": [".txt"]
+            "text/plain": [".txt"],
+            "application/msword": [".doc"],
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+              [".docx"]
           }
         : {
             "image/jpeg": [".jpeg", ".jpg"],

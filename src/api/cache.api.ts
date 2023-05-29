@@ -16,8 +16,14 @@ export interface CacheModel {
   list: any[];
 }
 
-export const getCache = async (cacheKey: string): Promise<CacheModel> => {
-  if (!AUTH_TOKEN_KEY) return;
+export const getCache = async (
+  cacheKey: string,
+  isAuthenticated = true
+): Promise<CacheModel> => {
+  if (!AUTH_TOKEN_KEY || !isAuthenticated) {
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    return;
+  }
   const token = localStorage.getItem(AUTH_TOKEN_KEY);
   const res = await axios.get(
     `${environment.apiUrl}/autID/cache/getCache/${cacheKey}`,

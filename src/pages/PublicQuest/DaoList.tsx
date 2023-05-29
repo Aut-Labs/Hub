@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import NovaCard from "@components/NovaCard";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -32,8 +32,9 @@ import { useEthers } from "@usedapp/core";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
 import { useGetAllNovasQuery } from "@api/community.api";
-
-const TOOLBAR_HEIGHT = 84;
+import { TOOLBAR_HEIGHT } from "./ToolbarConnector";
+import { ca } from "date-fns/locale";
+import { AUTH_TOKEN_KEY } from "@api/auth.api";
 
 export const GridBox = styled(Box)(({ theme }) => ({
   boxSizing: "border-box",
@@ -77,6 +78,18 @@ export const DaoList = () => {
       skip: false
     }
   );
+
+  const daoListArranged = useMemo(() => {
+    if (cache && cache.daoAddress && data) {
+      const dao = data.daos.find((dao) => dao.daoAddress === cache.daoAddress);
+      const dataWithoutDao = data.daos.filter(
+        (dao) => dao.daoAddress !== cache.daoAddress
+      );
+      return { daos: [dao, ...dataWithoutDao] };
+    } else {
+      return data;
+    }
+  }, [cache, data, isAuthenticated]);
 
   const [apply, { isLoading: isApplying, isError, error, reset, isSuccess }] =
     useApplyForQuestMutation();
@@ -301,7 +314,7 @@ export const DaoList = () => {
             }}
           >
             <Typography color="rgb(107, 114, 128)" variant="subtitle2">
-              No modules were found...
+              No Novas were found...
             </Typography>
             <Button
               size="medium"
@@ -324,7 +337,7 @@ export const DaoList = () => {
         ) : (
           <>
             <GridBox sx={{ flexGrow: 1, mt: 4 }}>
-              {(data?.daos || []).map((dao, index) => (
+              {(daoListArranged?.daos || []).map((dao, index) => (
                 <NovaCard
                   key={`nova-card-${index}`}
                   daoData={dao}

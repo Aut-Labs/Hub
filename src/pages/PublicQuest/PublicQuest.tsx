@@ -11,7 +11,9 @@ import {
   linearProgressClasses,
   styled,
   Tooltip,
-  IconButton
+  IconButton,
+  useTheme,
+  useMediaQuery
 } from "@mui/material";
 import { useSearchParams } from "react-router-dom";
 import { memo, useEffect, useMemo } from "react";
@@ -46,6 +48,8 @@ const PublicQuest = () => {
   const { account: userAddress } = useEthers();
   const [searchParams] = useSearchParams();
   const { account } = useEthers();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const {
     data: quest,
@@ -179,7 +183,12 @@ const PublicQuest = () => {
       <LoadingProgressBar
         sx={{
           zIndex: 99,
-          top: `${TOOLBAR_HEIGHT}px`
+          ...(isMobile && {
+            top: `${TOOLBAR_HEIGHT + 33 + "px"}`
+          }),
+          ...(!isMobile && {
+            top: `${TOOLBAR_HEIGHT + "px"}`
+          })
         }}
         isLoading={isFetchingQuest || isFetchingTasks}
       />

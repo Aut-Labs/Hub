@@ -247,7 +247,11 @@ const UserSubmitContent = ({
                   textAlign="center"
                   p="20px"
                 >
-                  Upload a file
+                  {`Upload a file ${
+                    attachmentType === "image"
+                      ? "(.png, .jpg, .jpeg)"
+                      : "(.doc, .docx, .txt, .pdf)"
+                  }`}
                 </Typography>
                 <Controller
                   name="attachment"
