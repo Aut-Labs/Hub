@@ -171,35 +171,35 @@ const UserSubmitContent = ({
             >
               {task?.metadata?.description}
             </Typography>
-            <Controller
-              name="openTask"
-              control={control}
-              rules={{
-                required: textRequired,
-                maxLength: 257
-              }}
-              render={({ field: { name, value, onChange } }) => {
-                return (
-                  <AutTextField
-                    name={name}
-                    disabled={
-                      task.status === TaskStatus.Submitted ||
-                      task.status === TaskStatus.Finished
-                    }
-                    value={value || ""}
-                    sx={{ mb: "20px" }}
-                    onChange={onChange}
-                    variant="outlined"
-                    color="offWhite"
-                    multiline
-                    rows={5}
-                    placeholder={`Enter text here ${
-                      textRequired ? "(required)" : "(not required)"
-                    }:`}
-                  />
-                );
-              }}
-            />
+            {textRequired && (
+              <Controller
+                name="openTask"
+                control={control}
+                rules={{
+                  required: true,
+                  maxLength: 257
+                }}
+                render={({ field: { name, value, onChange } }) => {
+                  return (
+                    <AutTextField
+                      name={name}
+                      disabled={
+                        task.status === TaskStatus.Submitted ||
+                        task.status === TaskStatus.Finished
+                      }
+                      value={value || ""}
+                      sx={{ mb: "20px" }}
+                      onChange={onChange}
+                      variant="outlined"
+                      color="offWhite"
+                      multiline
+                      rows={5}
+                      placeholder={`Enter text here (required)`}
+                    />
+                  );
+                }}
+              />
+            )}
             {attachmentType === "url" && (
               <>
                 <Typography
