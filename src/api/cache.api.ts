@@ -11,9 +11,11 @@ export interface CacheModel {
   cacheKey: string;
   address: string;
   daoAddress: string;
+  startDate: number;
   onboardingQuestAddress: string;
   questId: number;
   list: any[];
+  createdAt?: Date;
 }
 
 export const getCache = async (

@@ -212,12 +212,16 @@ export const DaoList = () => {
       setOpenApplySuccess(true);
       const start = async () => {
         try {
+          const communityData = data.daos.find(
+            (d) => d.daoAddress === questToApply.daoAddress
+          );
           const updatedCache = {
             ...(cache || {}),
             cacheKey: CacheTypes.UserPhases,
             address: account,
             questId: questToApply.questId,
             onboardingQuestAddress: questToApply.onboardingQuestAddress,
+            startDate: communityData?.properties?.timestamp,
             daoAddress: questToApply.daoAddress,
             list: [
               {

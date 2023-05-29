@@ -1,53 +1,11 @@
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Link,
-  Stack,
-  Tooltip,
-  Typography,
-  styled
-} from "@mui/material";
+import { Box, Button, Link, Typography, styled } from "@mui/material";
 import { memo, useEffect, useMemo, useState } from "react";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import Flipcard from "@components/Flipcard";
 import FlipIcon from "@assets/flip.svg";
-import {
-  useApplyForQuestMutation,
-  useLazyHasUserCompletedQuestQuery,
-  useWithdrawFromAQuestMutation
-} from "@api/onboarding.api";
-import {
-  isAuthenticated,
-  setAuthenticated,
-  changeConnectStatus,
-  ConnectStatus
-} from "@auth/auth.reducer";
-import { useSelector } from "react-redux";
-import { useAppDispatch } from "@store/store.model";
-import {
-  CacheModel,
-  CacheTypes,
-  deleteCache,
-  getCache,
-  updateCache
-} from "@api/cache.api";
 import FlipClockCountdown from "@leenguyen/react-flip-clock-countdown";
-import { useNavigate } from "react-router-dom";
-import { communityUpdateState } from "@store/Community/community.reducer";
-import { RequiredQueryParams } from "@api/RequiredQueryParams";
-import { LoadingButton } from "@mui/lab";
-import { useConfirmDialog } from "react-mui-confirm";
-import { useEthers } from "@usedapp/core";
-import {
-  isAfter,
-  addDays,
-  set,
-  addHours,
-  addMinutes,
-  addSeconds
-} from "date-fns";
 import { ApplyOrWithdrawFromQuest } from "./ApplyOrWithdrawFromQuest";
+import { NovaDAO } from "@api/community.model";
 
 const getRoleName = (daoData, quest) => {
   const role = daoData.properties.rolesSets[0].roles.find(
@@ -159,7 +117,7 @@ export const NovaCard = ({
   questToApplyFor,
   isApplying
 }: {
-  daoData: any;
+  daoData: NovaDAO;
   highlightData: any;
   onQuestSelected: any;
   onApplyForQuest: any;
