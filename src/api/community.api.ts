@@ -436,16 +436,7 @@ const getCommunity = async (daoAddress: string, api: BaseQueryApi) => {
 const getAllNovas = async (body: any, api: BaseQueryApi) => {
   const response = await axios.get(`${environment.apiUrl}/autID/user/daos`);
 
-  const daos: any[] = response.data?.filter((dao) => {
-    let foundActiveQuest = true;
-    for (let j = 0; j < dao.quests.length; j++) {
-      const quest = dao.quests[j];
-      if (quest.active) {
-        foundActiveQuest = true;
-      }
-    }
-    return foundActiveQuest;
-  });
+  const daos: any[] = response.data;
 
   const daoData: NovaDAO[] = [];
 
