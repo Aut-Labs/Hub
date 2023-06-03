@@ -11,17 +11,19 @@ import {
   linearProgressClasses,
   styled,
   Tooltip,
-  IconButton
+  IconButton,
+  useTheme,
+  useMediaQuery
 } from "@mui/material";
 import { useSearchParams } from "react-router-dom";
-import { memo, useMemo } from "react";
+import { memo, useEffect, useMemo } from "react";
 import LoadingProgressBar from "@components/LoadingProgressBar";
 import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
-import { isAfter } from "date-fns";
+import { addMilliseconds, isAfter } from "date-fns";
 import Tasks from "./Tasks";
 import CommunityInfo from "./CommunityInfo";
-import QuestInfo from "./QuestInfo";
+import QuestInfo, { fractionToMilliseconds } from "./QuestInfo";
 import AutLoading from "@components/AutLoading";
 import { RequiredQueryParams } from "../../api/RequiredQueryParams";
 import { useEthers } from "@usedapp/core";
@@ -45,6 +47,9 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
 const PublicQuest = () => {
   const { account: userAddress } = useEthers();
   const [searchParams] = useSearchParams();
+  const { account } = useEthers();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const {
     data: quest,
@@ -72,11 +77,14 @@ const PublicQuest = () => {
     })
   });
 
-  const { cache } = useGetPhasesCacheQuery(CacheTypes.UserPhases, {
-    selectFromResult: ({ data }) => ({
-      cache: data
-    })
-  });
+  const { cache } = useGetPhasesCacheQuery(
+    { cacheKey: CacheTypes.UserPhases, account },
+    {
+      selectFromResult: ({ data }) => ({
+        cache: data
+      })
+    }
+  );
 
   const isOwner = useMemo(() => {
     return communityData?.admin === userAddress;
@@ -117,6 +125,28 @@ const PublicQuest = () => {
     }
   );
 
+  // useEffect(() => {
+  //   const toDate = new Date(
+  //     hasQuestStarted
+  //       ? addMilliseconds(
+  //           new Date(quest?.startDate),
+  //           fractionToMilliseconds(quest?.durationInDays)
+  //         )
+  //       : quest?.startDate
+  //   );
+  //   const timeDifference = toDate.getTime() - new Date().getTime();
+
+  //   const refetchTimeout = setTimeout(() => {
+  //     refetch();
+  //   }, timeDifference);
+
+  //   debugger;
+
+  //   return () => {
+  //     clearTimeout(refetchTimeout);
+  //   };
+  // }, []);
+
   const { isSuccess, isLoading: isLoadingPlugins } =
     useGetAllPluginDefinitionsByDAOQuery(null, {
       selectFromResult: ({ isLoading, isSuccess }) => ({
@@ -153,7 +183,12 @@ const PublicQuest = () => {
       <LoadingProgressBar
         sx={{
           zIndex: 99,
-          top: `${TOOLBAR_HEIGHT}px`
+          ...(isMobile && {
+            top: `${TOOLBAR_HEIGHT + 33 + "px"}`
+          }),
+          ...(!isMobile && {
+            top: `${TOOLBAR_HEIGHT + "px"}`
+          })
         }}
         isLoading={isFetchingQuest || isFetchingTasks}
       />
@@ -241,18 +276,19 @@ const PublicQuest = () => {
           >
             Quest tasks
             <Tooltip title="Refresh tasks">
-              <IconButton
-                size="medium"
-                component="span"
-                color="offWhite"
-                sx={{
-                  ml: 1
-                }}
-                disabled={isLoadingTasks || isFetchingTasks}
-                onClick={refetch}
-              >
-                <RefreshIcon />
-              </IconButton>
+              <span>
+                <IconButton
+                  size="medium"
+                  color="offWhite"
+                  sx={{
+                    ml: 1
+                  }}
+                  disabled={isLoadingTasks || isFetchingTasks}
+                  onClick={() => refetch()}
+                >
+                  <RefreshIcon />
+                </IconButton>
+              </span>
             </Tooltip>
           </Typography>
           <Tasks

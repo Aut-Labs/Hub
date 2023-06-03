@@ -20,6 +20,7 @@ import {
   finaliseQuizTask,
   finaliseTransactionTask
 } from "./tasks.api";
+import { AUTH_TOKEN_KEY } from "./auth.api";
 
 const getAllOnboardingQuests = async (
   pluginAddress: any,
@@ -183,7 +184,8 @@ const deactivateOnboarding = async (
 };
 
 const getPhasesCache = async (body, api: BaseQueryApi) => {
-  const cache = await getCache(CacheTypes.UserPhases);
+  const authenticated = (api.getState() as any)?.auth?.isAuthenticated;
+  const cache = await getCache(CacheTypes.UserPhases, authenticated);
   return {
     data: cache
   };
@@ -498,6 +500,7 @@ const submitQuizTask = async (
       body.pluginAddress,
       body.onboardingQuestAddress,
       body.task.taskId,
+      body.task.metadata.properties["uuid"],
       body.questionsAndAnswers
     );
 

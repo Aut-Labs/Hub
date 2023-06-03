@@ -1,46 +1,11 @@
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Link,
-  Stack,
-  Tooltip,
-  Typography,
-  styled
-} from "@mui/material";
+import { Box, Button, Link, Typography, styled } from "@mui/material";
 import { memo, useEffect, useMemo, useState } from "react";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import Flipcard from "@components/Flipcard";
 import FlipIcon from "@assets/flip.svg";
-import {
-  useApplyForQuestMutation,
-  useLazyHasUserCompletedQuestQuery,
-  useWithdrawFromAQuestMutation
-} from "@api/onboarding.api";
-import {
-  isAuthenticated,
-  setAuthenticated,
-  changeConnectStatus,
-  ConnectStatus
-} from "@auth/auth.reducer";
-import { useSelector } from "react-redux";
-import { useAppDispatch } from "@store/store.model";
-import {
-  CacheModel,
-  CacheTypes,
-  deleteCache,
-  getCache,
-  updateCache
-} from "@api/cache.api";
 import FlipClockCountdown from "@leenguyen/react-flip-clock-countdown";
-import { useNavigate } from "react-router-dom";
-import { communityUpdateState } from "@store/Community/community.reducer";
-import { RequiredQueryParams } from "@api/RequiredQueryParams";
-import { LoadingButton } from "@mui/lab";
-import { useConfirmDialog } from "react-mui-confirm";
-import { useEthers } from "@usedapp/core";
-import { isAfter, addDays, set } from "date-fns";
 import { ApplyOrWithdrawFromQuest } from "./ApplyOrWithdrawFromQuest";
+import { NovaDAO } from "@api/community.model";
 
 const getRoleName = (daoData, quest) => {
   const role = daoData.properties.rolesSets[0].roles.find(
@@ -152,7 +117,7 @@ export const NovaCard = ({
   questToApplyFor,
   isApplying
 }: {
-  daoData: any;
+  daoData: NovaDAO;
   highlightData: any;
   onQuestSelected: any;
   onApplyForQuest: any;
@@ -160,6 +125,7 @@ export const NovaCard = ({
   isApplying: boolean;
 }) => {
   const [isFlipped, setFlipped] = useState(false);
+  const [hasTimePassed, setHasTimePassed] = useState(false);
 
   const questStartTime = useMemo(() => {
     return new Date(
@@ -167,7 +133,21 @@ export const NovaCard = ({
         (q) => q.questId === highlightData?.questId
       )?.startDate
     );
-  }, [highlightData, daoData]);
+  }, [highlightData, daoData, hasTimePassed]);
+
+  useEffect(() => {
+    if (highlightData.highlighted && questStartTime > new Date()) {
+      const timeDifference = questStartTime.getTime() - new Date().getTime();
+
+      const buttonTimeout = setTimeout(() => {
+        setHasTimePassed(true);
+      }, timeDifference);
+
+      return () => {
+        clearTimeout(buttonTimeout);
+      };
+    }
+  }, []);
 
   const questDetails = async (e, quest) => {
     e.stopPropagation();
@@ -184,6 +164,18 @@ export const NovaCard = ({
     } else {
       setFlipped(true);
     }
+  };
+
+  const goToQuest = (e) => {
+    e.stopPropagation();
+    const quest = daoData.properties.quests.find(
+      (q) => q.questId === highlightData.questId
+    );
+    onQuestSelected({
+      ...quest,
+      onboardingQuestAddress: daoData.onboardingQuestAddress,
+      daoAddress: daoData.daoAddress
+    });
   };
 
   return (
@@ -401,35 +393,56 @@ export const NovaCard = ({
           </AutCardContainer>
         </AutCardBack>
       </Flipcard>
-      {highlightData.highlighted && questStartTime > new Date() ? (
-        <Countdown>
-          <Typography
-            width="100%"
-            textAlign="center"
-            variant="subtitle2"
-            mb={1}
-            className="text-secondary"
+      {highlightData.highlighted ? (
+        questStartTime > new Date() ? (
+          <Countdown>
+            <Typography
+              width="100%"
+              textAlign="center"
+              variant="subtitle2"
+              mb={1}
+              className="text-secondary"
+            >
+              Quest starts in...
+            </Typography>
+            <FlipClockCountdown
+              digitBlockStyle={{
+                fontFamily: "FractulRegular",
+                width: "26px",
+                height: "40px",
+                fontSize: "38px"
+              }}
+              labelStyle={{
+                fontSize: "12px",
+                fontFamily: "FractulRegular"
+              }}
+              separatorStyle={{
+                size: "4px"
+              }}
+              // next line should have a date thats 10 minutes from now
+              to={questStartTime}
+            />
+          </Countdown>
+        ) : (
+          <div
+            style={{ width: "100%", display: "flex", justifyContent: "center" }}
           >
-            Quest starts in...
-          </Typography>
-          <FlipClockCountdown
-            digitBlockStyle={{
-              fontFamily: "FractulRegular",
-              width: "26px",
-              height: "40px",
-              fontSize: "38px"
-            }}
-            labelStyle={{
-              fontSize: "12px",
-              fontFamily: "FractulRegular"
-            }}
-            separatorStyle={{
-              size: "4px"
-            }}
-            // next line should have a date thats 10 minutes from now
-            to={questStartTime}
-          />
-        </Countdown>
+            <SeeQuestButton
+              sx={{
+                width: "100%",
+                mt: "24px",
+                boxShadow:
+                  "0px 4px 5px -2px rgba(0,0,0,0.2), 0px 7px 10px 1px rgba(0,0,0,0.14), 0px 2px 16px 1px rgba(0,0,0,0.12)"
+              }}
+              variant="outlined"
+              size="normal"
+              color="offWhite"
+              onClick={goToQuest}
+            >
+              GO TO QUEST
+            </SeeQuestButton>
+          </div>
+        )
       ) : (
         <div
           style={{ width: "100%", display: "flex", justifyContent: "center" }}
@@ -438,10 +451,6 @@ export const NovaCard = ({
             sx={{
               width: "100%",
               mt: "24px",
-              // borderTopLeftRadius: "0 !important",
-              // borderTopRightRadius: "0 !important",
-              // borderBottomLeftRadius: "16px !important",
-              // borderBottomRightRadius: "16px !important",
               boxShadow:
                 "0px 4px 5px -2px rgba(0,0,0,0.2), 0px 7px 10px 1px rgba(0,0,0,0.14), 0px 2px 16px 1px rgba(0,0,0,0.12)"
             }}

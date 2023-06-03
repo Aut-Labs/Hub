@@ -1,6 +1,6 @@
 import axios from "axios";
 import { CommitmentMessages } from "@utils/misc";
-import { Community, findRoleName } from "./community.model";
+import { Community, NovaDAO, findRoleName } from "./community.model";
 import { Web3ThunkProviderFactory } from "./ProviderFactory/web3-thunk.provider";
 import { ipfsCIDToHttpUrl, isValidUrl } from "./storage.api";
 import { AutID, DAOMember } from "./aut.model";
@@ -436,42 +436,43 @@ const getCommunity = async (daoAddress: string, api: BaseQueryApi) => {
 const getAllNovas = async (body: any, api: BaseQueryApi) => {
   const response = await axios.get(`${environment.apiUrl}/autID/user/daos`);
 
-  const daos = response.data?.filter((dao) => {
-    let foundActiveQuest = false;
-    for (let j = 0; j < dao.quests.length; j++) {
-      const quest = dao.quests[j];
-      if (quest.active) {
-        foundActiveQuest = true;
-      }
-    }
-    return foundActiveQuest;
-  });
+  const daos: any[] = response.data;
 
-  const daoData = [];
+  const daoData: NovaDAO[] = [];
 
   for (let i = 0; i < daos.length; i++) {
-    const dao = daos[i];
-    // prettier-ignore
-    const metadata =
-      await fetchMetadata(dao.daoMetadataUri, environment.nftStorageUrl);
-    const daoModel = metadata;
-    (daoModel as any).daoAddress = dao.daoAddress;
-    (daoModel as any).admin = dao.admin;
-    (daoModel as any).onboardingQuestAddress = dao.onboardingQuestAddress;
-    (daoModel as any).properties.quests = [];
+    const {
+      daoAddress,
+      admin,
+      onboardingQuestAddress,
+      daoMetadataUri,
+      quests
+    } = daos[i];
 
-    for (let j = 0; j < dao.quests.length; j++) {
-      const quest = dao.quests[j];
+    const metadata = await fetchMetadata<NovaDAO>(
+      daoMetadataUri,
+      environment.nftStorageUrl
+    );
+
+    metadata.properties.quests = [];
+    for (let j = 0; j < quests.length; j++) {
+      const quest = quests[j];
       const questMetadata = await fetchMetadata(
         quest.metadataUri,
         environment.nftStorageUrl
       );
       quest.metadata = questMetadata;
-      (daoModel as any).properties.quests.push(quest);
+      metadata.properties.quests.push(quest);
     }
-    daoData.push(daoModel);
+
+    const novaDAO = new NovaDAO({
+      ...metadata,
+      daoAddress,
+      admin,
+      onboardingQuestAddress
+    });
+    daoData.push(novaDAO);
   }
-  // setDaoList(daoData);
   return {
     data: { daos: daoData }
   };
@@ -530,7 +531,7 @@ export const communityApi = createApi({
     }),
     getAllNovas: builder.query<
       {
-        daos: any;
+        daos: NovaDAO[];
       },
       void
     >({

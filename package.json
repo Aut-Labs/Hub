@@ -7,7 +7,7 @@
     "deploy": "gh-pages -d build",
     "eject": "react-app-rewired eject",
     "lint:fix": "eslint --fix \"src/**/*.{js,jsx,ts,tsx}\"",
-    "start": "react-app-rewired  --max-old-space-size=5120 start",
+    "start": "react-app-rewired start",
     "test": "react-app-rewired test",
     "lint": "eslint --fix \"src/**/*.{js,jsx,ts,tsx}\"",
     "prettier-format": "prettier --config .prettierrc.json \"src/**/*.{js,jsx,ts,tsx}\" --write"
@@ -32,9 +32,8 @@
   },
   "dependencies": {
     "@aut-labs-private/abi-types": "^0.0.34",
-    "@aut-labs-private/sdk": "^0.0.54",
+    "@aut-labs-private/sdk": "^0.0.57",
     "@aut-labs-private/sdk-biconomy": "latest",
-    "@aut-labs/d-aut": "^1.0.22",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@leenguyen/react-flip-clock-countdown": "^1.4.0",

@@ -3,7 +3,6 @@ import { PluginDefinition, Task } from "@aut-labs-private/sdk";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { FormHelperText } from "@components/Fields";
-import { StepperButton } from "@components/Stepper";
 import { Box, Button, Chip, Container, Stack, Typography } from "@mui/material";
 import { AutTextField } from "@theme/field-text-styles";
 import { pxToRem } from "@utils/text-size";
@@ -16,7 +15,6 @@ import { addMinutes } from "date-fns";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { useSelector } from "react-redux";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DoneIcon from "@mui/icons-material/Done";
 import {
   DiscordLink,
@@ -25,6 +23,7 @@ import {
 import DiscordServerVerificationPopup from "@components/Dialog/DiscordServerVerificationPopup";
 import LinkWithQuery from "@components/LinkWithQuery";
 import { countWords } from "@utils/helpers";
+import { StepperButton } from "@components/StepperButton";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,

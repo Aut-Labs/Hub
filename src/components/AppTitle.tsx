@@ -16,9 +16,9 @@ const AppTitle = (props: TypographyProps) => {
           fontFamily: "FractulAltBold"
         }}
       >
-        Āut
+        Nova
       </strong>{" "}
-      Dashboard <Typography variant="body">(beta)</Typography>
+      Showcase <Typography variant="body">(beta)</Typography>
     </Typography>
   );
 };

@@ -56,7 +56,8 @@ export const useOAuth = () => {
             const response = await axios.post(
               `${environment.apiUrl}/autID/config/oauth2AccessToken`,
               {
-                code: message.data.payload.code
+                code: message.data.payload.code,
+                callbackUrl
               }
             );
             setAuthenticating(false);

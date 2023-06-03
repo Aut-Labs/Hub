@@ -9,7 +9,8 @@ import {
   CircularProgress,
   Button,
   ButtonProps,
-  styled
+  styled,
+  IconButton
 } from "@mui/material";
 import { isAfter, addMilliseconds } from "date-fns";
 import { memo, useEffect, useMemo } from "react";
@@ -31,6 +32,7 @@ import BetaCountdown from "@components/BetaCountdown";
 import { RequiredQueryParams } from "../../api/RequiredQueryParams";
 import { useGetAllNovasQuery } from "@api/community.api";
 import { getMemberPhases } from "@utils/beta-phases";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 const ButtonWithPulse = styled<ButtonProps<any, any>>(Button)`
   &:not(.Mui-disabled) {
@@ -52,7 +54,7 @@ const ButtonWithPulse = styled<ButtonProps<any, any>>(Button)`
   }
 `;
 
-const fractionToMilliseconds = (fraction: number) => {
+export const fractionToMilliseconds = (fraction: number) => {
   const millisecondsInDay = 24 * 60 * 60 * 1000;
   return fraction * millisecondsInDay;
 };
@@ -62,23 +64,26 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
   const { account } = useEthers();
   const confirm = useConfirmDialog();
 
-  const { cache } = useGetPhasesCacheQuery(CacheTypes.UserPhases, {
-    selectFromResult: ({ data }) => ({
-      cache: data
-    })
-  });
+  const { cache } = useGetPhasesCacheQuery(
+    { cacheKey: CacheTypes.UserPhases, account },
+    {
+      selectFromResult: ({ data }) => ({
+        cache: data
+      })
+    }
+  );
 
   const [apply, { isLoading: isApplying, isError, error, reset, isSuccess }] =
     useApplyForQuestMutation();
 
-  const [deletePhasesCache] = useDeletePhasesCacheMutation({
-    fixedCacheKey: "PhasesCache"
-  });
-  const [updatePhasesCache] = useUpdatePhasesCacheMutation({
-    fixedCacheKey: "PhasesCache"
-  });
+  const [deletePhasesCache] = useDeletePhasesCacheMutation();
+  const [updatePhasesCache] = useUpdatePhasesCacheMutation();
 
-  const { data: quest } = useGetOnboardingQuestByIdQuery(
+  const {
+    data: quest,
+    refetch,
+    isLoading
+  } = useGetOnboardingQuestByIdQuery(
     {
       questId: +searchParams.get(RequiredQueryParams.QuestId),
       onboardingQuestAddress: searchParams.get(
@@ -87,7 +92,8 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
       daoAddress: searchParams.get(RequiredQueryParams.DaoAddress)
     },
     {
-      selectFromResult: ({ data }) => ({
+      selectFromResult: ({ data, isLoading, isFetching }) => ({
+        isLoading: isLoading || isFetching,
         data
       })
     }
@@ -105,9 +111,14 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
     return communityData?.admin === account;
   }, [account, communityData]);
 
-  const hasMemberPhaseOneStarted = useMemo(() => {
-    return isAfter(new Date(), new Date(getMemberPhases().phaseOneStartDate));
-  }, [quest]);
+  // const hasMemberPhaseOneStarted = useMemo(() => {
+  //   if (!cache?.createdAt) return false;
+  //   return isAfter(
+  //     new Date(),
+  //     new Date(getMemberPhases(new Date(cache?.createdAt)).phaseOneStartDate)
+  //   );
+  // }, [quest, cache]);
+  // const hasMemberPhaseOneStarted = true;
 
   const hasQuestStarted = useMemo(() => {
     if (!quest?.startDate) return false;
@@ -117,17 +128,17 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
   const hasQuestEnded = useMemo(() => {
     if (!quest?.startDate) return false;
     return isAfter(
+      new Date(),
       addMilliseconds(
         new Date(quest.startDate),
         fractionToMilliseconds(quest?.durationInDays)
-      ),
-      new Date()
+      )
     );
   }, [quest]);
 
   const canApplyForAQuest = useMemo(() => {
-    return !isOwner && !cache && !!hasMemberPhaseOneStarted && !hasQuestEnded;
-  }, [cache, hasMemberPhaseOneStarted, hasQuestEnded, isOwner]);
+    return !isOwner && !cache && !hasQuestEnded;
+  }, [cache, hasQuestEnded, isOwner]);
 
   const hasAppliedForQuest = useMemo(() => {
     return (
@@ -189,6 +200,7 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
             onboardingQuestAddress: searchParams.get(
               RequiredQueryParams.OnboardingQuestAddress
             ),
+            startDate: communityData?.properties?.timestamp,
             daoAddress: searchParams.get(RequiredQueryParams.DaoAddress),
             list: [
               {
@@ -213,6 +225,26 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
       start();
     }
   }, [isSuccess]);
+
+  useEffect(() => {
+    const toDate = new Date(
+      hasQuestStarted
+        ? addMilliseconds(
+            new Date(quest?.startDate),
+            fractionToMilliseconds(quest?.durationInDays)
+          )
+        : quest?.startDate
+    );
+    const timeDifference = toDate.getTime() - new Date().getTime();
+
+    const refetchTimeout = setTimeout(() => {
+      refetch();
+    }, timeDifference);
+
+    return () => {
+      clearTimeout(refetchTimeout);
+    };
+  }, []);
 
   return (
     <>
@@ -248,14 +280,21 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
             <Typography color="white" variant="subtitle1">
               <Stack direction="row" alignItems="center">
                 {quest?.metadata?.name}
-                {/* <Tooltip title={quest?.metadata?.description}>
-                  <DescriptionIcon
-                    sx={{
-                      color: "offWhite.main",
-                      ml: 1
-                    }}
-                  />
-                </Tooltip> */}
+                <Tooltip title="Refresh quest">
+                  <span>
+                    <IconButton
+                      size="medium"
+                      color="offWhite"
+                      sx={{
+                        ml: 1
+                      }}
+                      disabled={isLoading}
+                      onClick={() => refetch()}
+                    >
+                      <RefreshIcon />
+                    </IconButton>
+                  </span>
+                </Tooltip>
                 <Chip
                   sx={{
                     ml: 1
@@ -270,10 +309,6 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
               Quest
             </Typography>
           </Stack>
-
-          {/* {!hasQuestStarted && (
-            
-          )} */}
           <>
             {canApplyForAQuest && (
               <Badge
@@ -339,9 +374,6 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
             gridTemplateColumns: "1fr 2fr"
           }}
         >
-          {
-            // Also rip that off
-          }
           {tasksCompleted ? (
             <ButtonWithPulse
               sx={{

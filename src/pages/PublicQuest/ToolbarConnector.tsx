@@ -2,27 +2,15 @@ import ConnectorBtn from "@api/ProviderFactory/components/ConnectorBtn";
 import { NetworkConfig } from "@api/ProviderFactory/network.config";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { AUTH_TOKEN_KEY } from "@api/auth.api";
-import { useLazyGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import AutSDK from "@aut-labs-private/sdk";
 import AutLoading from "@components/AutLoading";
 import DialogWrapper from "@components/Dialog/DialogWrapper";
-import ErrorDialog from "@components/Dialog/ErrorPopup";
-import {
-  Box,
-  Button,
-  Link,
-  Stack,
-  Toolbar,
-  Typography,
-  styled
-} from "@mui/material";
-import { communityUpdateState } from "@store/Community/community.reducer";
+import { Box, Button, Toolbar, Typography, styled } from "@mui/material";
 import {
   ConnectorTypes,
   NetworksConfig,
   setWallet
 } from "@store/WalletProvider/WalletProvider";
-import { resetState } from "@store/store";
 import { useAppDispatch } from "@store/store.model";
 import { useState, useMemo, useEffect } from "react";
 import { useSelector } from "react-redux";
@@ -33,7 +21,6 @@ import { ethers } from "ethers";
 import AppTitle from "@components/AppTitle";
 import {
   ConnectStatus,
-  isAuthenticated,
   setAuthenticated,
   changeConnectStatus
 } from "@auth/auth.reducer";

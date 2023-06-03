@@ -6,7 +6,6 @@ import {
 } from "@api/onboarding.api";
 import AutSDK, { PluginDefinition, Task } from "@aut-labs-private/sdk";
 import AutLoading from "@components/AutLoading";
-import { StepperButton } from "@components/Stepper";
 import {
   Card,
   CardContent,
@@ -35,6 +34,7 @@ import AFileUpload, { TaskFileUpload } from "@components/FileUpload";
 import { toBase64 } from "@utils/to-base-64";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
 import { FormHelperText } from "@components/Fields";
+import { StepperButton } from "@components/StepperButton";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -61,7 +61,6 @@ const UserSubmitContent = ({
   const [searchParams] = useSearchParams();
   const [initialized, setInitialized] = useState(false);
   const navigate = useNavigate();
-  const daoData = useSelector(CommunityData);
   const [openSubmitSuccess, setOpenSubmitSuccess] = useState(false);
   const { control, handleSubmit, formState, setValue } = useForm({
     mode: "onChange",
@@ -111,6 +110,11 @@ const UserSubmitContent = ({
     return task.metadata.properties.attachmentType;
   }, [task]);
 
+  const textRequired = useMemo(() => {
+    // @ts-ignore
+    return task.metadata.properties.textRequired;
+  }, [task]);
+
   return (
     <Stack
       direction="column"
@@ -138,11 +142,7 @@ const UserSubmitContent = ({
           setOpenSubmitSuccess(false);
           navigate({
             pathname: "/quest",
-            search: `?questId=${+searchParams.get(
-              RequiredQueryParams.QuestId
-            )}&onboardingQuestAddress=${searchParams.get(
-              RequiredQueryParams.OnboardingQuestAddress
-            )}&daoAddress=${daoData.properties.address}`
+            search: searchParams.toString()
           });
         }}
       ></SuccessDialog>
@@ -171,33 +171,36 @@ const UserSubmitContent = ({
             >
               {task?.metadata?.description}
             </Typography>
-            <Controller
-              name="openTask"
-              control={control}
-              rules={{
-                maxLength: 257
-              }}
-              render={({ field: { name, value, onChange } }) => {
-                return (
-                  <AutTextField
-                    name={name}
-                    disabled={
-                      task.status === TaskStatus.Submitted ||
-                      task.status === TaskStatus.Finished
-                    }
-                    value={value || ""}
-                    sx={{ mb: "20px" }}
-                    onChange={onChange}
-                    variant="outlined"
-                    color="offWhite"
-                    multiline
-                    rows={5}
-                    placeholder="Comments to task to go here not required..."
-                  />
-                );
-              }}
-            />
-            {attachmentType === "url" ? (
+            {textRequired && (
+              <Controller
+                name="openTask"
+                control={control}
+                rules={{
+                  required: true,
+                  maxLength: 257
+                }}
+                render={({ field: { name, value, onChange } }) => {
+                  return (
+                    <AutTextField
+                      name={name}
+                      disabled={
+                        task.status === TaskStatus.Submitted ||
+                        task.status === TaskStatus.Finished
+                      }
+                      value={value || ""}
+                      sx={{ mb: "20px" }}
+                      onChange={onChange}
+                      variant="outlined"
+                      color="offWhite"
+                      multiline
+                      rows={5}
+                      placeholder={`Enter text here (required)`}
+                    />
+                  );
+                }}
+              />
+            )}
+            {attachmentType === "url" && (
               <>
                 <Typography
                   color="white"
@@ -244,7 +247,8 @@ const UserSubmitContent = ({
                   }}
                 />
               </>
-            ) : (
+            )}
+            {(attachmentType === "image" || attachmentType === "text") && (
               <>
                 <Typography
                   color="white"
@@ -252,7 +256,11 @@ const UserSubmitContent = ({
                   textAlign="center"
                   p="20px"
                 >
-                  Upload a file
+                  {`Upload a file ${
+                    attachmentType === "image"
+                      ? "(.png, .jpg, .jpeg)"
+                      : "(.doc, .docx, .txt, .pdf)"
+                  }`}
                 </Typography>
                 <Controller
                   name="attachment"
