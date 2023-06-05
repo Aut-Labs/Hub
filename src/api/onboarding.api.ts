@@ -20,7 +20,7 @@ import {
   finaliseQuizTask,
   finaliseTransactionTask
 } from "./tasks.api";
-import { AUTH_TOKEN_KEY } from "./auth.api";
+import { toBase64 } from "@utils/to-base-64";
 
 const getAllOnboardingQuests = async (
   pluginAddress: any,
@@ -459,8 +459,12 @@ const submitOpenTask = async (
   // @ts-ignore
   if (body.task.metadata.properties.attachmentType === "url") {
     body.task.submission.properties["externalUrl"] = body.file;
+  } else if (body.task.metadata.properties.attachmentType === "image") {
+    const fileUri = await sdk.client.storeImageAsBlob(body.file);
+    body.task.submission.properties["fileUri"] = fileUri;
   } else {
-    const fileUri = await sdk.client.storeAsBlob(body.file);
+    const file = await toBase64(body.file);
+    const fileUri = await sdk.client.storeAsBlob(file);
     body.task.submission.properties["fileUri"] = fileUri;
   }
 

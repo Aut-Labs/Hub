@@ -281,7 +281,7 @@ const UserSubmitContent = ({
                           color="offWhite"
                           fileChange={async (file) => {
                             if (file) {
-                              onChange(await toBase64(file));
+                              onChange(file);
                             } else {
                               onChange(null);
                             }
