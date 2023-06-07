@@ -456,7 +456,8 @@ const submitOpenTask = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  if (body.task.metadata.properties.attachmentRequired) {
+  // @ts-ignore
+  if (body?.task?.metadata?.properties?.attachmentRequired) {
     // @ts-ignore
     if (body.task.metadata.properties.attachmentType === "url") {
       body.task.submission.properties["externalUrl"] = body.file;
