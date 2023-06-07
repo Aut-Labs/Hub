@@ -456,16 +456,18 @@ const submitOpenTask = async (
   api: BaseQueryApi
 ) => {
   const sdk = AutSDK.getInstance();
-  // @ts-ignore
-  if (body.task.metadata.properties.attachmentType === "url") {
-    body.task.submission.properties["externalUrl"] = body.file;
-  } else if (body.task.metadata.properties.attachmentType === "image") {
-    const fileUri = await sdk.client.storeImageAsBlob(body.file);
-    body.task.submission.properties["fileUri"] = fileUri;
-  } else {
-    const file = await toBase64(body.file);
-    const fileUri = await sdk.client.storeAsBlob(file);
-    body.task.submission.properties["fileUri"] = fileUri;
+  if (body.task.metadata.properties.attachmentRequired) {
+    // @ts-ignore
+    if (body.task.metadata.properties.attachmentType === "url") {
+      body.task.submission.properties["externalUrl"] = body.file;
+    } else if (body.task.metadata.properties.attachmentType === "image") {
+      const fileUri = await sdk.client.storeImageAsBlob(body.file);
+      body.task.submission.properties["fileUri"] = fileUri;
+    } else {
+      const file = await toBase64(body.file);
+      const fileUri = await sdk.client.storeAsBlob(file);
+      body.task.submission.properties["fileUri"] = fileUri;
+    }
   }
 
   const questOnboarding = sdk.initService<QuestOnboarding>(

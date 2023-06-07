@@ -337,7 +337,8 @@ export const NovaCard = ({
                       style={{
                         display: "flex",
                         justifyContent: "flex-end",
-                        width: "120px"
+                        alignItems: "center",
+                        width: "105px"
                       }}
                     >
                       <ApplyOrWithdrawFromQuest
@@ -393,7 +394,7 @@ export const NovaCard = ({
           </AutCardContainer>
         </AutCardBack>
       </Flipcard>
-      {highlightData.highlighted ? (
+      {highlightData.highlighted && highlightData.questId ? (
         questStartTime > new Date() ? (
           <Countdown>
             <Typography

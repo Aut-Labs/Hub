@@ -130,6 +130,7 @@ export const ApplyOrWithdrawFromQuest = ({
     <>
       {hasAppliedForQuest && (
         <LoadingButton
+          sx={{ minWidth: "105px" }}
           onClick={(e) => {
             e.stopPropagation();
             confimWithdrawal();
@@ -150,6 +151,7 @@ export const ApplyOrWithdrawFromQuest = ({
       )}
       {canApplyForAQuest && (
         <LoadingButton
+          sx={{ minWidth: "105px" }}
           onClick={(e) => {
             e.stopPropagation();
             onApplyForQuest({
@@ -189,6 +191,7 @@ export const ApplyOrWithdrawFromQuest = ({
         >
           <div>
             <Button
+              sx={{ minWidth: "105px" }}
               onClick={(e) => {
                 e.stopPropagation();
               }}

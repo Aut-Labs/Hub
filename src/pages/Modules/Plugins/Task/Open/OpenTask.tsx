@@ -329,33 +329,34 @@ const UserSubmitContent = ({
                 Task Description
               </Typography>
             </Stack>
-
-            <Stack direction="column" alignItems="center">
-              <Typography
-                color="white"
-                variant="body"
-                textAlign="center"
-                p="5px"
-              >
-                <Link
-                  color="primary"
-                  sx={{
-                    mt: 1,
-                    cursor: "pointer"
-                  }}
+            {task?.metadata?.properties?.attachmentRequired && (
+              <Stack direction="column" alignItems="center">
+                <Typography
+                  color="white"
                   variant="body"
-                  target="_blank"
-                  href={ipfsCIDToHttpUrl(
-                    task?.submission?.properties["fileUri"]
-                  )}
+                  textAlign="center"
+                  p="5px"
                 >
-                  Open attachment
-                </Link>
-              </Typography>
-              <Typography variant="caption" className="text-secondary">
-                Attachment File
-              </Typography>
-            </Stack>
+                  <Link
+                    color="primary"
+                    sx={{
+                      mt: 1,
+                      cursor: "pointer"
+                    }}
+                    variant="body"
+                    target="_blank"
+                    href={ipfsCIDToHttpUrl(
+                      task?.submission?.properties["fileUri"]
+                    )}
+                  >
+                    Open attachment
+                  </Link>
+                </Typography>
+                <Typography variant="caption" className="text-secondary">
+                  Attachment File
+                </Typography>
+              </Stack>
+            )}
           </CardContent>
         </Card>
       )}
