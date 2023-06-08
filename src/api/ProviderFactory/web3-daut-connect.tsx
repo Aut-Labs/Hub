@@ -16,6 +16,7 @@ import { debounce } from "@mui/material";
 import { useSearchParams } from "react-router-dom";
 import { AUTH_TOKEN_KEY } from "@api/auth.api";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
+import { autUrls } from "@api/environment";
 
 function Web3DautConnect({
   setLoading,
@@ -126,8 +127,9 @@ function Web3DautConnect({
   };
 
   const onAutMenuProfile = () => {
+    const urls = autUrls();
     const profile = JSON.parse(sessionStorage.getItem("aut-data"));
-    window.open(`https://my.aut.id/${profile.name}`, "_blank");
+    window.open(`${urls.myAut}${profile.name}`, "_blank");
   };
 
   useEffect(() => {
