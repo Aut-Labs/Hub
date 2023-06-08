@@ -66,7 +66,8 @@ const add = async (body: PluginDefinition, api: BaseQueryApi) => {
   const response = await sdk.pluginRegistry.addPluginToDAO(
     pluginDefinitionId,
     selectedCommunityAddress,
-    questPlugin.pluginAddress
+    questPlugin.pluginAddress,
+    ""
   );
 
   if (!response.isSuccess) {
