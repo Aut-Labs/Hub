@@ -39,7 +39,7 @@
     "@leenguyen/react-flip-clock-countdown": "^1.4.0",
     "@lottiefiles/lottie-player": "^1.5.7",
     "@lottiefiles/react-lottie-player": "^3.4.7",
-    "@marker.io/browser": "^0.13.0",
+    "@marker.io/browser": "^0.16.0",
     "@mui/icons-material": "^5.10.9",
     "@mui/lab": "^5.0.0-alpha.103",
     "@mui/material": "^5.10.9",
