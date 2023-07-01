@@ -75,6 +75,10 @@ export const ApplyOrWithdrawFromQuest = ({
   // }, [quest, daoData, hasAppliedForQuest]);
   // const hasMemberPhaseOneStarted = true;
 
+  const isQuestActive = useMemo(() => {
+    return quest.active;
+  }, [quest]);
+
   const hasQuestEnded = useMemo(() => {
     if (!quest?.startDate) return false;
     return isAfter(
@@ -182,7 +186,9 @@ export const ApplyOrWithdrawFromQuest = ({
       {!canApplyForAQuest && !hasAppliedForQuest && (
         <Tooltip
           title={
-            hasQuestEnded
+            !isQuestActive
+              ? "Quest is inactive"
+              : hasQuestEnded
               ? "Quest has ended"
               : !hasQuestStarted
               ? "Quest hasn't started yet"

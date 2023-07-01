@@ -321,17 +321,23 @@ export const NovaCard = ({
                       >
                         {getRoleName(daoData, quest)}
                       </Typography>
-                      <Link
-                        sx={{
-                          textAlign: "start"
-                        }}
-                        component="button"
-                        color="offWhite.main"
-                        variant="caption"
-                        onClick={(e) => questDetails(e, quest)}
-                      >
-                        Details
-                      </Link>
+                      {quest.active ? (
+                        <Link
+                          sx={{
+                            textAlign: "start"
+                          }}
+                          component="button"
+                          color="offWhite.main"
+                          variant="caption"
+                          onClick={(e) => questDetails(e, quest)}
+                        >
+                          Details
+                        </Link>
+                      ) : (
+                        <Typography color="offWhite.main" variant="caption">
+                          Inactive
+                        </Typography>
+                      )}
                     </div>
                     <div
                       style={{
