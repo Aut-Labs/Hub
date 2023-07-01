@@ -13,6 +13,15 @@ import "./App.scss";
 // import { persistStore } from "redux-persist";
 // import AutLoading from "@components/AutLoading";
 import CssBaseline from "@mui/material/CssBaseline";
+import markerSDK from "@marker.io/browser";
+
+markerSDK.loadWidget({
+  project: `${process.env.REACT_APP_MARKER}`,
+  reporter: {
+    email: "frontend@aut.id",
+    fullName: "Nova Showcase"
+  }
+});
 
 const container = document.getElementById("root");
 const root = createRoot(container);

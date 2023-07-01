@@ -33,6 +33,7 @@ import { RequiredQueryParams } from "../../api/RequiredQueryParams";
 import { useGetAllNovasQuery } from "@api/community.api";
 import { getMemberPhases } from "@utils/beta-phases";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import { autUrls } from "@api/environment";
 
 const ButtonWithPulse = styled<ButtonProps<any, any>>(Button)`
   &:not(.Mui-disabled) {
@@ -173,6 +174,7 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
         });
       }
     });
+  const urls = autUrls();
 
   useEffect(() => {
     if (withdrawIsSuccess) {
@@ -382,7 +384,7 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
                 minWidth: "230px"
               }}
               onClick={() => {
-                window.open(`https://try-aut-internal-test.aut.id/`, "_blank");
+                window.open(urls.tryAut, "_blank");
               }}
               size="large"
               variant="outlined"

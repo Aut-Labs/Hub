@@ -24,6 +24,7 @@ import { ReactComponent as TelegramIcon } from "@assets/SocialIcons/TelegramIcon
 import { ReactComponent as TwitterIcon } from "@assets/SocialIcons/TwitterIcon.svg";
 import { RequiredQueryParams } from "../../api/RequiredQueryParams";
 import { useGetAllNovasQuery } from "@api/community.api";
+import { autUrls } from "@api/environment";
 
 const socialIcons = {
   discord: DiscordIcon,
@@ -37,6 +38,7 @@ const CommunityInfo = () => {
   const [searchParams] = useSearchParams();
   const networks = useSelector(NetworksConfig);
   const { account, chainId } = useEthers();
+  const urls = autUrls();
 
   const selectedNetworkConfig = useMemo(() => {
     const config = networks.find(
@@ -192,7 +194,7 @@ const CommunityInfo = () => {
           }}
           variant="body"
           target="_blank"
-          href={`https://my.aut.id/${data?.admin}`}
+          href={`${urls.myAut}${data?.admin}`}
         >
           {data?.admin === account ? "View profile" : "View operator profile"}
         </Link>

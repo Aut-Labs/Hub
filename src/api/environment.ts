@@ -34,3 +34,25 @@ export const swEnvVariables = {
 
 export const environment: typeof swEnvVariables =
   envionmentGenerator(swEnvVariables);
+
+export const autUrls = () => {
+  if (environment.env === EnvMode.Development) {
+    return {
+      tryAut: "https://try-internal.aut.id/",
+      novaDashboard: "https://nova-internal.aut.id/",
+      myAut: "https://my-internal.aut.id/",
+      showcase: "https://showcase-internal.aut.id/",
+      leaderboard: "https://leaderboard-internal.aut.id/",
+      expander: "https://expander-internal.aut.id/"
+    };
+  }
+
+  return {
+    tryAut: "https://try.aut.id/",
+    novaDashboard: "https://nova.aut.id/",
+    myAut: "https://my.aut.id/",
+    showcase: "https://showcase.aut.id/",
+    leaderboard: "https://leaderboard.aut.id/",
+    expander: "https://expander.aut.id/"
+  };
+};
