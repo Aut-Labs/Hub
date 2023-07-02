@@ -12,7 +12,7 @@ import {
   styled,
   IconButton
 } from "@mui/material";
-import { isAfter, addMilliseconds } from "date-fns";
+import { isAfter, addMilliseconds, addDays } from "date-fns";
 import { memo, useEffect, useMemo } from "react";
 import {
   useApplyForQuestMutation,
@@ -138,8 +138,19 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
   }, [quest]);
 
   const canApplyForAQuest = useMemo(() => {
-    return !isOwner && !cache && !hasQuestEnded;
-  }, [cache, hasQuestEnded, isOwner]);
+    const currentDate = new Date();
+    const questStartDate = new Date(quest?.startDate); // assuming quest.startDate is in a format recognized by Date
+    const twoDaysBeforeQuestStart = new Date(
+      questStartDate.setDate(questStartDate.getDate() - 2)
+    );
+    return (
+      quest?.active &&
+      !isOwner &&
+      !cache &&
+      !hasQuestEnded &&
+      currentDate >= twoDaysBeforeQuestStart
+    );
+  }, [cache, quest, hasQuestEnded, isOwner]);
 
   const hasAppliedForQuest = useMemo(() => {
     return (
@@ -202,7 +213,11 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
             onboardingQuestAddress: searchParams.get(
               RequiredQueryParams.OnboardingQuestAddress
             ),
-            startDate: communityData?.properties?.timestamp,
+            startDate: quest.startDate,
+            endDate: `${addDays(
+              quest.startDate,
+              quest.durationInDays
+            ).getTime()}`,
             daoAddress: searchParams.get(RequiredQueryParams.DaoAddress),
             list: [
               {

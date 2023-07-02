@@ -12,6 +12,7 @@ export interface CacheModel {
   address: string;
   daoAddress: string;
   startDate: number;
+  endDate: string;
   onboardingQuestAddress: string;
   questId: number;
   list: any[];

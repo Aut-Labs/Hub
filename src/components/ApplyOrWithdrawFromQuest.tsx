@@ -87,8 +87,19 @@ export const ApplyOrWithdrawFromQuest = ({
   }, [quest]);
 
   const canApplyForAQuest = useMemo(() => {
-    return !isOwner && !cache && !hasQuestEnded;
-  }, [cache, hasQuestEnded, isOwner]);
+    const currentDate = new Date();
+    const questStartDate = new Date(quest?.startDate); // assuming quest.startDate is in a format recognized by Date
+    const twoDaysBeforeQuestStart = new Date(
+      questStartDate.setDate(questStartDate.getDate() - 2)
+    );
+    return (
+      quest?.active &&
+      !isOwner &&
+      !cache &&
+      !hasQuestEnded &&
+      currentDate >= twoDaysBeforeQuestStart
+    );
+  }, [cache, quest, hasQuestEnded, isOwner]);
 
   const [
     withdraw,

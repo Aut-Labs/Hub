@@ -33,8 +33,8 @@ import ErrorDialog from "@components/Dialog/ErrorPopup";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
 import { useGetAllNovasQuery } from "@api/community.api";
 import { TOOLBAR_HEIGHT } from "./ToolbarConnector";
-import { ca } from "date-fns/locale";
-import { AUTH_TOKEN_KEY } from "@api/auth.api";
+import { addDays } from "date-fns";
+import { Quest } from "@aut-labs-private/sdk";
 
 export const GridBox = styled(Box)(({ theme }) => ({
   boxSizing: "border-box",
@@ -56,7 +56,9 @@ export const DaoList = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [selectedQuest, setSelectedQuest] = useState(null);
-  const [questToApply, setQuestToApply] = useState(null);
+  const [questToApply, setQuestToApply] = useState<
+    Quest & { onboardingQuestAddress: string; daoAddress: string }
+  >(null);
   const [alreadyApplied, setAlreadyApplied] = useState(false);
   const [openApplySuccess, setOpenApplySuccess] = useState(false);
   const [searchParams] = useSearchParams();
@@ -168,7 +170,9 @@ export const DaoList = () => {
     start();
   }, [connectStatus, selectedQuest]);
 
-  const applyForQuest = async (quest) => {
+  const applyForQuest = async (
+    quest: Quest & { onboardingQuestAddress: string; daoAddress: string }
+  ) => {
     setQuestToApply(quest);
   };
 
@@ -221,7 +225,11 @@ export const DaoList = () => {
             address: account,
             questId: questToApply.questId,
             onboardingQuestAddress: questToApply.onboardingQuestAddress,
-            startDate: communityData?.properties?.timestamp,
+            startDate: questToApply.startDate,
+            endDate: `${addDays(
+              questToApply.startDate,
+              questToApply.durationInDays
+            ).getTime()}`,
             daoAddress: questToApply.daoAddress,
             list: [
               {
