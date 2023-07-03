@@ -7,7 +7,9 @@ import {
   Button,
   useMediaQuery,
   useTheme,
-  styled
+  styled,
+  FormControlLabel,
+  Switch
 } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -64,6 +66,7 @@ export const DaoList = () => {
   const [searchParams] = useSearchParams();
   const connectStatus = useSelector(ConnectStatus);
   const isAuthenticated = useSelector(IsAuthenticated);
+  const [showExpired, setShowExpired] = useState(false);
   const theme = useTheme();
   const { account } = useEthers();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -82,16 +85,36 @@ export const DaoList = () => {
   );
 
   const daoListArranged = useMemo(() => {
+    let result = [];
     if (cache && cache.daoAddress && data) {
-      const dao = data.daos.find((dao) => dao.daoAddress === cache.daoAddress);
-      const dataWithoutDao = data.daos.filter(
+      let filteredExpiredDaos = [...data.daos];
+      if (!showExpired) {
+        filteredExpiredDaos = filteredExpiredDaos.filter((d) =>
+          d.properties.quests.every((q) => q.isExpired === false)
+        );
+      }
+      const dao = filteredExpiredDaos.find(
+        (dao) => dao.daoAddress === cache.daoAddress
+      );
+      const dataWithoutDao = filteredExpiredDaos.filter(
         (dao) => dao.daoAddress !== cache.daoAddress
       );
-      return { daos: [dao, ...dataWithoutDao] };
+      result = [dao, ...dataWithoutDao];
     } else {
-      return data;
+      if (data?.daos) {
+        result = data?.daos;
+      } else {
+        result = [];
+      }
     }
-  }, [cache, data, isAuthenticated]);
+    let filteredExpiredDaos = [...result];
+    if (!showExpired) {
+      filteredExpiredDaos = filteredExpiredDaos.filter((d) =>
+        d.properties.quests.every((q) => q.isExpired === false)
+      );
+    }
+    return { daos: [...filteredExpiredDaos] };
+  }, [showExpired, cache, data, isAuthenticated]);
 
   const [apply, { isLoading: isApplying, isError, error, reset, isSuccess }] =
     useApplyForQuestMutation();
@@ -348,6 +371,25 @@ export const DaoList = () => {
           <AutLoading width="130px" height="130px" />
         ) : (
           <>
+            {(data?.daos || [])?.length && (
+              <Box
+                sx={{
+                  display: "flex",
+                  mt: 4,
+                  alignItems: "center",
+                  justifyContent: "flex-end"
+                }}
+              >
+                <FormControlLabel
+                  sx={{
+                    color: "white"
+                  }}
+                  onChange={(_, checked) => setShowExpired(checked)}
+                  control={<Switch checked={showExpired} color="primary" />}
+                  label="Show expired Novas"
+                />
+              </Box>
+            )}
             <GridBox sx={{ flexGrow: 1, mt: 4 }}>
               {(daoListArranged?.daos || []).map((dao, index) => (
                 <NovaCard
