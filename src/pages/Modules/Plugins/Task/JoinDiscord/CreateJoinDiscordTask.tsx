@@ -1,4 +1,4 @@
-import { PluginDefinition } from "@aut-labs-private/sdk";
+import { PluginDefinition } from "@aut-labs/sdk";
 import { memo } from "react";
 
 interface PluginParams {

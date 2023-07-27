@@ -3,7 +3,7 @@ import AutSDK, {
   QuestOnboarding,
   Task,
   fetchMetadata
-} from "@aut-labs-private/sdk";
+} from "@aut-labs/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { REHYDRATE } from "redux-persist";
 import { environment } from "./environment";
@@ -14,7 +14,7 @@ import {
   getCache,
   updateCache
 } from "./cache.api";
-import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
+import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import {
   finaliseJoinDiscordTask,
   finaliseQuizTask,

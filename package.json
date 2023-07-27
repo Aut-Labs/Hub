@@ -31,9 +31,9 @@
     ]
   },
   "dependencies": {
-    "@aut-labs-private/abi-types": "^0.0.37",
-    "@aut-labs-private/sdk": "^0.0.68",
-    "@aut-labs-private/sdk-biconomy": "latest",
+    "@aut-labs/abi-types": "^0.0.39",
+    "@aut-labs/sdk": "^0.0.71",
+    "@aut-labs/sdk-biconomy": "^0.0.2",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@leenguyen/react-flip-clock-countdown": "^1.4.0",

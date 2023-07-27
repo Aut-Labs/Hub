@@ -5,7 +5,7 @@ import {
   useGetPhasesCacheQuery,
   useWithdrawFromAQuestMutation
 } from "@api/onboarding.api";
-import { Quest } from "@aut-labs-private/sdk";
+import { Quest } from "@aut-labs/sdk";
 import { LoadingButton } from "@mui/lab";
 import { Stack, CircularProgress, Tooltip, Button } from "@mui/material";
 import { useEthers } from "@usedapp/core";

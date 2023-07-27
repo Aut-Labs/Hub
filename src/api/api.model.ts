@@ -1,5 +1,5 @@
-import { BaseNFTModel } from "@aut-labs-private/sdk/dist/models/baseNFTModel";
-import { CommunityMembershipDetails } from "@aut-labs-private/sdk/dist/models/holder";
+import { BaseNFTModel } from "@aut-labs/sdk/dist/models/baseNFTModel";
+import { CommunityMembershipDetails } from "@aut-labs/sdk/dist/models/holder";
 import { Community } from "./community.model";
 import { httpUrlToIpfsCID } from "./storage.api";
 

@@ -1,5 +1,5 @@
 import { useCreateTaskPerQuestMutation } from "@api/onboarding.api";
-import { PluginDefinition, Task } from "@aut-labs-private/sdk";
+import { PluginDefinition, Task } from "@aut-labs/sdk";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { FormHelperText } from "@components/Fields";

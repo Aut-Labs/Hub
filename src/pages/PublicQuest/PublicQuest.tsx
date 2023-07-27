@@ -19,7 +19,7 @@ import { useSearchParams } from "react-router-dom";
 import { memo, useEffect, useMemo } from "react";
 import LoadingProgressBar from "@components/LoadingProgressBar";
 import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
-import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
+import { TaskStatus } from "@aut-labs/sdk/dist/models/task";
 import { addMilliseconds, isAfter } from "date-fns";
 import Tasks from "./Tasks";
 import CommunityInfo from "./CommunityInfo";

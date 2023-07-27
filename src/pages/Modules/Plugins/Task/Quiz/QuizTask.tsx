@@ -2,8 +2,8 @@ import {
   useGetAllTasksPerQuestQuery,
   useSubmitQuizTaskMutation
 } from "@api/onboarding.api";
-import { PluginDefinition } from "@aut-labs-private/sdk";
-import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
+import { PluginDefinition } from "@aut-labs/sdk";
+import { TaskStatus } from "@aut-labs/sdk/dist/models/task";
 import AutLoading from "@components/AutLoading";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
@@ -26,7 +26,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import TaskDetails from "../Shared/TaskDetails";
 import { GridBox } from "./QuestionsAndAnswers";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
-import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
+import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import { taskTypes } from "../Shared/Tasks";
 import { useEthers } from "@usedapp/core";
 import SuccessDialog from "@components/Dialog/SuccessPopup";

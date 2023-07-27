@@ -1,4 +1,4 @@
-import { Task } from "@aut-labs-private/sdk";
+import { Task } from "@aut-labs/sdk";
 import {
   Box,
   Stack,
@@ -20,8 +20,8 @@ import {
 } from "react-router-dom";
 import { TaskStatus } from "@store/model";
 import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
-import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
-import { TaskType } from "@aut-labs-private/sdk/dist/models/task";
+import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
+import { TaskType } from "@aut-labs/sdk/dist/models/task";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useConfirmDialog } from "react-mui-confirm";
 import OverflowTooltip from "@components/OverflowTooltip";

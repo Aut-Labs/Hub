@@ -1,4 +1,4 @@
-import { Task } from "@aut-labs-private/sdk";
+import { Task } from "@aut-labs/sdk";
 import {
   Box,
   TableCell,
@@ -26,8 +26,8 @@ import {
   useParams
 } from "react-router-dom";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
-import { TaskStatus, TaskType } from "@aut-labs-private/sdk/dist/models/task";
+import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
+import { TaskStatus, TaskType } from "@aut-labs/sdk/dist/models/task";
 import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import OverflowTooltip from "@components/OverflowTooltip";
 import AutLoading from "@components/AutLoading";

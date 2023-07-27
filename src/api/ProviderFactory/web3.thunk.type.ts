@@ -5,7 +5,7 @@ import {
 } from "@reduxjs/toolkit";
 import { BaseThunkAPI } from "@reduxjs/toolkit/dist/createAsyncThunk";
 import { FallbackIfUnknown } from "@reduxjs/toolkit/dist/tsHelpers";
-import { Web3ProviderExtras } from "@aut-labs-private/abi-types";
+import { Web3ProviderExtras } from "@aut-labs/abi-types";
 
 export type AppDispatch = ThunkDispatch<any, any, AnyAction>;
 

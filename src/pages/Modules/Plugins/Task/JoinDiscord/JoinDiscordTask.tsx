@@ -2,7 +2,7 @@ import {
   useGetAllTasksPerQuestQuery,
   useSubmitJoinDiscordTaskMutation
 } from "@api/onboarding.api";
-import { PluginDefinition } from "@aut-labs-private/sdk";
+import { PluginDefinition } from "@aut-labs/sdk";
 import AutLoading from "@components/AutLoading";
 import { Container, Stack } from "@mui/material";
 import { CommunityData, IsAdmin } from "@store/Community/community.reducer";
@@ -17,8 +17,8 @@ import {
 import TaskDetails from "../Shared/TaskDetails";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { taskTypes } from "../Shared/Tasks";
-import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
-import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
+import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
+import { TaskStatus } from "@aut-labs/sdk/dist/models/task";
 import { useEthers } from "@usedapp/core";
 import { useOAuth } from "@components/Oauth2/oauth2";
 import ErrorDialog from "@components/Dialog/ErrorPopup";

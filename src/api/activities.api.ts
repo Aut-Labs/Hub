@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 //   CommunityCallContractEventType,
 //   PollsContractEventType,
 //   TasksContractEventType
-// } from "@aut-labs-private/abi-types";
+// } from "@aut-labs/abi-types";
 import { Task, TaskStatus } from "@store/model";
 import axios from "axios";
 import { dateToUnix } from "@utils/date-format";

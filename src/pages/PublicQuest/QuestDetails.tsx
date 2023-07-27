@@ -5,7 +5,7 @@ import PublicQuest from "./PublicQuest";
 import { Route, Routes, useLocation } from "react-router-dom";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
-import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
+import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import { TOOLBAR_HEIGHT } from "./ToolbarConnector";
 
 const OpenTask = lazy(() => import("../Modules/Plugins/Task/Open/OpenTask"));

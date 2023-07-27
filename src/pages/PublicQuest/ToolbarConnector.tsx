@@ -2,7 +2,7 @@ import ConnectorBtn from "@api/ProviderFactory/components/ConnectorBtn";
 import { NetworkConfig } from "@api/ProviderFactory/network.config";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { AUTH_TOKEN_KEY } from "@api/auth.api";
-import AutSDK from "@aut-labs-private/sdk";
+import AutSDK from "@aut-labs/sdk";
 import AutLoading from "@components/AutLoading";
 import DialogWrapper from "@components/Dialog/DialogWrapper";
 import { Box, Button, Toolbar, Typography, styled } from "@mui/material";

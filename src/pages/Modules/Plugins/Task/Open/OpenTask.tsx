@@ -4,7 +4,7 @@ import {
   useGetAllTasksPerQuestQuery,
   useSubmitOpenTaskMutation
 } from "@api/onboarding.api";
-import AutSDK, { PluginDefinition, Task } from "@aut-labs-private/sdk";
+import AutSDK, { PluginDefinition, Task } from "@aut-labs/sdk";
 import AutLoading from "@components/AutLoading";
 import {
   Card,
@@ -23,12 +23,12 @@ import { useSelector } from "react-redux";
 import { useSearchParams, useParams, useNavigate } from "react-router-dom";
 import TaskDetails from "../Shared/TaskDetails";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
-import { PluginDefinitionType } from "@aut-labs-private/sdk/dist/models/plugin";
+import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import { taskTypes } from "../Shared/Tasks";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { useEthers } from "@usedapp/core";
-import { TaskStatus } from "@aut-labs-private/sdk/dist/models/task";
+import { TaskStatus } from "@aut-labs/sdk/dist/models/task";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import AFileUpload, { TaskFileUpload } from "@components/FileUpload";
 import { toBase64 } from "@utils/to-base-64";

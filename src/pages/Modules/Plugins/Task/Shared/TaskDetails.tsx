@@ -1,4 +1,4 @@
-import { Task } from "@aut-labs-private/sdk";
+import { Task } from "@aut-labs/sdk";
 import {
   Box,
   Button,

@@ -8,7 +8,7 @@ import {
   updateWalletProviderState
 } from "@store/WalletProvider/WalletProvider";
 import { useSelector } from "react-redux";
-import AutSDK from "@aut-labs-private/sdk";
+import AutSDK from "@aut-labs/sdk";
 import { ethers } from "ethers";
 import { NetworkConfig } from "./network.config";
 import { Config, Connector, useConnector, useEthers } from "@usedapp/core";

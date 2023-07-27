@@ -2,7 +2,7 @@ import axios from "axios";
 import { environment } from "./environment";
 import { Web3ThunkProviderFactory } from "./ProviderFactory/web3-thunk.provider";
 import { NetworkConfig } from "./ProviderFactory/network.config";
-import { Web3AutIDProvider } from "@aut-labs-private/abi-types";
+import { Web3AutIDProvider } from "@aut-labs/abi-types";
 
 export const getUsersData = () => {
   const params = {

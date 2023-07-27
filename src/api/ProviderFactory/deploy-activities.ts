@@ -7,7 +7,7 @@ import { ethers } from "ethers";
 //   CommunityCallByteCode,
 //   TasksABI,
 //   TasksByteCode
-// } from "@aut-labs-private/abi-types";
+// } from "@aut-labs/abi-types";
 
 export const deployPolls = async (
   communityAddress: string,

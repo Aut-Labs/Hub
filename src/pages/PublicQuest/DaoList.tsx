@@ -36,7 +36,7 @@ import SuccessDialog from "@components/Dialog/SuccessPopup";
 import { useGetAllNovasQuery } from "@api/community.api";
 import { TOOLBAR_HEIGHT } from "./ToolbarConnector";
 import { addDays } from "date-fns";
-import { Quest } from "@aut-labs-private/sdk";
+import { Quest } from "@aut-labs/sdk";
 
 export const GridBox = styled(Box)(({ theme }) => ({
   boxSizing: "border-box",
