@@ -10,7 +10,7 @@ import {
   SvgIcon,
   Link
 } from "@mui/material";
-import { memo, useMemo } from "react";
+import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import DescriptionIcon from "@mui/icons-material/Description";
@@ -22,9 +22,13 @@ import { ReactComponent as GitHubIcon } from "@assets/SocialIcons/GitHubIcon.svg
 import { ReactComponent as LensfrensIcon } from "@assets/SocialIcons/LensfrensIcon.svg";
 import { ReactComponent as TelegramIcon } from "@assets/SocialIcons/TelegramIcon.svg";
 import { ReactComponent as TwitterIcon } from "@assets/SocialIcons/TwitterIcon.svg";
+import { ReactComponent as WebsiteIcon } from "@assets/SocialIcons/WebsiteIcon.svg";
+
 import { RequiredQueryParams } from "../../api/RequiredQueryParams";
 import { useGetAllNovasQuery } from "@api/community.api";
 import { autUrls } from "@api/environment";
+import { novaSocialUrls } from "@api/aut.model";
+import theme from "@theme/theme";
 
 const socialIcons = {
   discord: DiscordIcon,
@@ -32,6 +36,11 @@ const socialIcons = {
   twitter: TwitterIcon,
   telegram: TelegramIcon,
   lensfrens: LensfrensIcon
+};
+
+const novaSocialIcons = {
+  discord: DiscordIcon,
+  website: WebsiteIcon
 };
 
 const CommunityInfo = () => {
@@ -142,7 +151,8 @@ const CommunityInfo = () => {
               </Stack>
               <Stack direction="row">
                 {data?.properties.socials.map((social, index) => {
-                  const AutIcon = socialIcons[Object.keys(socialIcons)[index]];
+                  const AutIcon =
+                    novaSocialIcons[Object.keys(novaSocialIcons)[index]];
 
                   return (
                     <Link
@@ -153,9 +163,14 @@ const CommunityInfo = () => {
                         href: social.link,
                         target: "_blank"
                       })}
-                      {...(!social.link && {
+                      {...((!social.link ||
+                        social.link === novaSocialUrls[social.type]?.prefix ||
+                        social.link ===
+                          novaSocialUrls[social.type]?.placeholder) && {
                         sx: {
-                          color: "divider"
+                          svg: {
+                            color: theme.palette.divider
+                          }
                         },
                         component: "button",
                         disabled: true
