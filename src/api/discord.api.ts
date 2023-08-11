@@ -1,6 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { Community } from "./community.model";
 import { environment } from "./environment";
 
 export interface TaskData {

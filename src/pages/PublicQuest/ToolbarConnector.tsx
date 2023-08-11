@@ -1,30 +1,27 @@
-import ConnectorBtn from "@api/ProviderFactory/components/ConnectorBtn";
 import { NetworkConfig } from "@api/ProviderFactory/network.config";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
-import { AUTH_TOKEN_KEY } from "@api/auth.api";
 import AutSDK from "@aut-labs/sdk";
 import AutLoading from "@components/AutLoading";
 import DialogWrapper from "@components/Dialog/DialogWrapper";
 import { Box, Button, Toolbar, Typography, styled } from "@mui/material";
 import {
-  ConnectorTypes,
+  NetworkSelectorIsOpen,
   NetworksConfig,
-  setWallet
+  updateWalletProviderState
 } from "@store/WalletProvider/WalletProvider";
 import { useAppDispatch } from "@store/store.model";
-import { useState, useMemo, useEffect } from "react";
+import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useAutWalletConnect } from "./use-aut-wallet-connect";
-import { useEthers } from "@usedapp/core";
 import { ethers } from "ethers";
 import AppTitle from "@components/AppTitle";
-import {
-  ConnectStatus,
-  setAuthenticated,
-  changeConnectStatus
-} from "@auth/auth.reducer";
+import { changeConnectStatus } from "@auth/auth.reducer";
 import Logo from "@assets/logo.svg";
+import { useEthersSigner } from "@api/ProviderFactory/ethers";
+import { useAccount, useConnect, useChainId, useDisconnect } from "wagmi";
+import { ReactComponent as WalletConnectLogo } from "@assets/aut/wallet-connect.svg";
+import { ReactComponent as MetamaskLogo } from "@assets/aut/metamask.svg";
+import { communityUpdateState } from "@store/Community/community.reducer";
 
 export const TOOLBAR_HEIGHT = 84;
 
@@ -46,119 +43,109 @@ const ErrorWrapper = styled(Box)({
   textAlign: "center"
 });
 
+const btnConfig = {
+  metaMask: {
+    label: "metaMask",
+    icon: <MetamaskLogo />
+  },
+  walletConnect: {
+    label: "WalletConnect",
+    icon: <WalletConnectLogo />
+  }
+};
+
 export const ToolbarConnector = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const networks = useSelector(NetworksConfig);
-  const [isOpen, setIsOpen] = useState(false);
-  const {
-    connect,
-    disconnect,
-    isLoading: isConnecting,
-    waitingUserConfirmation,
-    errorMessage
-  } = useAutWalletConnect();
-  const { account } = useEthers();
-  const [isLoading, setIsLoading] = useState(false);
-  const [connected, setIsConnected] = useState(false);
-  const [initialAccount, setInitialAccount] = useState("");
-  const hasAccountChanged = useMemo(() => {
-    return (
-      connected && !!initialAccount && !!account && initialAccount !== account
-    );
-  }, [connected, initialAccount, account]);
-  const connectStatus = useSelector(ConnectStatus);
-
-  const initialiseSDK = async (
-    network: NetworkConfig,
-    signer: ethers.providers.JsonRpcSigner
-  ) => {
-    const sdk = AutSDK.getInstance();
-    return sdk.init(signer, {
-      daoExpanderAddress: searchParams.get(RequiredQueryParams.DaoAddress),
-      daoTypesAddress: network.contracts.daoTypesAddress,
-      novaRegistryAddress: network.contracts.novaRegistryAddress,
-      autIDAddress: network.contracts.autIDAddress,
-      daoExpanderRegistryAddress: network.contracts.daoExpanderRegistryAddress,
-      pluginRegistryAddress: network.contracts.pluginRegistryAddress
-    });
-  };
-
-  useEffect(() => {
-    if (connectStatus === "start") {
-      setIsOpen(true);
-    }
-  }, [connectStatus]);
-
-  const changeConnector = async (connectorType: string) => {
-    try {
-      dispatch(changeConnectStatus("connecting"));
-      setIsLoading(true);
-      const [network] = networks.filter((d) => !d.disabled);
-      const { provider, connected, account } = await connect(connectorType);
-
-      if (!connected) {
-        dispatch(changeConnectStatus("failed"));
-        throw new Error("not connected");
-      }
-      const signer = provider.getSigner();
-      await initialiseSDK(network, signer as ethers.providers.JsonRpcSigner);
-      setTimeout(() => {
-        setInitialAccount(account);
-        setIsLoading(false);
-        setIsOpen(false);
-        dispatch(
-          setAuthenticated({
-            isAuthenticated: true,
-            userInfo: {}
-          })
-        );
-        setIsConnected(true);
-        dispatch(changeConnectStatus("connected"));
-      }, 500);
-      return account;
-    } catch (error) {
-      dispatch(setWallet(null));
-      setIsLoading(false);
-    }
-  };
+  const { connector, isReconnecting, isConnecting, isConnected } = useAccount();
+  const { connectAsync, connectors, error, isLoading } = useConnect();
+  const chainId = useChainId();
+  const signer = useEthersSigner({ chainId: chainId });
+  const { disconnectAsync } = useDisconnect();
+  const isOpen = useSelector(NetworkSelectorIsOpen);
 
   const closeAndDisconnect = async () => {
-    disconnect();
-    setIsConnected(false);
-    dispatch(setWallet(null));
-    setIsLoading(false);
-    setIsOpen(false);
-    dispatch(changeConnectStatus("disconnected"));
-    dispatch(
-      setAuthenticated({
-        isAuthenticated: false,
-        userInfo: {}
-      })
-    );
-    // exclude the rest of the app data (main page)
-    // dispatch(resetState);
-    localStorage.removeItem(AUTH_TOKEN_KEY);
+    const itemsToUpdate = {
+      isAuthorised: false,
+      sdkInitialized: false,
+      isOpen: false
+    };
+    await disconnectAsync();
+    await dispatch(updateWalletProviderState(itemsToUpdate));
+    await dispatch(changeConnectStatus("disconnected"));
   };
 
   const handleButtonClick = async () => {
-    if (connected) {
+    if (isConnected) {
       closeAndDisconnect();
     } else {
-      dispatch(changeConnectStatus("start"));
+      await dispatch(
+        updateWalletProviderState({
+          isOpen: true
+        })
+      );
     }
   };
 
   useEffect(() => {
-    if (hasAccountChanged) {
-      closeAndDisconnect();
+    const initialiseSDK = async (
+      network: NetworkConfig,
+      signer: ethers.providers.JsonRpcSigner
+    ) => {
+      const sdk = AutSDK.getInstance();
+      return sdk.init(signer, {
+        daoExpanderAddress: searchParams.get(RequiredQueryParams.DaoAddress),
+        daoTypesAddress: network.contracts.daoTypesAddress,
+        novaRegistryAddress: network.contracts.novaRegistryAddress,
+        autIDAddress: network.contracts.autIDAddress,
+        daoExpanderRegistryAddress:
+          network.contracts.daoExpanderRegistryAddress,
+        pluginRegistryAddress: network.contracts.pluginRegistryAddress
+      });
+    };
+    if (connector?.ready && isConnected && signer) {
+      const start = async () => {
+        const [network] = networks.filter((d) => !d.disabled);
+        const itemsToUpdate = {
+          isAuthorised: true,
+          sdkInitialized: true,
+          isOpen: false,
+          selectedNetwork: network
+        };
+
+        if (searchParams?.get(RequiredQueryParams.DaoAddress)) {
+          await dispatch(
+            communityUpdateState({
+              selectedCommunityAddress: searchParams?.get(
+                RequiredQueryParams.DaoAddress
+              )
+            })
+          );
+        }
+        await initialiseSDK(network, signer);
+        await dispatch(changeConnectStatus("connected"));
+        setTimeout(async () => {
+          await dispatch(updateWalletProviderState(itemsToUpdate));
+        }, 20);
+      };
+      start();
     }
-  }, [hasAccountChanged]);
+  }, [dispatch, isConnected, connector?.ready, signer, networks, searchParams]);
 
   return (
     <Box>
-      <DialogWrapper open={isOpen} onClose={closeAndDisconnect}>
+      <DialogWrapper
+        open={isOpen}
+        onClose={() =>
+          dispatch(
+            updateWalletProviderState({
+              isOpen: false
+            })
+          )
+        }
+      >
         <>
           <AppTitle
             mb={{
@@ -168,37 +155,53 @@ export const ToolbarConnector = () => {
             }}
             variant="h2"
           />
-          {(isLoading || waitingUserConfirmation || isConnecting) && (
+          {(isLoading || isConnecting) && (
             <div style={{ position: "relative", flex: 1 }}>
-              {waitingUserConfirmation && (
-                <Typography m="0" color="white" variant="subtitle1">
-                  Waiting confirmation...
-                </Typography>
-              )}
               <AutLoading width="130px" height="130px" />
             </div>
           )}
 
-          {!isLoading && !waitingUserConfirmation && (
+          {!isLoading && (
             <>
               <Typography color="white" variant="subtitle1">
                 Connect your wallet
               </Typography>
               <DialogInnerContent>
-                <ConnectorBtn
-                  setConnector={changeConnector}
-                  connectorType={ConnectorTypes.Metamask}
-                />
-                <ConnectorBtn
-                  setConnector={changeConnector}
-                  connectorType={ConnectorTypes.WalletConnect}
-                />
+                {connectors.map((c) => (
+                  <Button
+                    disabled={
+                      !c.ready || isReconnecting || c.id === connector?.id
+                    }
+                    key={c.id}
+                    onClick={async () => {
+                      await dispatch(changeConnectStatus("connecting"));
+                      await connectAsync({
+                        connector: c,
+                        chainId: c.chains[0].id
+                      });
+                    }}
+                    startIcon={btnConfig[c.id]?.icon}
+                    variant="outlined"
+                    size="normal"
+                    color="offWhite"
+                    sx={{
+                      minWidth: {
+                        xs: "260px",
+                        md: "280px",
+                        lg: "300px",
+                        xxl: "440px"
+                      }
+                    }}
+                  >
+                    {c.name}
+                  </Button>
+                ))}
               </DialogInnerContent>
 
-              {errorMessage && (
+              {error?.message && (
                 <ErrorWrapper>
                   <Typography textAlign="center" color="error" variant="body">
-                    {errorMessage}
+                    {error?.message}
                   </Typography>
                 </ErrorWrapper>
               )}
@@ -242,37 +245,6 @@ export const ToolbarConnector = () => {
           }}
           alt="Āut Logo"
         />
-        {/* <AppTitle
-          sx={{
-            cursor: "pointer"
-          }}
-          onClick={() => navigate("/")}
-          variant="h3"
-        /> */}
-        {/* <Stack
-          flex={1}
-          alignItems="center"
-          justifyContent="center"
-          direction="row"
-          gap={2}
-        >
-          <Link
-            color="offWhite.main"
-            variant="body"
-            target="_blank"
-            href="http://176.34.149.248:4001"
-          >
-            Leaderboard
-          </Link>
-          <Link
-            color="offWhite.main"
-            variant="body"
-            target="_blank"
-            href="http://176.34.149.248:4002"
-          >
-            Nova showcase
-          </Link>
-        </Stack> */}
         <div>
           <Button
             onClick={handleButtonClick}
@@ -283,23 +255,9 @@ export const ToolbarConnector = () => {
             color="offWhite"
             variant="outlined"
           >
-            {connected ? "Disconnect" : "Connect"}
+            {isConnected ? "Disconnect" : "Connect"}
           </Button>
-          {/* <Button
-            onClick={() => {
-              setIsOpen(true);
-            }}
-            sx={{
-              width: "220px",
-              height: "55px"
-            }}
-            color="offWhite"
-            variant="outlined"
-          >
-            Cnnct
-          </Button> */}
         </div>
-        {/* Switch this */}
       </Toolbar>
     </Box>
   );

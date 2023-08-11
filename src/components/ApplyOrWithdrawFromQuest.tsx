@@ -8,10 +8,10 @@ import {
 import { Quest } from "@aut-labs/sdk";
 import { LoadingButton } from "@mui/lab";
 import { Stack, CircularProgress, Tooltip, Button } from "@mui/material";
-import { useEthers } from "@usedapp/core";
 import { isAfter, addMilliseconds } from "date-fns";
 import { useMemo, useEffect } from "react";
 import { useConfirmDialog } from "react-mui-confirm";
+import { useAccount } from "wagmi";
 
 const fractionToMiliseconds = (fraction: number) => {
   const millisecondsInDay = 24 * 60 * 60 * 1000;
@@ -33,7 +33,7 @@ export const ApplyOrWithdrawFromQuest = ({
 }) => {
   // const [cache, setCache] = useState<CacheModel>(null);
   const confirm = useConfirmDialog();
-  const { account } = useEthers();
+  const { address: account } = useAccount();
   const isOwner = useMemo(() => {
     return !!account && daoData?.admin === account;
   }, [account, daoData]);

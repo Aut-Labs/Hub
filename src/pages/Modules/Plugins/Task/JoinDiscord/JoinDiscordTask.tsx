@@ -19,12 +19,12 @@ import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { taskTypes } from "../Shared/Tasks";
 import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import { TaskStatus } from "@aut-labs/sdk/dist/models/task";
-import { useEthers } from "@usedapp/core";
 import { useOAuth } from "@components/Oauth2/oauth2";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
 import { StepperButton } from "@components/StepperButton";
+import { useAccount } from "wagmi";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -34,7 +34,7 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const params = useParams();
-  const { account: userAddress } = useEthers();
+  const { address: userAddress } = useAccount();
   const isAdmin = useSelector(IsAdmin);
   const { getAuth } = useOAuth();
   const [joinClicked, setJoinClicked] = useState(false);
@@ -76,6 +76,7 @@ const JoinDiscordTask = ({ plugin }: PluginParams) => {
         const { access_token } = data;
 
         submitJoinDiscordTask({
+          userAddress,
           task,
           bearerToken: access_token,
           onboardingPluginAddress: searchParams.get(

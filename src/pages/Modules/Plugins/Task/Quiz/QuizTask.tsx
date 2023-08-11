@@ -28,9 +28,9 @@ import { GridBox } from "./QuestionsAndAnswers";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import { taskTypes } from "../Shared/Tasks";
-import { useEthers } from "@usedapp/core";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
 import { StepperButton } from "@components/StepperButton";
+import { useAccount } from "wagmi";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -161,7 +161,7 @@ const AnswersAdminView = memo(({ questionIndex, answers }: any) => {
 const QuizTask = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
   const isAdmin = useSelector(IsAdmin);
-  const { account: userAddress } = useEthers();
+  const { address: userAddress } = useAccount();
   const params = useParams();
   const [initialized, setInitialized] = useState(false);
   const navigate = useNavigate();
@@ -222,6 +222,7 @@ const QuizTask = ({ plugin }: PluginParams) => {
   const onSubmit = async () => {
     const values = getValues();
     submitTask({
+      userAddress,
       task,
       questionsAndAnswers: values.questions,
       onboardingQuestAddress: searchParams.get(

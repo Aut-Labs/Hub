@@ -22,6 +22,7 @@ import { saveQestions } from "@api/tasks.api";
 import LinkWithQuery from "@components/LinkWithQuery";
 import { countWords } from "@utils/helpers";
 import { StepperButton } from "@components/StepperButton";
+import { useAccount } from "wagmi";
 
 const errorTypes = {
   maxWords: `Words cannot be more than 6`,
@@ -104,6 +105,7 @@ addMinutes(endDatetime, 45);
 
 const QuizTasks = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
+  const { address } = useAccount();
   const navigate = useNavigate();
   const [answersSaved, setAnswersSaved] = useState(false);
   const {
@@ -133,6 +135,7 @@ const QuizTasks = ({ plugin }: PluginParams) => {
         // store answers in the db
         try {
           await saveQestions(
+            address,
             plugin.pluginAddress,
             data.taskId,
             values.questions

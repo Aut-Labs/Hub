@@ -15,7 +15,6 @@ import { useSearchParams } from "react-router-dom";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import DescriptionIcon from "@mui/icons-material/Description";
 import { NetworksConfig } from "@store/WalletProvider/WalletProvider";
-import { useEthers } from "@usedapp/core";
 import { useSelector } from "react-redux";
 import { ReactComponent as DiscordIcon } from "@assets/SocialIcons/DiscordIcon.svg";
 import { ReactComponent as GitHubIcon } from "@assets/SocialIcons/GitHubIcon.svg";
@@ -25,6 +24,7 @@ import { ReactComponent as TwitterIcon } from "@assets/SocialIcons/TwitterIcon.s
 import { RequiredQueryParams } from "../../api/RequiredQueryParams";
 import { useGetAllNovasQuery } from "@api/community.api";
 import { autUrls } from "@api/environment";
+import { useAccount, useChainId } from "wagmi";
 
 const socialIcons = {
   discord: DiscordIcon,
@@ -37,7 +37,8 @@ const socialIcons = {
 const CommunityInfo = () => {
   const [searchParams] = useSearchParams();
   const networks = useSelector(NetworksConfig);
-  const { account, chainId } = useEthers();
+  const { address: account } = useAccount();
+  const chainId = useChainId();
   const urls = autUrls();
 
   const selectedNetworkConfig = useMemo(() => {

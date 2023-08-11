@@ -15,9 +15,11 @@ export interface WalletProviderState {
   isOpen: boolean;
   sdkInitialized: boolean;
   wallets: any;
+  isAuthorised: boolean;
 }
 
 const initialState: WalletProviderState = {
+  isAuthorised: false,
   signer: null,
   selectedWalletType: null,
   selectedNetwork: null,
@@ -67,6 +69,9 @@ export const {
   initializeSdk,
   setProviderIsOpen
 } = walletProviderSlice.actions;
+
+export const IsAuthorised = (state: any) =>
+  state.walletProvider.isAuthorised as boolean;
 
 const networkSelectorIsOpen = (state: any) =>
   state.walletProvider.isOpen as boolean;

@@ -22,7 +22,6 @@ import {
   useUpdatePhasesCacheMutation,
   useWithdrawFromAQuestMutation
 } from "@api/onboarding.api";
-import { useEthers } from "@usedapp/core";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import { useSearchParams } from "react-router-dom";
 import InfoIcon from "@mui/icons-material/Info";
@@ -34,6 +33,7 @@ import { useGetAllNovasQuery } from "@api/community.api";
 import { getMemberPhases } from "@utils/beta-phases";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { autUrls } from "@api/environment";
+import { useAccount } from "wagmi";
 
 const ButtonWithPulse = styled<ButtonProps<any, any>>(Button)`
   &:not(.Mui-disabled) {
@@ -62,7 +62,7 @@ export const fractionToMilliseconds = (fraction: number) => {
 
 const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
   const [searchParams] = useSearchParams();
-  const { account } = useEthers();
+  const { address: account } = useAccount();
   const confirm = useConfirmDialog();
 
   const { cache } = useGetPhasesCacheQuery(

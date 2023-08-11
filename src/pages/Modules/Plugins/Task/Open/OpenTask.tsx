@@ -27,7 +27,6 @@ import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import { taskTypes } from "../Shared/Tasks";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
-import { useEthers } from "@usedapp/core";
 import { TaskStatus } from "@aut-labs/sdk/dist/models/task";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import AFileUpload, { TaskFileUpload } from "@components/FileUpload";
@@ -35,6 +34,7 @@ import { toBase64 } from "@utils/to-base-64";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
 import { FormHelperText } from "@components/Fields";
 import { StepperButton } from "@components/StepperButton";
+import { useAccount } from "wagmi";
 
 interface PluginParams {
   plugin: PluginDefinition;
@@ -88,6 +88,7 @@ const UserSubmitContent = ({
 
   const onSubmit = async (values) => {
     submitTask({
+      userAddress,
       file: values.attachment,
       task: {
         ...task,
@@ -389,7 +390,7 @@ const UserSubmitContent = ({
 
 const OpenTask = ({ plugin }: PluginParams) => {
   const [searchParams] = useSearchParams();
-  const { account: userAddress } = useEthers();
+  const { address: userAddress } = useAccount();
 
   const params = useParams();
 

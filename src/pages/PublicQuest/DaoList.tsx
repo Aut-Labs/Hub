@@ -30,13 +30,17 @@ import {
   useGetPhasesCacheQuery,
   useUpdatePhasesCacheMutation
 } from "@api/onboarding.api";
-import { useEthers } from "@usedapp/core";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
 import { useGetAllNovasQuery } from "@api/community.api";
 import { TOOLBAR_HEIGHT } from "./ToolbarConnector";
 import { addDays } from "date-fns";
 import { Quest } from "@aut-labs/sdk";
+import { useAccount } from "wagmi";
+import {
+  IsAuthorised,
+  updateWalletProviderState
+} from "@store/WalletProvider/WalletProvider";
 
 export const GridBox = styled(Box)(({ theme }) => ({
   boxSizing: "border-box",
@@ -61,14 +65,13 @@ export const DaoList = () => {
   const [questToApply, setQuestToApply] = useState<
     Quest & { onboardingQuestAddress: string; daoAddress: string }
   >(null);
-  const [alreadyApplied, setAlreadyApplied] = useState(false);
   const [openApplySuccess, setOpenApplySuccess] = useState(false);
   const [searchParams] = useSearchParams();
   const connectStatus = useSelector(ConnectStatus);
-  const isAuthenticated = useSelector(IsAuthenticated);
+  const isAuthorised = useSelector(IsAuthorised);
   const [showExpired, setShowExpired] = useState(false);
   const theme = useTheme();
-  const { account } = useEthers();
+  const { address: account } = useAccount();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const { data, isLoading, isFetching } = useGetAllNovasQuery(null, {
@@ -114,7 +117,7 @@ export const DaoList = () => {
       );
     }
     return { daos: [...filteredExpiredDaos] };
-  }, [showExpired, cache, data, isAuthenticated]);
+  }, [showExpired, cache, data, isAuthorised]);
 
   const [apply, { isLoading: isApplying, isError, error, reset, isSuccess }] =
     useApplyForQuestMutation();
@@ -122,10 +125,10 @@ export const DaoList = () => {
   const [updatePhasesCache] = useUpdatePhasesCacheMutation();
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthorised) {
       refetchCache();
     }
-  }, [isAuthenticated]);
+  }, [isAuthorised]);
 
   const highlightData = (daoAddress) => {
     if (cache && cache.daoAddress && cache.questId) {
@@ -188,6 +191,11 @@ export const DaoList = () => {
         navigateToQuest();
       } else if (selectedQuest && connectStatus === "initial") {
         dispatch(changeConnectStatus("start"));
+        dispatch(
+          updateWalletProviderState({
+            isOpen: true
+          })
+        );
       }
     };
     start();

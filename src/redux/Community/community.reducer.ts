@@ -101,7 +101,7 @@ export const { communityUpdateState } = communitySlice.actions;
 export const CommunityStatus = (state) => state.community.status as ResultState;
 export const Communities = (state) =>
   state.community.communities as Community[];
-const CommunityAddress = (state) =>
+export const CommunityAddress = (state) =>
   state.community.selectedCommunityAddress as string;
 export const CommunityData = createSelector(
   Communities,

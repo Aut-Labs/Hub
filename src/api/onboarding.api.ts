@@ -172,7 +172,7 @@ const deactivateOnboarding = async (
   }
 
   try {
-    const cache = await getCache(CacheTypes.UserPhases);
+    const cache = await getCache(CacheTypes.UserPhases, userAddress);
     cache.list[2].status = 0; // reset phase 3
     await updateCache(cache);
   } catch (error) {
@@ -198,8 +198,10 @@ const updatePhasesCache = async (body, api: BaseQueryApi) => {
 };
 
 const deletePhasesCache = async (body, api: BaseQueryApi) => {
+  const sdk = AutSDK.getInstance();
+  const address = await sdk.daoExpander.contract.signerAddress;
   return {
-    data: await deleteCache(CacheTypes.UserPhases)
+    data: await deleteCache(CacheTypes.UserPhases, address)
   };
 };
 
@@ -216,7 +218,9 @@ const applyForQuest = async (
     body.onboardingQuestAddress
   );
 
-  const cache = await getCache(CacheTypes.UserPhases);
+  const address = await sdk.daoExpander.contract.signerAddress;
+
+  const cache = await getCache(CacheTypes.UserPhases, address);
   if (cache && cache.questId) {
     return {
       error: "You have already applied for a quest."
@@ -320,7 +324,7 @@ const getAllTasksPerQuest = async (
         +questId
       );
     if (hasCompletedAQuest) {
-      const cacheResult = await getCache(CacheTypes.UserPhases);
+      const cacheResult = await getCache(CacheTypes.UserPhases, userAddress);
       if (cacheResult.list[1].status !== 1) {
         cacheResult.list[1].status = 1;
         await updateCache(cacheResult);
@@ -494,6 +498,7 @@ const submitOpenTask = async (
 
 const submitQuizTask = async (
   body: {
+    userAddress: string;
     task: Task;
     questionsAndAnswers: any[];
     pluginAddress: string;
@@ -504,6 +509,7 @@ const submitQuizTask = async (
 ) => {
   try {
     await finaliseQuizTask(
+      body.userAddress,
       body.pluginAddress,
       body.onboardingQuestAddress,
       body.task.taskId,
@@ -523,6 +529,7 @@ const submitQuizTask = async (
 
 const submitTransactionTask = async (
   body: {
+    userAddress: string;
     task: Task;
     pluginAddress: string;
     onboardingQuestAddress: string;
@@ -532,6 +539,7 @@ const submitTransactionTask = async (
 ) => {
   try {
     await finaliseTransactionTask(
+      body.userAddress,
       body.pluginAddress,
       body.onboardingQuestAddress,
       body.task.taskId
@@ -548,6 +556,7 @@ const submitTransactionTask = async (
 
 const submitJoinDiscordTask = async (
   body: {
+    userAddress: string;
     task: Task;
     bearerToken: string;
     onboardingPluginAddress: string;
@@ -556,6 +565,7 @@ const submitJoinDiscordTask = async (
 ) => {
   try {
     await finaliseJoinDiscordTask(
+      body.userAddress,
       body.task.pluginAddress,
       body.onboardingPluginAddress,
       body.task.taskId,
@@ -802,7 +812,6 @@ export const onboardingApi = createApi({
       },
       providesTags: ["PhasesCache"]
       // providesTags: (result, error, arg) => {
-      //   debugger;
       //   return result
       //     ? [{ type: "PhasesCache" as const, id: result["_id"] }, "PhasesCache"]
       //     : ["PhasesCache"];
@@ -936,6 +945,7 @@ export const onboardingApi = createApi({
     removeTaskFromQuest: builder.mutation<
       Task,
       {
+        userAddress: string;
         task: Task;
         questId: number;
         pluginAddress: string;
@@ -954,6 +964,7 @@ export const onboardingApi = createApi({
     submitOpenTask: builder.mutation<
       Task,
       {
+        userAddress: string;
         file: any;
         task: Task;
         pluginAddress: string;
@@ -972,6 +983,7 @@ export const onboardingApi = createApi({
     submitJoinDiscordTask: builder.mutation<
       Task,
       {
+        userAddress: string;
         task: Task;
         bearerToken: string;
         onboardingPluginAddress: string;
@@ -988,6 +1000,7 @@ export const onboardingApi = createApi({
     submitQuizTask: builder.mutation<
       Task,
       {
+        userAddress: string;
         task: Task;
         questionsAndAnswers: any[];
         pluginAddress: string;
@@ -1006,6 +1019,7 @@ export const onboardingApi = createApi({
     submitTransactionTask: builder.mutation<
       Task,
       {
+        userAddress: string;
         task: Task;
         pluginAddress: string;
         onboardingQuestAddress: string;
@@ -1023,6 +1037,7 @@ export const onboardingApi = createApi({
     finaliseOpenTask: builder.mutation<
       Task,
       {
+        userAddress: string;
         task: Task;
         pluginAddress: string;
         onboardingQuestAddress: string;

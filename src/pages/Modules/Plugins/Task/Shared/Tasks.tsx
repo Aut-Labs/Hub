@@ -31,6 +31,7 @@ import ErrorDialog from "@components/Dialog/ErrorPopup";
 import AddIcon from "@mui/icons-material/Add";
 import { differenceInDays } from "date-fns";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
+import { useAccount } from "wagmi";
 
 export const taskStatuses: any = {
   [TaskStatus.Created]: {
@@ -88,6 +89,7 @@ const TaskCard = ({
   const navigate = useNavigate();
   const confirm = useConfirmDialog();
   const [searchParams] = useSearchParams();
+  const { address: userAddress } = useAccount();
   const [removeTask, { error, isError, isLoading, reset }] =
     useRemoveTaskFromQuestMutation();
 
@@ -111,6 +113,7 @@ const TaskCard = ({
       title: "Are you sure you want to delete this task?",
       onConfirm: () => {
         removeTask({
+          userAddress,
           task: row,
           questId: +params.questId,
           pluginTokenId: plugin.tokenId,

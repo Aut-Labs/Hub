@@ -16,21 +16,21 @@ import {
   useMediaQuery
 } from "@mui/material";
 import { useSearchParams } from "react-router-dom";
-import { memo, useEffect, useMemo } from "react";
+import { memo, useMemo } from "react";
 import LoadingProgressBar from "@components/LoadingProgressBar";
 import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import { TaskStatus } from "@aut-labs/sdk/dist/models/task";
-import { addMilliseconds, isAfter } from "date-fns";
+import { isAfter } from "date-fns";
 import Tasks from "./Tasks";
 import CommunityInfo from "./CommunityInfo";
-import QuestInfo, { fractionToMilliseconds } from "./QuestInfo";
+import QuestInfo from "./QuestInfo";
 import AutLoading from "@components/AutLoading";
 import { RequiredQueryParams } from "../../api/RequiredQueryParams";
-import { useEthers } from "@usedapp/core";
 import { useGetAllNovasQuery } from "@api/community.api";
 import { CacheTypes } from "@api/cache.api";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { TOOLBAR_HEIGHT } from "./ToolbarConnector";
+import { useAccount } from "wagmi";
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   height: 30,
@@ -45,9 +45,8 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
 }));
 
 const PublicQuest = () => {
-  const { account: userAddress } = useEthers();
   const [searchParams] = useSearchParams();
-  const { account } = useEthers();
+  const { address: account } = useAccount();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -87,8 +86,8 @@ const PublicQuest = () => {
   );
 
   const isOwner = useMemo(() => {
-    return communityData?.admin === userAddress;
-  }, [userAddress, communityData]);
+    return communityData?.admin === account;
+  }, [account, communityData]);
 
   const hasQuestStarted = useMemo(() => {
     if (!quest?.startDate) return false;
@@ -112,7 +111,7 @@ const PublicQuest = () => {
     refetch
   } = useGetAllTasksPerQuestQuery(
     {
-      userAddress,
+      userAddress: account,
       isAdmin: false,
       questId: +searchParams.get(RequiredQueryParams.QuestId),
       pluginAddress: searchParams.get(
@@ -139,8 +138,6 @@ const PublicQuest = () => {
   //   const refetchTimeout = setTimeout(() => {
   //     refetch();
   //   }, timeDifference);
-
-  //   debugger;
 
   //   return () => {
   //     clearTimeout(refetchTimeout);

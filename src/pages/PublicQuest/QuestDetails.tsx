@@ -7,6 +7,9 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import { TOOLBAR_HEIGHT } from "./ToolbarConnector";
+import { useAccount } from "wagmi";
+import { useSelector } from "react-redux";
+import { IsAuthorised } from "@store/WalletProvider/WalletProvider";
 
 const OpenTask = lazy(() => import("../Modules/Plugins/Task/Open/OpenTask"));
 
@@ -24,10 +27,16 @@ const QuestDetails = () => {
   const ps = useRef<HTMLElement>();
   const { pathname } = useLocation();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const { data: plugins } = useGetAllPluginDefinitionsByDAOQuery(null, {
-    refetchOnMountOrArgChange: false,
-    skip: false
-  });
+
+  const { data: plugins, isLoading } = useGetAllPluginDefinitionsByDAOQuery(
+    null,
+    {
+      refetchOnMountOrArgChange: false,
+      skip: false
+    }
+  );
+
+  console.log("isLoading: ", isLoading);
 
   const taskPluginTypes = useMemo(() => {
     return (plugins || []).reduce((prev, curr) => {
@@ -61,7 +70,7 @@ const QuestDetails = () => {
       }}
     >
       <>
-        {!plugins?.length ? (
+        {isLoading ? (
           <AutLoading width="130px" height="130px" />
         ) : (
           <Suspense fallback={<AutLoading width="130px" height="130px" />}>
