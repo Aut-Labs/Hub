@@ -52,6 +52,29 @@ export const DefaultSocials: AutSocial[] = [
   }
 ];
 
+export const novaSocialUrls = {
+  discord: {
+    hidePrefix: true,
+    placeholder: "name#1234",
+    prefix: "https://discord.com/users/"
+  },
+  website: {
+    hidePrefix: true,
+    placeholder: "https://..."
+  }
+};
+
+export const DefaultNovaSocials: AutSocial[] = [
+  {
+    type: "discord",
+    link: ""
+  },
+  {
+    type: "website",
+    link: ""
+  }
+];
+
 export class AutIDProperties {
   avatar: string;
 
