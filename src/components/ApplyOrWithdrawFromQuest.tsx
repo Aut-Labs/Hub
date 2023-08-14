@@ -131,7 +131,10 @@ export const ApplyOrWithdrawFromQuest = ({
       const start = async () => {
         try {
           onApplyForQuest(null);
-          deletePhasesCache(CacheTypes.UserPhases);
+          deletePhasesCache({
+            cacheKey: CacheTypes.UserPhases,
+            userAddress: account
+          });
           withdrawReset();
         } catch (error) {
           console.log(error);

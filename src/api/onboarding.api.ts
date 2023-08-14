@@ -183,9 +183,8 @@ const deactivateOnboarding = async (
   };
 };
 
-const getPhasesCache = async (body, api: BaseQueryApi) => {
-  const authenticated = (api.getState() as any)?.auth?.isAuthenticated;
-  const cache = await getCache(CacheTypes.UserPhases, authenticated);
+const getPhasesCache = async ({ account }, api: BaseQueryApi) => {
+  const cache = await getCache(CacheTypes.UserPhases, account);
   return {
     data: cache
   };
@@ -197,11 +196,9 @@ const updatePhasesCache = async (body, api: BaseQueryApi) => {
   };
 };
 
-const deletePhasesCache = async (body, api: BaseQueryApi) => {
-  const sdk = AutSDK.getInstance();
-  const address = await sdk.daoExpander.contract.signerAddress;
+const deletePhasesCache = async ({ userAddress }, api: BaseQueryApi) => {
   return {
-    data: await deleteCache(CacheTypes.UserPhases, address)
+    data: await deleteCache(CacheTypes.UserPhases, userAddress)
   };
 };
 
@@ -218,7 +215,7 @@ const applyForQuest = async (
     body.onboardingQuestAddress
   );
 
-  const address = await sdk.daoExpander.contract.signerAddress;
+  const address = await questOnboarding.contract.signerAddress;
 
   const cache = await getCache(CacheTypes.UserPhases, address);
   if (cache && cache.questId) {
@@ -826,7 +823,7 @@ export const onboardingApi = createApi({
       },
       invalidatesTags: ["PhasesCache"]
     }),
-    deletePhasesCache: builder.mutation<void, string>({
+    deletePhasesCache: builder.mutation<any, any>({
       query: (body) => {
         return {
           body,

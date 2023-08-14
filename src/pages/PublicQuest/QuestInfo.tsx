@@ -191,7 +191,10 @@ const QuestInfo = ({ tasksCompleted }: { tasksCompleted: boolean }) => {
     if (withdrawIsSuccess) {
       const start = async () => {
         try {
-          deletePhasesCache(CacheTypes.UserPhases);
+          deletePhasesCache({
+            cacheKey: CacheTypes.UserPhases,
+            userAddress: account
+          });
           withdrawReset();
         } catch (error) {
           console.log(error);
