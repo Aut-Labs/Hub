@@ -22,6 +22,7 @@ import { useAccount, useConnect, useChainId, useDisconnect } from "wagmi";
 import { ReactComponent as WalletConnectLogo } from "@assets/aut/wallet-connect.svg";
 import { ReactComponent as MetamaskLogo } from "@assets/aut/metamask.svg";
 import { communityUpdateState } from "@store/Community/community.reducer";
+import { MultiSigner } from "@aut-labs/sdk/dist/models/models";
 
 export const TOOLBAR_HEIGHT = 84;
 
@@ -62,7 +63,7 @@ export const ToolbarConnector = () => {
   const { connector, isReconnecting, isConnecting, isConnected } = useAccount();
   const { connectAsync, connectors, error, isLoading } = useConnect();
   const chainId = useChainId();
-  const signer = useEthersSigner({ chainId: chainId });
+  const multiSigner = useEthersSigner({ chainId: chainId });
   const { disconnectAsync } = useDisconnect();
   const isOpen = useSelector(NetworkSelectorIsOpen);
 
@@ -92,10 +93,10 @@ export const ToolbarConnector = () => {
   useEffect(() => {
     const initialiseSDK = async (
       network: NetworkConfig,
-      signer: ethers.providers.JsonRpcSigner
+      multiSigner: MultiSigner
     ) => {
       const sdk = AutSDK.getInstance();
-      return sdk.init(signer, {
+      return sdk.init(multiSigner, {
         daoExpanderAddress: searchParams.get(RequiredQueryParams.DaoAddress),
         daoTypesAddress: network.contracts.daoTypesAddress,
         novaRegistryAddress: network.contracts.novaRegistryAddress,
@@ -105,7 +106,7 @@ export const ToolbarConnector = () => {
         pluginRegistryAddress: network.contracts.pluginRegistryAddress
       });
     };
-    if (connector?.ready && isConnected && signer) {
+    if (connector?.ready && isConnected && multiSigner) {
       const start = async () => {
         const [network] = networks.filter((d) => !d.disabled);
         const itemsToUpdate = {
@@ -124,7 +125,7 @@ export const ToolbarConnector = () => {
             })
           );
         }
-        await initialiseSDK(network, signer);
+        await initialiseSDK(network, multiSigner);
         await dispatch(changeConnectStatus("connected"));
         setTimeout(async () => {
           await dispatch(updateWalletProviderState(itemsToUpdate));
@@ -132,7 +133,14 @@ export const ToolbarConnector = () => {
       };
       start();
     }
-  }, [dispatch, isConnected, connector?.ready, signer, networks, searchParams]);
+  }, [
+    dispatch,
+    isConnected,
+    connector?.ready,
+    multiSigner,
+    networks,
+    searchParams
+  ]);
 
   return (
     <Box>

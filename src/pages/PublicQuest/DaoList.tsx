@@ -102,7 +102,11 @@ export const DaoList = () => {
       const dataWithoutDao = filteredExpiredDaos.filter(
         (dao) => dao.daoAddress !== cache.daoAddress
       );
-      result = [dao, ...dataWithoutDao];
+      if (dao) {
+        result = [dao, ...dataWithoutDao];
+      } else {
+        result = dataWithoutDao;
+      }
     } else {
       if (data?.daos) {
         result = data?.daos;
