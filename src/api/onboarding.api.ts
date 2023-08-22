@@ -163,7 +163,7 @@ const deactivateOnboarding = async (
     pluginAddress
   );
 
-  const response = await questOnboarding.deactivateOnboarding(quests);
+  const response = await questOnboarding.activateQuest(null);
 
   if (!response.isSuccess) {
     return {
