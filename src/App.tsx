@@ -20,6 +20,8 @@ import { generateNetworkConfig } from "@api/ProviderFactory/setup.config";
 import { WagmiConfig } from "wagmi";
 import { useSelector } from "react-redux";
 import { CommunityAddress } from "@store/Community/community.reducer";
+import CommunityInfo from "./pages/PublicQuest/CommunityInfo";
+import NovaDetails from "./pages/PublicQuest/NovaDetails";
 
 const QuestProtected = () => {
   const isAuthorised = useSelector(IsAuthorised);
@@ -118,6 +120,7 @@ function App() {
                 <Route path="/" element={<DaoList />} />
                 <Route path="callback" element={<Callback />} />
                 <Route path="quest/*" element={<QuestProtected />} />
+                <Route path="dao/*" element={<NovaDetails />} />
               </Routes>
             </Box>
           </WagmiConfig>

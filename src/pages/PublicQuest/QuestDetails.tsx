@@ -124,6 +124,7 @@ const QuestDetails = () => {
                   />
                 }
               />
+              {/* //TODO : Check this}
               <Route
                 path={`task/${
                   PluginDefinitionType[
@@ -139,7 +140,7 @@ const QuestDetails = () => {
                     }
                   />
                 }
-              />
+              /> */}
             </Routes>
           </Suspense>
         )}

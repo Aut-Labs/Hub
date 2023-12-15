@@ -95,7 +95,7 @@ const CommunityInfo = () => {
           <Typography color="white" variant="subtitle1">
             <Stack direction="row" alignItems="center">
               {data?.name}
-              <Tooltip title={data?.description}>
+              <Tooltip title={data?.properties.description}>
                 <DescriptionIcon
                   sx={{
                     color: "offWhite.main",

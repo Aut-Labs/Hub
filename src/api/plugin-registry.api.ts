@@ -59,7 +59,9 @@ const add = async (body: PluginDefinition, api: BaseQueryApi) => {
     state.pluginRegistryApi.queries["getAllPluginDefinitionsByDAO(null)"];
   const questPlugin: PluginDefinition = data.find(
     (d: PluginDefinition) =>
-      d.pluginDefinitionId === PluginDefinitionType.QuestOnboardingPlugin
+      //TODO: fix this
+      // d.pluginDefinitionId === PluginDefinitionType.QuestOnboardingPlugin
+      true
   );
 
   const { pluginDefinitionId } = body;

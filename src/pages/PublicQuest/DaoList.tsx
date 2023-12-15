@@ -9,7 +9,9 @@ import {
   useTheme,
   styled,
   FormControlLabel,
-  Switch
+  Switch,
+  MenuItem,
+  Select
 } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -41,6 +43,18 @@ import {
   IsAuthorised,
   updateWalletProviderState
 } from "@store/WalletProvider/WalletProvider";
+import backgroundImage from "@assets/autos/background.png";
+import { AutSelectField } from "@components/Fields";
+
+const AutContainer = styled("div")(() => ({
+  display: "flex",
+  flexDirection: "column",
+  height: "100%",
+  backgroundImage: `url(${backgroundImage})`,
+  backgroundBlendMode: "hard-light",
+  backgroundSize: "cover",
+  backgroundRepeat: "repeat-y"
+}));
 
 export const GridBox = styled(Box)(({ theme }) => ({
   boxSizing: "border-box",
@@ -74,94 +88,14 @@ export const DaoList = () => {
   const { address: account } = useAccount();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+  const [activeOnboardingFilter, setActiveOnboardingFilter] = useState(null);
+  const [marketFilter, setMarkerFilter] = useState(null);
+  const [archetypeFilter, setArchetypeFilter] = useState(null);
+
   const { data, isLoading, isFetching } = useGetAllNovasQuery(null, {
     refetchOnMountOrArgChange: true,
     skip: false
   });
-
-  const { data: cache, refetch: refetchCache } = useGetPhasesCacheQuery(
-    { cacheKey: CacheTypes.UserPhases, account },
-    {
-      refetchOnMountOrArgChange: true,
-      skip: false
-    }
-  );
-
-  const daoListArranged = useMemo(() => {
-    let result = [];
-    if (cache && cache.daoAddress && data) {
-      let filteredExpiredDaos = [...data.daos];
-      if (!showExpired) {
-        filteredExpiredDaos = filteredExpiredDaos.filter((d) =>
-          d.properties.quests.every((q) => q.isExpired === false)
-        );
-      }
-      const dao = filteredExpiredDaos.find(
-        (dao) => dao.daoAddress === cache.daoAddress
-      );
-      const dataWithoutDao = filteredExpiredDaos.filter(
-        (dao) => dao.daoAddress !== cache.daoAddress
-      );
-      if (dao) {
-        result = [dao, ...dataWithoutDao];
-      } else {
-        result = dataWithoutDao;
-      }
-    } else {
-      if (data?.daos) {
-        result = data?.daos;
-      } else {
-        result = [];
-      }
-    }
-    let filteredExpiredDaos = [...result];
-    if (!showExpired) {
-      filteredExpiredDaos = filteredExpiredDaos.filter((d) =>
-        d.properties.quests.every((q) => q.isExpired === false)
-      );
-    }
-    return { daos: [...filteredExpiredDaos] };
-  }, [showExpired, cache, data, isAuthorised]);
-
-  const [apply, { isLoading: isApplying, isError, error, reset, isSuccess }] =
-    useApplyForQuestMutation();
-
-  const [updatePhasesCache] = useUpdatePhasesCacheMutation();
-
-  useEffect(() => {
-    if (isAuthorised) {
-      refetchCache();
-    }
-  }, [isAuthorised]);
-
-  const highlightData = (daoAddress) => {
-    if (cache && cache.daoAddress && cache.questId) {
-      if (cache.daoAddress === daoAddress) {
-        return {
-          daoAddress: cache.daoAddress,
-          highlighted: true,
-          questId: cache.questId
-        };
-      } else {
-        return {
-          daoAddress: cache.daoAddress,
-          highlighted: false,
-          questId: cache.questId
-        };
-      }
-    } else {
-      return {
-        daoAddress: null,
-        highlighted: searchParams.get("daoAddress") === daoAddress,
-        questId: null
-      };
-    }
-  };
-
-  //show quest details
-  const questDetails = async (quest) => {
-    setSelectedQuest(quest);
-  };
 
   useEffect(() => {
     if ((questToApply || selectedQuest) && connectStatus === "disconnected") {
@@ -173,123 +107,11 @@ export const DaoList = () => {
     }
   }, [connectStatus, selectedQuest, questToApply]);
 
-  useEffect(() => {
-    const navigateToQuest = async () => {
-      await dispatch(
-        communityUpdateState({
-          selectedCommunityAddress: selectedQuest.daoAddress
-        })
-      );
-      navigate({
-        pathname: "/quest",
-        search: new URLSearchParams({
-          questId: selectedQuest.questId,
-          onboardingQuestAddress: selectedQuest.onboardingQuestAddress,
-          daoAddress: selectedQuest.daoAddress
-        }).toString()
-      });
-      setSelectedQuest(null);
-    };
-    const start = async () => {
-      if (selectedQuest && connectStatus === "connected") {
-        navigateToQuest();
-      } else if (selectedQuest && connectStatus === "initial") {
-        dispatch(changeConnectStatus("start"));
-        dispatch(
-          updateWalletProviderState({
-            isOpen: true
-          })
-        );
-      }
-    };
-    start();
-  }, [connectStatus, selectedQuest]);
-
   const applyForQuest = async (
     quest: Quest & { onboardingQuestAddress: string; daoAddress: string }
   ) => {
     setQuestToApply(quest);
   };
-
-  // useEffect(() => {
-  //   dispatch(resetState);
-  // }, []);
-
-  // useEffect(() => {
-  //   if (questToApply && connectStatus === "disconnected") {
-  //     setQuestToApply(null);
-  //   }
-  //   if (connectStatus === "disconnected" && !questToApply) {
-  //     dispatch(changeConnectStatus("initial"));
-  //   }
-  // }, [connectStatus, questToApply]);
-
-  useEffect(() => {
-    const applyToQuest = async () => {
-      await dispatch(
-        communityUpdateState({
-          selectedCommunityAddress: questToApply.daoAddress
-        })
-      );
-      apply({
-        onboardingQuestAddress: questToApply.onboardingQuestAddress,
-        questId: +questToApply.questId
-      });
-    };
-    const start = async () => {
-      if (questToApply && connectStatus === "connected") {
-        applyToQuest();
-      } else if (questToApply && connectStatus === "initial") {
-        dispatch(changeConnectStatus("start"));
-      }
-    };
-    start();
-  }, [connectStatus, questToApply]);
-
-  useEffect(() => {
-    if (isSuccess) {
-      setOpenApplySuccess(true);
-      const start = async () => {
-        try {
-          const communityData = data.daos.find(
-            (d) => d.daoAddress === questToApply.daoAddress
-          );
-          const updatedCache = {
-            ...(cache || {}),
-            cacheKey: CacheTypes.UserPhases,
-            address: account,
-            questId: questToApply.questId,
-            onboardingQuestAddress: questToApply.onboardingQuestAddress,
-            startDate: questToApply.startDate,
-            endDate: `${addDays(
-              questToApply.startDate,
-              questToApply.durationInDays
-            ).getTime()}`,
-            daoAddress: questToApply.daoAddress,
-            list: [
-              {
-                phase: 1,
-                status: 1
-              },
-              {
-                phase: 2,
-                status: 0
-              },
-              {
-                phase: 3,
-                status: 0
-              }
-            ]
-          };
-          updatePhasesCache(updatedCache);
-          reset();
-        } catch (error) {
-          console.log(error);
-        }
-      };
-      start();
-    }
-  }, [isSuccess]);
 
   return (
     <PerfectScrollbar
@@ -306,12 +128,8 @@ export const DaoList = () => {
         flexDirection: "column"
       }}
     >
-      <Container maxWidth="lg" sx={{ py: "20px" }}>
-        <ErrorDialog
-          handleClose={() => reset()}
-          open={isError}
-          message={error}
-        />
+      <AutContainer>
+        <ErrorDialog handleClose={() => null} open={null} message={null} />
         <SuccessDialog
           open={openApplySuccess}
           message="Congrats!"
@@ -326,7 +144,6 @@ export const DaoList = () => {
           sx={{
             display: "flex",
             flexDirection: "column",
-            flex: 1,
             position: "relative"
           }}
         >
@@ -347,6 +164,90 @@ export const DaoList = () => {
             Pick a Nova, complete their onboarding quest and join their
             community to help them rise up the Nova leaderboard
           </Typography>
+        </Box>
+
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            mt: 2
+          }}
+        >
+          <Box
+            sx={{
+              flex: 1,
+              mx: 1
+            }}
+          >
+            <AutSelectField
+              width="100%"
+              value={activeOnboardingFilter}
+              onChange={(e) => setActiveOnboardingFilter(e.target.value)}
+            >
+              <MenuItem value="All">
+                <em>All Novae</em>
+              </MenuItem>
+              <MenuItem value="Active">
+                <em>Active</em>
+              </MenuItem>
+              <MenuItem value="Inactive">
+                <em>Inactive</em>
+              </MenuItem>
+            </AutSelectField>
+          </Box>
+
+          <Box
+            sx={{
+              flex: 1,
+              mx: 1
+            }}
+          >
+            <AutSelectField
+              width="100%"
+              value={marketFilter}
+              onChange={(e) => setMarkerFilter(e.target.value)}
+            >
+              <MenuItem value="Infra, Defi & DAO Tooling">
+                <em>Infra, Defi & DAO Tooling</em>
+              </MenuItem>
+              <MenuItem value="Art, Events & NFTs">
+                <em>Art, Events & NFTs</em>
+              </MenuItem>
+              <MenuItem value="Governance & Public Goods">
+                <em>Governance & Public Goods</em>
+              </MenuItem>
+            </AutSelectField>
+          </Box>
+
+          <Box
+            sx={{
+              flex: 1,
+              mx: 1
+            }}
+          >
+            <AutSelectField
+              width="100%"
+              value={archetypeFilter}
+              onChange={(e) => setArchetypeFilter(e.target.value)}
+            >
+              <MenuItem value="Growth">
+                <em>Growth</em>
+              </MenuItem>
+              <MenuItem value="Performance">
+                <em>Performance</em>
+              </MenuItem>
+              <MenuItem value="Size">
+                <em>Size</em>
+              </MenuItem>
+              <MenuItem value="Reputation">
+                <em>Reputation</em>
+              </MenuItem>
+              <MenuItem value="Conviction">
+                <em>Conviction</em>
+              </MenuItem>
+            </AutSelectField>
+          </Box>
+          {/* END: ed8c6549bwf9 */}
         </Box>
 
         {!isLoading && !(data?.daos || [])?.length && (
@@ -383,41 +284,14 @@ export const DaoList = () => {
           <AutLoading width="130px" height="130px" />
         ) : (
           <>
-            {(data?.daos || [])?.length && (
-              <Box
-                sx={{
-                  display: "flex",
-                  mt: 4,
-                  alignItems: "center",
-                  justifyContent: "flex-end"
-                }}
-              >
-                <FormControlLabel
-                  sx={{
-                    color: "white"
-                  }}
-                  onChange={(_, checked) => setShowExpired(checked)}
-                  control={<Switch checked={showExpired} color="primary" />}
-                  label="Show expired Novas"
-                />
-              </Box>
-            )}
             <GridBox sx={{ flexGrow: 1, mt: 4 }}>
-              {(daoListArranged?.daos || []).map((dao, index) => (
-                <NovaCard
-                  key={`nova-card-${index}`}
-                  daoData={dao}
-                  highlightData={highlightData(dao.daoAddress)}
-                  onQuestSelected={questDetails}
-                  onApplyForQuest={applyForQuest}
-                  questToApplyFor={questToApply}
-                  isApplying={isApplying}
-                />
+              {(data?.daos || []).map((dao, index) => (
+                <NovaCard key={`nova-card-${index}`} daoData={dao} />
               ))}
             </GridBox>
           </>
         )}
-      </Container>
+      </AutContainer>
     </PerfectScrollbar>
   );
 };

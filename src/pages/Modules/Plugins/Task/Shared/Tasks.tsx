@@ -57,10 +57,11 @@ export const taskTypes = {
     pluginType: PluginDefinitionType.OnboardingOpenTaskPlugin,
     label: "Open Task"
   },
-  [TaskType.ContractInteraction]: {
-    pluginType: PluginDefinitionType.OnboardingTransactionTaskPlugin,
-    label: "Contract Interaction"
-  },
+  //TODO: check this
+  // [TaskType.ContractInteraction]: {
+  //   pluginType: PluginDefinitionType.OnboardingTransactionTaskPlugin,
+  //   label: "Contract Interaction"
+  // },
   [TaskType.Quiz]: {
     pluginType: PluginDefinitionType.OnboardingQuizTaskPlugin,
     label: "Multiple-Choice Quiz"
@@ -99,7 +100,9 @@ const TaskCard = ({
       selectFromResult: ({ data }) => ({
         questOnboarding: (data || []).find(
           (p) =>
-            PluginDefinitionType.QuestOnboardingPlugin === p.pluginDefinitionId
+            // TODO: check this
+            // PluginDefinitionType.QuestOnboardingPlugin === p.pluginDefinitionId
+            true
         ),
         plugin: (data || []).find(
           (p) => taskTypes[row.taskType].pluginType === p.pluginDefinitionId

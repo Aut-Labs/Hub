@@ -4,7 +4,7 @@ import { Community, NovaDAO, findRoleName } from "./community.model";
 import { Web3ThunkProviderFactory } from "./ProviderFactory/web3-thunk.provider";
 import { ipfsCIDToHttpUrl, isValidUrl } from "./storage.api";
 import { AutID, DAOMember } from "./aut.model";
-import AutSDK, { DAOExpander, fetchMetadata } from "@aut-labs/sdk";
+import AutSDK, { Nova, fetchMetadata } from "@aut-labs/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { base64toFile } from "@utils/to-base-64";
 import { environment } from "./environment";
@@ -355,14 +355,10 @@ const getMembers = async (body, api: BaseQueryApi) => {
 
   const sdk = AutSDK.getInstance();
 
-  sdk.daoExpander = sdk.initService<DAOExpander>(
-    DAOExpander,
-    selectedCommunityAddress
-  );
+  sdk.nova = sdk.initService<Nova>(Nova, selectedCommunityAddress);
 
   const members: DAOMember[] = [];
-  const membersResponse =
-    await sdk.daoExpander.contract.members.getAllMembers();
+  const membersResponse = await sdk.nova.contract.members.getAllMembers();
 
   for (let i = 0; i < membersResponse.data.length; i += 1) {
     try {
@@ -379,7 +375,7 @@ const getMembers = async (body, api: BaseQueryApi) => {
       );
       const { role, commitment } = comDataResponse.data;
       const roleName = findRoleName(role, community.properties.rolesSets);
-      const isAdminResponse = await sdk.daoExpander.contract.admins.isAdmin(
+      const isAdminResponse = await sdk.nova.contract.admins.isAdmin(
         memberAddress
       );
       const member = new DAOMember({
@@ -409,9 +405,9 @@ const getMembers = async (body, api: BaseQueryApi) => {
 
 const getCommunity = async (daoAddress: string, api: BaseQueryApi) => {
   const sdk = AutSDK.getInstance();
-  sdk.daoExpander = sdk.initService<DAOExpander>(DAOExpander, daoAddress);
+  sdk.nova = sdk.initService<Nova>(Nova, daoAddress);
 
-  const response = await sdk.daoExpander.contract.metadata.getMetadataUri();
+  const response = await sdk.nova.contract.metadata.getMetadataUri();
 
   if (!response.isSuccess) {
     return {
@@ -424,7 +420,7 @@ const getCommunity = async (daoAddress: string, api: BaseQueryApi) => {
     environment.nftStorageUrl
   );
 
-  const adminResponse = await sdk.daoExpander.contract.admins.getAdmins();
+  const adminResponse = await sdk.nova.contract.admins.getAdmins();
   return {
     data: {
       community: new Community(metadata),
@@ -434,47 +430,100 @@ const getCommunity = async (daoAddress: string, api: BaseQueryApi) => {
 };
 
 const getAllNovas = async (body: any, api: BaseQueryApi) => {
-  const response = await axios.get(`${environment.apiUrl}/autID/user/daos`);
+  // const response = await axios.get(`${environment.apiUrl}/autID/user/daos`);
 
-  const daos: any[] = response.data;
+  // const daos: any[] = response.data;
 
-  const daoData: NovaDAO[] = [];
+  // const daoData: NovaDAO[] = [];
 
-  for (let i = 0; i < daos.length; i++) {
-    const {
-      daoAddress,
-      admin,
-      onboardingQuestAddress,
-      daoMetadataUri,
-      quests
-    } = daos[i];
+  // for (let i = 0; i < daos.length; i++) {
+  //   const {
+  //     daoAddress,
+  //     admin,
+  //     onboardingQuestAddress,
+  //     daoMetadataUri,
+  //     quests
+  //   } = daos[i];
 
-    const metadata = await fetchMetadata<NovaDAO>(
-      daoMetadataUri,
-      environment.nftStorageUrl
-    );
+  //   const metadata = await fetchMetadata<NovaDAO>(
+  //     daoMetadataUri,
+  //     environment.nftStorageUrl
+  //   );
 
-    metadata.properties.quests = [];
-    for (let j = 0; j < quests.length; j++) {
-      const quest = quests[j];
-      const questMetadata = await fetchMetadata(
-        quest.metadataUri,
-        environment.nftStorageUrl
-      );
-      quest.metadata = questMetadata;
-      metadata.properties.quests.push(quest);
+  //   metadata.properties.quests = [];
+  //   for (let j = 0; j < quests.length; j++) {
+  //     const quest = quests[j];
+  //     const questMetadata = await fetchMetadata(
+  //       quest.metadataUri,
+  //       environment.nftStorageUrl
+  //     );
+  //     quest.metadata = questMetadata;
+  //     metadata.properties.quests.push(quest);
+  //   }
+
+  //   const novaDAO = new NovaDAO({
+  //     ...metadata,
+  //     daoAddress,
+  //     admin,
+  //     onboardingQuestAddress
+  //   });
+  //   daoData.push(novaDAO);
+  // }
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  const mockDaos = [
+    {
+      address: "0x123",
+      name: "DAO1",
+      onboardingQuestAddress: "0x456",
+      properties: {
+        market: 1,
+        archetype: 1,
+        prestige: 66,
+        members: 14,
+        description: "Description for DAO1",
+        image:
+          "ipfs://bafkreihrhccb2qvrnb2zcgyjnl4z6asv7qtgzshzuj6hk7tpm4lywxb7fi",
+        roles: [
+          { name: "Role1", id: "1" },
+          { name: "Role2", id: "2" }
+        ],
+        socials: [
+          { type: "discord", link: "", metadata: {} },
+          { type: "ens", link: "", metadata: {} },
+          { type: "twitter", link: "", metadata: {} },
+          { type: "github", link: "", metadata: {} }
+        ]
+      }
+    },
+    {
+      address: "0x789",
+      name: "DAO2",
+      onboardingQuestAddress: "0xabc",
+      properties: {
+        market: 2,
+        archetype: 2,
+        prestige: 76,
+        members: 45,
+        description: "Description for DAO2",
+        image:
+          "https://ipfs.nftstorage.link/ipfs/bafkreiddqyd46fvb5ffpbi3lgv7lea2s3mtpyjoh2ti4mj7r56nu4zydwe",
+        roles: [
+          { name: "Role3", id: "3" },
+          { name: "Role4", id: "4" }
+        ],
+        socials: [
+          { type: "discord", link: "", metadata: {} },
+          { type: "ens", link: "", metadata: {} },
+          { type: "twitter", link: "", metadata: {} },
+          { type: "github", link: "", metadata: {} }
+        ]
+      }
     }
+    // Add more DAOs as needed
+  ];
 
-    const novaDAO = new NovaDAO({
-      ...metadata,
-      daoAddress,
-      admin,
-      onboardingQuestAddress
-    });
-    daoData.push(novaDAO);
-  }
   return {
-    data: { daos: daoData }
+    data: { daos: mockDaos }
   };
 };
 
@@ -530,8 +579,11 @@ export const communityApi = createApi({
       }
     }),
     getAllNovas: builder.query<
+      // {
+      //   daos: NovaDAO[];
+      // },
       {
-        daos: NovaDAO[];
+        daos: any[];
       },
       void
     >({

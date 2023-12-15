@@ -97,7 +97,7 @@ export const ToolbarConnector = () => {
     ) => {
       const sdk = AutSDK.getInstance();
       return sdk.init(multiSigner, {
-        daoExpanderAddress: searchParams.get(RequiredQueryParams.DaoAddress),
+        novaAddress: searchParams.get(RequiredQueryParams.DaoAddress),
         daoTypesAddress: network.contracts.daoTypesAddress,
         novaRegistryAddress: network.contracts.novaRegistryAddress,
         autIDAddress: network.contracts.autIDAddress,

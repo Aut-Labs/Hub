@@ -15,13 +15,13 @@ import "./App.scss";
 import CssBaseline from "@mui/material/CssBaseline";
 import markerSDK from "@marker.io/browser";
 
-markerSDK.loadWidget({
-  project: `${process.env.REACT_APP_MARKER}`,
-  reporter: {
-    email: "frontend@aut.id",
-    fullName: "Nova Showcase"
-  }
-});
+// markerSDK.loadWidget({
+//   project: `${process.env.REACT_APP_MARKER}`,
+//   reporter: {
+//     email: "frontend@aut.id",
+//     fullName: "Nova Showcase"
+//   }
+// });
 
 const container = document.getElementById("root");
 const root = createRoot(container);
