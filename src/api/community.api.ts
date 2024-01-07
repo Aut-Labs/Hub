@@ -527,6 +527,93 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
   };
 };
 
+const getNovaTasks = async (body: any, api: BaseQueryApi) => {
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+
+  const tasks = [
+    {
+      name: "Write a Blog Post",
+      description:
+        "Contribute to our blog by sharing your insights on the latest crypto trends and developments.",
+      startDate: new Date("2022-01-01"),
+      endDate: new Date("2022-01-05"),
+      role: "Role 1"
+    },
+    {
+      name: "Code Review Session",
+      description:
+        "Help review and optimize a fellow developer's smart contract. Your expertise is valuable to the community.",
+      startDate: new Date("2022-02-01"),
+      endDate: new Date("2022-02-10"),
+      role: "Role 1"
+    },
+    {
+      name: "Task 3",
+      description: "Description for task 3",
+      startDate: new Date("2022-03-01"),
+      endDate: new Date("2022-03-10"),
+      role: "Role 1"
+    },
+    {
+      name: "Write a Blog Post",
+      description:
+        "Contribute to our blog by sharing your insights on the latest crypto trends and developments.",
+      startDate: new Date("2022-01-01"),
+      endDate: new Date("2022-01-05"),
+      role: "Role 2"
+    },
+    {
+      name: "Code Review Session",
+      description:
+        "Help review and optimize a fellow developer's smart contract. Your expertise is valuable to the community.",
+      startDate: new Date("2022-02-01"),
+      endDate: new Date("2022-02-10"),
+      role: "Role 2"
+    },
+    {
+      name: "Task 3",
+      description: "Description for task 3",
+      startDate: new Date("2022-03-01"),
+      endDate: new Date("2022-03-10"),
+      role: "Role 2"
+    },
+    {
+      name: "Task 4",
+      description: "Description for task 4",
+      startDate: new Date("2022-04-01"),
+      endDate: new Date("2022-04-10"),
+      role: "Role 2"
+    },
+    {
+      name: "Write a Blog Post",
+      description:
+        "Contribute to our blog by sharing your insights on the latest crypto trends and developments.",
+      startDate: new Date("2022-01-01"),
+      endDate: new Date("2022-01-05"),
+      role: "Role 3"
+    },
+    {
+      name: "Code Review Session",
+      description:
+        "Help review and optimize a fellow developer's smart contract. Your expertise is valuable to the community.",
+      startDate: new Date("2022-02-01"),
+      endDate: new Date("2022-02-10"),
+      role: "Role 3"
+    },
+    {
+      name: "Task 3",
+      description: "Description for task 3",
+      startDate: new Date("2022-03-01"),
+      endDate: new Date("2022-03-10"),
+      role: "Role 2"
+    }
+  ];
+
+  return {
+    data: { tasks }
+  };
+};
+
 interface DaoModel {
   daoAddress: string;
   onboardingQuestAddress: string;
@@ -550,6 +637,10 @@ export const communityApi = createApi({
 
     if (url === "getAllNovas") {
       return getAllNovas(body, api);
+    }
+
+    if (url === "getNovaTasks") {
+      return getNovaTasks(body, api);
     }
     return {
       data: "Test"
@@ -593,6 +684,19 @@ export const communityApi = createApi({
           url: "getAllNovas"
         };
       }
+    }),
+    getNovaTasks: builder.query<
+      {
+        tasks: any[];
+      },
+      string
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "getNovaTasks"
+        };
+      }
     })
   })
 });
@@ -600,5 +704,6 @@ export const communityApi = createApi({
 export const {
   useGetAllMembersQuery,
   useGetCommunityQuery,
-  useGetAllNovasQuery
+  useGetAllNovasQuery,
+  useGetNovaTasksQuery
 } = communityApi;

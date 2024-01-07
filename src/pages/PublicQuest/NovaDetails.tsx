@@ -31,7 +31,7 @@ import { IsAuthorised } from "@store/WalletProvider/WalletProvider";
 import CommunityInfo from "./CommunityInfo";
 
 import backgroundImage from "@assets/autos/background.png";
-import { useGetAllNovasQuery } from "@api/community.api";
+import { useGetAllNovasQuery, useGetNovaTasksQuery } from "@api/community.api";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import { ReactComponent as DiscordIcon } from "@assets/SocialIcons/DiscordIcon.svg";
@@ -79,7 +79,7 @@ const RightWrapper = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  justifyContent: "flex-start",
+  justifyContent: "center",
   px: "30px",
   marginRight: "25px",
   marginLeft: "25px",
@@ -271,13 +271,18 @@ const NovaDetails = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [searchParams] = useSearchParams();
 
-  const { data } = useGetAllNovasQuery(null, {
+  const { data: nova } = useGetAllNovasQuery(null, {
     selectFromResult: ({ data }) => ({
       data: (data?.daos || []).find(
         (d) => d.address === searchParams.get(RequiredQueryParams.DaoAddress)
       )
     })
   });
+
+  const { data: tasks } = useGetNovaTasksQuery(nova?.address, {
+    skip: !nova?.address
+  });
+
   return (
     <PerfectScrollbar
       containerRef={(el) => (ps.current = el)}
@@ -314,7 +319,7 @@ const NovaDetails = () => {
                   bgcolor: "purple"
                 }}
                 aria-label="avatar"
-                src={ipfsCIDToHttpUrl(data?.properties.image as string)}
+                src={ipfsCIDToHttpUrl(nova?.properties.image as string)}
               />
               <Stack
                 sx={{
@@ -334,7 +339,7 @@ const NovaDetails = () => {
                       lineHeight={1}
                       variant="h2"
                     >
-                      {data?.name}
+                      {nova?.name}
                     </Typography>
                   </div>
 
@@ -345,7 +350,7 @@ const NovaDetails = () => {
                     direction="row"
                     alignItems="center"
                   >
-                    <CopyAddress address={data?.address} />
+                    <CopyAddress address={nova?.address} />
                     {/* {selectedNetworkConfig?.name && (
                       <Tooltip
                         title={`Explore in ${selectedNetworkConfig?.name}`}
@@ -387,7 +392,7 @@ const NovaDetails = () => {
                     textAlign="left"
                     variant="body"
                   >
-                    {data?.properties.description || "No description yet..."}
+                    {nova?.properties.description || "No description yet..."}
                   </Typography>
                 </Box>
               </Box>
@@ -398,7 +403,7 @@ const NovaDetails = () => {
                 }}
               >
                 <IconContainer>
-                  {data?.properties.socials.map((social, index) => {
+                  {nova?.properties.socials.map((social, index) => {
                     const AutIcon =
                       socialIcons[Object.keys(socialIcons)[index]];
 
@@ -453,7 +458,9 @@ const NovaDetails = () => {
             </Stack>
           </LeftWrapper>
           <RightWrapper>
-            <AutUserTabs />
+            {!!tasks && !!nova && (
+              <AutUserTabs nova={nova} tasks={tasks.tasks} />
+            )}
           </RightWrapper>
         </>
       </AutContainer>

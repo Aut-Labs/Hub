@@ -24,7 +24,7 @@ import { ReactComponent as MetamaskLogo } from "@assets/aut/metamask.svg";
 import { communityUpdateState } from "@store/Community/community.reducer";
 import { MultiSigner } from "@aut-labs/sdk/dist/models/models";
 
-export const TOOLBAR_HEIGHT = 84;
+export const TOOLBAR_HEIGHT = 88;
 
 const DialogInnerContent = styled("div")({
   display: "flex",
@@ -246,12 +246,20 @@ export const ToolbarConnector = () => {
           }
         }}
       >
-        <img
+        {/* <img
           src={Logo}
           onClick={() => {
             navigate("/");
           }}
           alt="Āut Logo"
+        /> */}
+        <AppTitle
+          mb={{
+            xs: "16px",
+            lg: "24px",
+            xxl: "32px"
+          }}
+          variant="h2"
         />
         <div>
           <Button

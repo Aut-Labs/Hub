@@ -3,6 +3,7 @@ import { Stack, Typography, TypographyProps } from "@mui/material";
 const AppTitle = (props: TypographyProps) => {
   return (
     <Typography
+      marginTop="14px"
       fontWeight="300"
       fontFamily="FractulAltLight"
       component="h1"

@@ -117,8 +117,8 @@ export const DaoList = () => {
     <PerfectScrollbar
       style={{
         ...(isMobile && {
-          marginTop: `${TOOLBAR_HEIGHT + 70}px`,
-          height: `calc(100% - ${TOOLBAR_HEIGHT + 70 + "px"})`
+          marginTop: `${TOOLBAR_HEIGHT + 80}px`,
+          height: `calc(100% - ${TOOLBAR_HEIGHT + 80 + "px"})`
         }),
         ...(!isMobile && {
           marginTop: `${TOOLBAR_HEIGHT}px`,
@@ -140,7 +140,7 @@ export const DaoList = () => {
             setOpenApplySuccess(false);
           }}
         ></SuccessDialog>
-        <Box
+        {/* <Box
           sx={{
             display: "flex",
             flexDirection: "column",
@@ -164,7 +164,7 @@ export const DaoList = () => {
             Pick a Nova, complete their onboarding quest and join their
             community to help them rise up the Nova leaderboard
           </Typography>
-        </Box>
+        </Box> */}
 
         <Box
           sx={{

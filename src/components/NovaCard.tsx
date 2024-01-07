@@ -163,14 +163,16 @@ export const NovaCard = ({ daoData }: { daoData: any }) => {
             <Box
               display="flex"
               justifyContent="flex-end"
+              alignItems="center"
               marginTop="auto"
+              width="60%"
               marginBottom="10px"
-              width="100%"
             >
               {daoData.properties.roles.map((role: any) => (
                 <Button
                   key={role.id}
                   sx={{
+                    flex: "1",
                     color: "white",
                     backgroundColor: "transparent",
                     "&:hover": {
