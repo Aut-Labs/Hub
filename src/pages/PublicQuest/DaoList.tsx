@@ -44,12 +44,14 @@ import {
   updateWalletProviderState
 } from "@store/WalletProvider/WalletProvider";
 import backgroundImage from "@assets/autos/background.png";
-import { AutSelectField } from "@components/Fields";
+import { AutSelectField } from "@theme/field-select-styles";
 
 const AutContainer = styled("div")(() => ({
   display: "flex",
   flexDirection: "column",
   height: "100%",
+  paddingLeft: "60px",
+  paddingRight: "60px",
   backgroundImage: `url(${backgroundImage})`,
   backgroundBlendMode: "hard-light",
   backgroundSize: "cover",
@@ -88,9 +90,9 @@ export const DaoList = () => {
   const { address: account } = useAccount();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const [activeOnboardingFilter, setActiveOnboardingFilter] = useState(null);
-  const [marketFilter, setMarkerFilter] = useState(null);
-  const [archetypeFilter, setArchetypeFilter] = useState(null);
+  const [activeOnboardingFilter, setActiveOnboardingFilter] = useState("");
+  const [marketFilter, setMarkerFilter] = useState("");
+  const [archetypeFilter, setArchetypeFilter] = useState("");
 
   const { data, isLoading, isFetching } = useGetAllNovasQuery(null, {
     refetchOnMountOrArgChange: true,
@@ -170,7 +172,10 @@ export const DaoList = () => {
           sx={{
             display: "flex",
             justifyContent: "center",
-            mt: 2
+            alignItems: "flex-start",
+            gap: "30px",
+            width: "60%",
+            mt: "100px"
           }}
         >
           <Box
@@ -180,9 +185,11 @@ export const DaoList = () => {
             }}
           >
             <AutSelectField
-              width="100%"
               value={activeOnboardingFilter}
-              onChange={(e) => setActiveOnboardingFilter(e.target.value)}
+              color="offWhite"
+              onChange={(e) =>
+                setActiveOnboardingFilter(e.target.value as string)
+              }
             >
               <MenuItem value="All">
                 <em>All Novae</em>
@@ -203,9 +210,9 @@ export const DaoList = () => {
             }}
           >
             <AutSelectField
-              width="100%"
               value={marketFilter}
-              onChange={(e) => setMarkerFilter(e.target.value)}
+              color="offWhite"
+              onChange={(e) => setMarkerFilter(e.target.value as string)}
             >
               <MenuItem value="Infra, Defi & DAO Tooling">
                 <em>Infra, Defi & DAO Tooling</em>
@@ -226,9 +233,9 @@ export const DaoList = () => {
             }}
           >
             <AutSelectField
-              width="100%"
               value={archetypeFilter}
-              onChange={(e) => setArchetypeFilter(e.target.value)}
+              color="offWhite"
+              onChange={(e) => setArchetypeFilter(e.target.value as string)}
             >
               <MenuItem value="Growth">
                 <em>Growth</em>
@@ -247,7 +254,6 @@ export const DaoList = () => {
               </MenuItem>
             </AutSelectField>
           </Box>
-          {/* END: ed8c6549bwf9 */}
         </Box>
 
         {!isLoading && !(data?.daos || [])?.length && (

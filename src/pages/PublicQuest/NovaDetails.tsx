@@ -47,6 +47,9 @@ import theme from "@theme/theme";
 import AutUserTabs from "./AutNovaTabs/AutUserTabs";
 import { ReactComponent as ArrowIcon } from "@assets/autos/move-right.svg";
 import moment from "moment";
+import { AutButton, AutOsButton } from "@components/AutButton";
+import AutIconLabel from "@components/AutIconLabel";
+import AutValueLabel from "@components/AutValueLabel";
 
 const socialIcons = {
   discord: DiscordIcon,
@@ -79,8 +82,9 @@ const RightWrapper = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  justifyContent: "center",
+  justifyContent: "flex-start",
   px: "30px",
+  marginTop: "120px",
   marginRight: "25px",
   marginLeft: "25px",
   height: "100%",
@@ -156,26 +160,12 @@ const TableListItem = memo((data: any) => {
         </Typography>
       </StyledTableCell>
       <StyledTableCell align="left">
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "flex-start",
-            alignItems: "center"
-          }}
-        >
-          <Typography variant="body" fontWeight="normal" color="white">
-            {moment(row?.startDate).format("DD.MM.YY • HH:mm").toString()}
-          </Typography>
-          <SvgIcon
-            sx={{ fill: "transparent", ml: theme.spacing(4) }}
-            component={ArrowIcon}
-          />
-        </Box>
-      </StyledTableCell>
-      <StyledTableCell align="left">
         <Typography variant="body" fontWeight="normal" color="white">
           {moment(row?.endDate).format("DD.MM.YY • HH:mm").toString()}
         </Typography>
+      </StyledTableCell>
+      <StyledTableCell align="left">
+        <AutOsButton>Verify</AutOsButton>
       </StyledTableCell>
     </StyledTableRow>
   );
@@ -222,7 +212,7 @@ export const CommunityTasksTable = ({ header, tasks }) => {
                   fontWeight="normal"
                   color="offWhite.dark"
                 >
-                  Name
+                  Onboarding Task
                 </Typography>
               </StyledTableCell>
               <StyledTableCell align="left">
@@ -240,18 +230,10 @@ export const CommunityTasksTable = ({ header, tasks }) => {
                   fontWeight="normal"
                   color="offWhite.dark"
                 >
-                  Start Date
-                </Typography>
-              </StyledTableCell>
-              <StyledTableCell align="left">
-                <Typography
-                  variant="body"
-                  fontWeight="normal"
-                  color="offWhite.dark"
-                >
                   End Date
                 </Typography>
               </StyledTableCell>
+              <StyledTableCell></StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -303,55 +285,77 @@ const NovaDetails = () => {
         <>
           <LeftWrapper>
             <Stack>
-              <Avatar
+              <Box
                 sx={{
-                  height: {
-                    xs: "150px",
-                    md: "160px",
-                    xxl: "160px"
-                  },
-                  borderRadius: "0",
-                  width: {
-                    xs: "150px",
-                    md: "160px",
-                    xxl: "160px"
-                  },
-                  bgcolor: "purple"
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "12px",
+                  justifyContent: "center",
+                  alignItems: "center"
                 }}
-                aria-label="avatar"
-                src={ipfsCIDToHttpUrl(nova?.properties.image as string)}
-              />
+              >
+                <Avatar
+                  sx={{
+                    flex: "1",
+                    height: {
+                      xs: "140px",
+                      md: "150px",
+                      xxl: "150px"
+                    },
+                    borderRadius: "0",
+                    width: {
+                      xs: "140px",
+                      md: "150px",
+                      xxl: "150px"
+                    },
+                    bgcolor: "purple"
+                  }}
+                  aria-label="avatar"
+                  src={ipfsCIDToHttpUrl(nova?.properties.image as string)}
+                />
+                <div
+                  style={{
+                    flex: "1",
+                    display: "flex",
+                    alignItems: "flex-start"
+                  }}
+                >
+                  <Typography
+                    color="offWhite.main"
+                    textAlign="left"
+                    lineHeight={1}
+                    variant="h2"
+                  >
+                    {nova?.name}
+                  </Typography>
+                </div>
+              </Box>
+
               <Stack
                 sx={{
                   marginTop: theme.spacing(2)
                 }}
               >
                 <div>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "flex-start"
-                    }}
-                  >
-                    <Typography
-                      color="offWhite.main"
-                      textAlign="left"
-                      lineHeight={1}
-                      variant="h2"
-                    >
-                      {nova?.name}
-                    </Typography>
-                  </div>
-
-                  <Stack
+                  <Box
                     sx={{
-                      marginTop: theme.spacing(2)
+                      display: "flex",
+                      flexDirection: "row",
+                      gap: "12px",
+                      justifyContent: "center",
+                      alignItems: "center"
                     }}
-                    direction="row"
-                    alignItems="center"
                   >
-                    <CopyAddress address={nova?.address} />
-                    {/* {selectedNetworkConfig?.name && (
+                    <Stack
+                      sx={{
+                        flex: "1",
+                        marginTop: theme.spacing(2)
+                      }}
+                      direction="row"
+                      alignItems="center"
+                    >
+                      <CopyAddress address={nova?.address} />
+                      {/* {selectedNetworkConfig?.name && (
                       <Tooltip
                         title={`Explore in ${selectedNetworkConfig?.name}`}
                       >
@@ -367,39 +371,44 @@ const NovaDetails = () => {
                         </IconButton>
                       </Tooltip>
                     )} */}
-                  </Stack>
+                    </Stack>
+                    <AutValueLabel
+                      sx={{ flex: "1", marginTop: theme.spacing(2) }}
+                      value={nova?.properties.absoluteValue}
+                      label="Absolute Value"
+                    ></AutValueLabel>
+                  </Box>
                 </div>
               </Stack>
 
-              <Stack
+              <Box
                 sx={{
                   display: "flex",
                   flexDirection: "row",
-                  alignItems: "flex-start",
-                  alignContent: "flex-start",
-                  marginTop: theme.spacing(2)
-                }}
-              ></Stack>
-
-              <Box
-                sx={{
-                  marginTop: theme.spacing(2)
+                  gap: "12px",
+                  justifyContent: "center",
+                  alignItems: "center"
                 }}
               >
-                <Box sx={{ padding: "16.5px 0px" }}>
-                  <Typography
-                    color="offWhite.main"
-                    textAlign="left"
-                    variant="body"
-                  >
-                    {nova?.properties.description || "No description yet..."}
-                  </Typography>
-                </Box>
+                <AutIconLabel
+                  sx={{ flex: "1", marginTop: theme.spacing(2) }}
+                  icon={<ArrowIcon />}
+                  label={nova?.properties.archetype}
+                ></AutIconLabel>
+                <AutIconLabel
+                  sx={{ flex: "1", marginTop: theme.spacing(2) }}
+                  icon={<ArrowIcon />}
+                  label={nova?.properties.archetype}
+                ></AutIconLabel>
               </Box>
-
               <Box
                 sx={{
-                  marginTop: theme.spacing(2)
+                  marginTop: theme.spacing(2),
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "12px",
+                  justifyContent: "center",
+                  alignItems: "center"
                 }}
               >
                 <IconContainer>
@@ -434,6 +443,7 @@ const NovaDetails = () => {
                       >
                         <SvgIcon
                           sx={{
+                            marginTop: theme.spacing(2),
                             height: {
                               xs: "25px",
                               xxl: "30px"
@@ -454,6 +464,28 @@ const NovaDetails = () => {
                     );
                   })}
                 </IconContainer>
+
+                <AutValueLabel
+                  sx={{ flex: "1", marginTop: theme.spacing(2) }}
+                  value={nova?.properties.members}
+                  label="Members"
+                ></AutValueLabel>
+              </Box>
+              <Box
+                sx={{
+                  marginTop: theme.spacing(2)
+                }}
+              >
+                <Box>
+                  <Typography
+                    sx={{ flex: "1" }}
+                    color="offWhite.main"
+                    textAlign="left"
+                    variant="body"
+                  >
+                    {nova?.properties.description || "No description yet..."}
+                  </Typography>
+                </Box>
               </Box>
             </Stack>
           </LeftWrapper>

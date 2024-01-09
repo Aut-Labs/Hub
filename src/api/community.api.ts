@@ -478,6 +478,7 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
       properties: {
         market: 1,
         archetype: 1,
+        absoluteValue: "18",
         prestige: 66,
         members: 14,
         description: "Description for DAO1",
@@ -502,6 +503,7 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
       properties: {
         market: 2,
         archetype: 2,
+        absoluteValue: "44",
         prestige: 76,
         members: 45,
         description: "Description for DAO2",
