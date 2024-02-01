@@ -62,8 +62,8 @@ export const ToolbarConnector = () => {
   const networks = useSelector(NetworksConfig);
   const { connector, isReconnecting, isConnecting, isConnected } = useAccount();
   const { connectAsync, connectors, error, isLoading } = useConnect();
-  const chainId = useChainId();
-  const multiSigner = useEthersSigner({ chainId: chainId });
+  // const chainId = useChainId();
+  const multiSigner = useEthersSigner();
   const { disconnectAsync } = useDisconnect();
   const isOpen = useSelector(NetworkSelectorIsOpen);
 
@@ -96,7 +96,7 @@ export const ToolbarConnector = () => {
       multiSigner: MultiSigner
     ) => {
       const sdk = AutSDK.getInstance();
-      return sdk.init(multiSigner, {
+      return sdk.init(await multiSigner, {
         novaAddress: searchParams.get(RequiredQueryParams.DaoAddress),
         daoTypesAddress: network.contracts.daoTypesAddress,
         novaRegistryAddress: network.contracts.novaRegistryAddress,
@@ -125,7 +125,7 @@ export const ToolbarConnector = () => {
             })
           );
         }
-        await initialiseSDK(network, multiSigner);
+        await initialiseSDK(network, await multiSigner);
         await dispatch(changeConnectStatus("connected"));
         setTimeout(async () => {
           await dispatch(updateWalletProviderState(itemsToUpdate));

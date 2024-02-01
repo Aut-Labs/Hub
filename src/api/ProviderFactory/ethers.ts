@@ -1,9 +1,19 @@
 import * as React from "react";
-import { type WalletClient, useWalletClient } from "wagmi";
-import { providers } from "ethers";
-import { MultiSigner } from "@aut-labs/sdk/dist/models/models";
+import { useWalletClient } from "wagmi";
+import {
+  BrowserProvider,
+  JsonRpcProvider,
+  JsonRpcSigner,
+  Signer
+} from "ethers";
 
-export function walletClientToSigner(walletClient: WalletClient): MultiSigner {
+export type EtherSigner = JsonRpcSigner | BrowserProvider | Signer;
+export interface MultiSigner {
+  signer: EtherSigner;
+  readOnlySigner: EtherSigner;
+}
+
+export async function walletClientToSigner(walletClient): Promise<MultiSigner> {
   const { account, chain, transport } = walletClient;
   const network = {
     chainId: chain.id,
@@ -11,14 +21,9 @@ export function walletClientToSigner(walletClient: WalletClient): MultiSigner {
     ensAddress: chain.contracts?.ensRegistry?.address
   };
 
-  const provider = new providers.Web3Provider(transport as any, network);
-  const signer = provider.getSigner(account.address);
-  const readOnlyProvider = new providers.JsonRpcProvider(
-    "https://polygon-mumbai.g.alchemy.com/v2/G742dEaaWF0gE-SL0IlEFAJdlA_l7ezJ",
-    network
-  );
-  const readOnlySigner = readOnlyProvider.getSigner(account.address);
-  return { signer, readOnlySigner };
+  const provider = new BrowserProvider(transport as any, network);
+  const signer = await provider.getSigner(account.address);
+  return { signer, readOnlySigner: signer };
 }
 
 export function useEthersSigner({ chainId }: { chainId?: number } = {}) {

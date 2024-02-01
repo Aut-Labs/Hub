@@ -31,8 +31,10 @@
     ]
   },
   "dependencies": {
-    "@aut-labs/abi-types": "^0.0.62-dev",
-    "@aut-labs/sdk": "^0.0.106-dev",
+    "@apollo/client": "^3.9.2",
+    "@aut-labs/abi-types": "^0.0.70-dev",
+    "@aut-labs/d-aut": "^1.0.108-dev",
+    "@aut-labs/sdk": "^0.0.142-dev",
     "@aut-labs/sdk-biconomy": "^0.0.2",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
@@ -60,8 +62,9 @@
     "date-fns": "^2.28.0",
     "dateformat": "^5.0.3",
     "emoji-mart": "^5.5.2",
-    "ethers": "^5.7.2",
+    "ethers": "^6.10.0",
     "flipdown": "^0.3.2",
+    "graphql": "^16.8.1",
     "moment": "^2.29.4",
     "react": "^18.2.0",
     "react-copy-to-clipboard": "^5.1.0",

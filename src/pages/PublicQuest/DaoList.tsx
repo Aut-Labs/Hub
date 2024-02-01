@@ -11,7 +11,8 @@ import {
   FormControlLabel,
   Switch,
   MenuItem,
-  Select
+  Select,
+  FormControl
 } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -27,17 +28,12 @@ import {
 import { CacheTypes } from "@api/cache.api";
 import { communityUpdateState } from "@store/Community/community.reducer";
 import { useAppDispatch } from "@store/store.model";
-import {
-  useApplyForQuestMutation,
-  useGetPhasesCacheQuery,
-  useUpdatePhasesCacheMutation
-} from "@api/onboarding.api";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
 import { useGetAllNovasQuery } from "@api/community.api";
 import { TOOLBAR_HEIGHT } from "./ToolbarConnector";
 import { addDays } from "date-fns";
-import { Quest } from "@aut-labs/sdk";
+import { Quest, fetchMetadata, queryParamsAsString } from "@aut-labs/sdk";
 import { useAccount } from "wagmi";
 import {
   IsAuthorised,
@@ -45,17 +41,18 @@ import {
 } from "@store/WalletProvider/WalletProvider";
 import backgroundImage from "@assets/autos/background.png";
 import { AutSelectField } from "@theme/field-select-styles";
+import { Community } from "@api/community.model";
+import { gql, useQuery } from "@apollo/client";
 
 const AutContainer = styled("div")(() => ({
   display: "flex",
   flexDirection: "column",
   height: "100%",
   paddingLeft: "60px",
-  paddingRight: "60px",
-  backgroundImage: `url(${backgroundImage})`,
-  backgroundBlendMode: "hard-light",
-  backgroundSize: "cover",
-  backgroundRepeat: "repeat-y"
+  paddingRight: "60px"
+  // backgroundImage: `url(${backgroundImage})`,
+  // backgroundBlendMode: "hard-light",
+  // backgroundSize: "cover"
 }));
 
 export const GridBox = styled(Box)(({ theme }) => ({
@@ -78,14 +75,9 @@ export const DaoList = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [selectedQuest, setSelectedQuest] = useState(null);
-  const [questToApply, setQuestToApply] = useState<
-    Quest & { onboardingQuestAddress: string; daoAddress: string }
-  >(null);
   const [openApplySuccess, setOpenApplySuccess] = useState(false);
   const [searchParams] = useSearchParams();
   const connectStatus = useSelector(ConnectStatus);
-  const isAuthorised = useSelector(IsAuthorised);
-  const [showExpired, setShowExpired] = useState(false);
   const theme = useTheme();
   const { address: account } = useAccount();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -98,22 +90,6 @@ export const DaoList = () => {
     refetchOnMountOrArgChange: true,
     skip: false
   });
-
-  useEffect(() => {
-    if ((questToApply || selectedQuest) && connectStatus === "disconnected") {
-      setSelectedQuest(null);
-      setQuestToApply(null);
-    }
-    if (connectStatus === "disconnected" && !questToApply && !selectedQuest) {
-      dispatch(changeConnectStatus("initial"));
-    }
-  }, [connectStatus, selectedQuest, questToApply]);
-
-  const applyForQuest = async (
-    quest: Quest & { onboardingQuestAddress: string; daoAddress: string }
-  ) => {
-    setQuestToApply(quest);
-  };
 
   return (
     <PerfectScrollbar
@@ -142,32 +118,6 @@ export const DaoList = () => {
             setOpenApplySuccess(false);
           }}
         ></SuccessDialog>
-        {/* <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            position: "relative"
-          }}
-        >
-          <Typography
-            fontFamily="FractulAltLight"
-            textAlign="center"
-            color="white"
-            variant="h1"
-          >
-            Nova Showcase
-          </Typography>
-          <Typography
-            fontFamily="FractulAltLight"
-            textAlign="center"
-            color="white"
-            variant="h4"
-          >
-            Pick a Nova, complete their onboarding quest and join their
-            community to help them rise up the Nova leaderboard
-          </Typography>
-        </Box> */}
-
         <Box
           sx={{
             display: "flex",
@@ -178,7 +128,7 @@ export const DaoList = () => {
             mt: "100px"
           }}
         >
-          <Box
+          <FormControl
             sx={{
               flex: 1,
               mx: 1
@@ -187,6 +137,7 @@ export const DaoList = () => {
             <AutSelectField
               value={activeOnboardingFilter}
               color="offWhite"
+              label="Onboarding Status"
               onChange={(e) =>
                 setActiveOnboardingFilter(e.target.value as string)
               }
@@ -201,9 +152,9 @@ export const DaoList = () => {
                 <em>Inactive</em>
               </MenuItem>
             </AutSelectField>
-          </Box>
+          </FormControl>
 
-          <Box
+          <FormControl
             sx={{
               flex: 1,
               mx: 1
@@ -212,6 +163,7 @@ export const DaoList = () => {
             <AutSelectField
               value={marketFilter}
               color="offWhite"
+              label="Market"
               onChange={(e) => setMarkerFilter(e.target.value as string)}
             >
               <MenuItem value="Infra, Defi & DAO Tooling">
@@ -224,9 +176,9 @@ export const DaoList = () => {
                 <em>Governance & Public Goods</em>
               </MenuItem>
             </AutSelectField>
-          </Box>
+          </FormControl>
 
-          <Box
+          <FormControl
             sx={{
               flex: 1,
               mx: 1
@@ -236,6 +188,7 @@ export const DaoList = () => {
               value={archetypeFilter}
               color="offWhite"
               onChange={(e) => setArchetypeFilter(e.target.value as string)}
+              label="Archetype"
             >
               <MenuItem value="Growth">
                 <em>Growth</em>
@@ -253,7 +206,7 @@ export const DaoList = () => {
                 <em>Conviction</em>
               </MenuItem>
             </AutSelectField>
-          </Box>
+          </FormControl>
         </Box>
 
         {!isLoading && !(data?.daos || [])?.length && (

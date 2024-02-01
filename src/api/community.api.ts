@@ -4,475 +4,108 @@ import { Community, NovaDAO, findRoleName } from "./community.model";
 import { Web3ThunkProviderFactory } from "./ProviderFactory/web3-thunk.provider";
 import { ipfsCIDToHttpUrl, isValidUrl } from "./storage.api";
 import { AutID, DAOMember } from "./aut.model";
-import AutSDK, { Nova, fetchMetadata } from "@aut-labs/sdk";
+import AutSDK, { LocalReputation, Nova, fetchMetadata } from "@aut-labs/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { base64toFile } from "@utils/to-base-64";
 import { environment } from "./environment";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import Size from "@assets/archetypes/people.png";
+import Growth from "@assets/archetypes/seed.png";
+import Performance from "@assets/archetypes/growth.png";
+import Reputation from "@assets/archetypes/reputation-management.png";
+import Conviction from "@assets/archetypes/deal.png";
+import { gql } from "@apollo/client";
+import { apolloClient } from "@store/graphql";
+import { BaseNFTModel } from "@aut-labs/sdk/dist/models/baseNFTModel";
 
-const communityExtensionThunkProvider = Web3ThunkProviderFactory(
-  "CommunityExtension",
-  {
-    provider: null
-  }
-);
-
-export const fetchCommunity = communityExtensionThunkProvider(
-  {
-    type: "community/get"
-  },
-  (thunkAPI) => {
-    const state = thunkAPI.getState();
-    const { selectedCommunityAddress } = state.community;
-    return Promise.resolve(selectedCommunityAddress);
-  },
-  async (contract, _) => {
-    const [, , uri] = await contract.getComData();
-    const metadata: Community = (await axios.get(ipfsCIDToHttpUrl(uri))).data;
-    const community = new Community(metadata);
-    return community;
-  }
-);
-
-// export const fetchCommunity = createAsyncThunk(
-//   "community/get",
-//   async (_, { rejectWithValue, getState }) => {
-//     const sdk = AutSDK.getInstance();
-//     const state = getState() as any;
-//     const { selectedCommunityAddress } = state.community;
-//     const response = await sdk..getComData(
-//       requestBody.daoAddr,
-//       requestBody.daoType
-//     );
-//     if (response?.isSuccess) {
-//       return response.data;
-//     }
-//     return rejectWithValue(response?.errorMessage);
-//   }
-// );
-
-export const getWhitelistedAddresses = communityExtensionThunkProvider(
-  {
-    type: "aut-dashboard/addresses/get"
-  },
-  (thunkAPI) => {
-    const state = thunkAPI.getState();
-    const { selectedCommunityAddress } = state.community;
-    return Promise.resolve(selectedCommunityAddress);
-  },
-  async (contract, _, { getState }) => {
-    const { auth } = getState();
-    const memberAddresses = await contract.getAllMembers();
-    // const names = await getCoreTeamMemberNames(auth.userInfo.community);
-    // return memberAddresses.map((a) => ({
-    //   address: a,
-    //   name:
-    //     names.coreTeamMembers.find((c) => c.memberAddress === a)?.memberName ||
-    //     "N/A",
-    // }));
-  }
-);
-
-export const addNewWhitelistedAddresses = communityExtensionThunkProvider(
-  {
-    type: "aut-dashboard/addresses/add"
-    // event: AutIDCommunityContractEventType.CoreTeamMemberAdded,
-  },
-  (thunkAPI) => {
-    const state = thunkAPI.getState();
-    const { selectedCommunityAddress } = state.community;
-    return Promise.resolve(selectedCommunityAddress);
-  },
-  async (contract, newMembers, { dispatch, getState }) => {
-    const { auth } = getState();
-    // for (const newMember of newMembers) {
-    //   await contract.addNewCoreTeamMembers(newMember.address);
-    //   await addCoreTeamName(
-    //     auth?.userInfo?.community,
-    //     newMember.address,
-    //     newMember.name
-    //   );
-    // }
-    return dispatch(getWhitelistedAddresses(auth.userInfo.community));
-  }
-);
-
-export const whitelistAddress = communityExtensionThunkProvider(
-  {
-    type: "aut-dashboard/addresses/add"
-    // event: CommunityExtensionContractEventType.MemberAdded,
-  },
-  (thunkAPI) => {
-    const state = thunkAPI.getState();
-    const { selectedCommunityAddress } = state.community;
-    return Promise.resolve(selectedCommunityAddress);
-  },
-  async (contract, newMembers, { dispatch, getState }) => {
-    const { auth } = getState();
-    // await contract.addNewCoreTeamMembers(newMember.address);
-    return dispatch(getWhitelistedAddresses(auth.userInfo.community));
-  }
-);
-
-export const setAsCoreTeam = communityExtensionThunkProvider(
-  {
-    type: "aut-dashboard/core-team/add"
-  },
-  (thunkAPI) => {
-    const state = thunkAPI.getState();
-    const { selectedCommunityAddress } = state.community;
-    return Promise.resolve(selectedCommunityAddress);
-  },
-  async (contract, memberAddress) => {
-    const result = await contract.addToCoreTeam(memberAddress);
-    return memberAddress;
-  }
-);
-
-export const removeAsCoreTeam = communityExtensionThunkProvider(
-  {
-    type: "aut-dashboard/core-team/remove"
-  },
-  (thunkAPI) => {
-    const state = thunkAPI.getState();
-    const { selectedCommunityAddress } = state.community;
-    return Promise.resolve(selectedCommunityAddress);
-  },
-  async (contract, memberAddress) => {
-    const result = await contract.removeFromCoreTeam(memberAddress);
-    return memberAddress;
-  }
-);
-
-interface UpdateDiscordData {
-  community: Community;
-  inviteLink: string;
+export enum NovaArchetype {
+  "Size" = 1,
+  "Reputation" = 2,
+  "Conviction" = 3,
+  "Performance" = 4,
+  "Growth" = 5
 }
 
-export const updateDiscordSocials = createAsyncThunk(
-  "community/update",
-  async (args: UpdateDiscordData, { rejectWithValue }) => {
-    const sdk = AutSDK.getInstance();
-    const updatedCommunity = Community.updateCommunity(args.community);
-    const uri = await sdk.client.storeAsBlob(updatedCommunity);
-
-    console.log("New metadata: ->", ipfsCIDToHttpUrl(uri));
-    const response = await sdk.autID.contract.setMetadataUri(uri);
-
-    if (response.isSuccess) {
-      const autIdData = JSON.parse(window.sessionStorage.getItem("aut-data"));
-      let foundSocial = false;
-      for (let i = 0; i < autIdData.properties.communities.length; i++) {
-        if (foundSocial) {
-          break;
-        }
-        const community = autIdData.properties.communities[i];
-        if (community.name === args.community.name)
-          for (let i = 0; i < community.properties.socials.length; i++) {
-            const social = community.properties.socials[i];
-            if (social.type === "discord") {
-              social.link = args.inviteLink;
-              foundSocial = true;
-              break;
-            }
-          }
-      }
-      window.sessionStorage.setItem("aut-data", JSON.stringify(autIdData));
-      return args.community;
-    }
-    return rejectWithValue(response?.errorMessage);
-  }
-);
-
-export const updateCommunity = communityExtensionThunkProvider(
-  {
-    type: "community/update"
-  },
-  (thunkAPI) => {
-    const state = thunkAPI.getState();
-    const { selectedCommunityAddress } = state.community;
-    return Promise.resolve(selectedCommunityAddress);
-  },
-  async (contract, community) => {
-    if (community.image && !isValidUrl(community.image as string)) {
-      const file = base64toFile(community.image as string, "image");
-      // community.image = await storeImageAsBlob(file as File);
-    }
-
-    // const uri = await storeAsBlob(Community.updateCommunity(community));
-    // await contract.setMetadataUri(uri);
-    return community;
-  }
-);
-
-export const fetchMember = communityExtensionThunkProvider(
-  {
-    type: "community/member/get"
-  },
-  async (thunkAPI) => {
-    const state = thunkAPI.getState();
-    const { selectedCommunityAddress } = state.community;
-    return Promise.resolve(selectedCommunityAddress);
-  },
-  async (contract, memberAddress, thunkAPI) => {
-    const state = thunkAPI.getState();
-    const AutIDsResponse: { [role: string]: AutID[] } = {};
-    const communities = state.community.communities as Community[];
-    const communityAddress = state.community.selectedCommunityAddress as string;
-    const community = communities.find(
-      (c) => c.properties.address === communityAddress
-    );
-
-    const filteredRoles = community.properties.rolesSets[0].roles;
-
-    for (let i = 0; i < filteredRoles.length; i += 1) {
-      AutIDsResponse[filteredRoles[i].roleName] = [];
-    }
-
-    AutIDsResponse.Admins = [];
-
-    // const autContract = await Web3AutIDProvider(environment.autIDAddress);
-    // const tokenId = await autContract.getAutIDByOwner(memberAddress);
-    // const metadataCID = await autContract.tokenURI(Number(tokenId.toString()));
-    // const [, role, commitment] = await autContract.getCommunityData(
-    //   memberAddress,
-    //   community.properties.address
-    // );
-    // const jsonUri = ipfsCIDToHttpUrl(metadataCID);
-    // const jsonMetadata: AutID = (await axios.get(jsonUri)).data;
-    // const roleName = findRoleName(
-    //   role.toString(),
-    //   community.properties.rolesSets
-    // );
-
-    const isCoreTeam = await contract.isCoreTeam(memberAddress);
-    // const member = new AutID({
-    //   ...jsonMetadata,
-    //   properties: {
-    //     ...jsonMetadata.properties,
-    //     address: memberAddress,
-    //     role: role.toString(),
-    //     roleName,
-    //     tokenId: tokenId.toString(),
-    //     commitmentDescription: CommitmentMessages(commitment),
-    //     commitment: commitment.toString(),
-    //     isCoreTeam
-    //   } as any
-    // });
-    // if (isCoreTeam) {
-    //   AutIDsResponse.Admins.push(member);
-    // }
-    // AutIDsResponse[roleName].push(member);
-    return AutIDsResponse;
-  }
-);
-
-export const getPAUrl = communityExtensionThunkProvider(
-  {
-    type: "community/url/get"
-  },
-  (thunkAPI) => {
-    const state = thunkAPI.getState();
-    const { selectedCommunityAddress } = state.community;
-    return Promise.resolve(selectedCommunityAddress);
-  },
-  async (contract) => {
-    const urls = await contract.getURLs();
-    return urls?.length > 0 ? urls[urls.length - 1] : undefined;
-  }
-);
-
-export const getPAContracts = communityExtensionThunkProvider(
-  {
-    type: "aut-dashboard/contracts/get"
-  },
-  (thunkAPI) => {
-    const state = thunkAPI.getState();
-    const { selectedCommunityAddress } = state.community;
-    return Promise.resolve(selectedCommunityAddress);
-  },
-  async (contract) => {
-    // const contracts = await contract.getImportedAddresses();
-    // return contracts;
-  }
-);
-
-export const addPAContracts = communityExtensionThunkProvider(
-  {
-    type: "aut-dashboard/contracts/add"
-    // event: CommunityExtensionContractEventType.ActivitiesAddressAdded,
-  },
-  (thunkAPI) => {
-    const state = thunkAPI.getState();
-    const { selectedCommunityAddress } = state.community;
-    return Promise.resolve(selectedCommunityAddress);
-  },
-  async (contract, payload, { dispatch }) => {
-    const { newItems } = payload;
-    for (const item of newItems) {
-      // await contract.addNewContractAddressToAgreement(item.address);
-    }
-    return dispatch(getPAContracts(null));
-  }
-);
-
-export const addDiscordToCommunity = communityExtensionThunkProvider(
-  {
-    type: "community/integrate/discord"
-  },
-  (thunkAPI) => {
-    const state = thunkAPI.getState();
-    const { selectedCommunityAddress } = state.community;
-    return Promise.resolve(selectedCommunityAddress);
-  },
-  async (contract, discordId) => {
-    const result = await contract.setDiscordServer(discordId);
-    return result;
-  }
-);
-
-export const addPAUrl = communityExtensionThunkProvider(
-  {
-    type: "community/url/add"
-  },
-  (thunkAPI) => {
-    const state = thunkAPI.getState();
-    const { selectedCommunityAddress } = state.community;
-    return Promise.resolve(selectedCommunityAddress);
-  },
-  async (contract, daoUrl, { dispatch }) => {
-    await contract.addURL(daoUrl);
-    return dispatch(getPAUrl(null));
-  }
-);
-
-const getMembers = async (body, api: BaseQueryApi) => {
-  const state: any = api.getState();
-  const { selectedCommunityAddress, communities } = state.community;
-  const community: Community = communities.find(
-    (c) => c.properties.address === selectedCommunityAddress
-  );
-
-  const sdk = AutSDK.getInstance();
-
-  sdk.nova = sdk.initService<Nova>(Nova, selectedCommunityAddress);
-
-  const members: DAOMember[] = [];
-  const membersResponse = await sdk.nova.contract.members.getAllMembers();
-
-  for (let i = 0; i < membersResponse.data.length; i += 1) {
-    try {
-      const memberAddress = membersResponse.data[i];
-      const autIdResponse = await sdk.autID.findAutID(memberAddress);
-      const { tokenId, metadataUri } = autIdResponse.data;
-      const metadata = await fetchMetadata<DAOMember>(
-        metadataUri,
-        environment.nftStorageUrl
-      );
-      const comDataResponse = await sdk.autID.contract.getCommunityMemberData(
-        memberAddress,
-        selectedCommunityAddress
-      );
-      const { role, commitment } = comDataResponse.data;
-      const roleName = findRoleName(role, community.properties.rolesSets);
-      const isAdminResponse = await sdk.nova.contract.admins.isAdmin(
-        memberAddress
-      );
-      const member = new DAOMember({
-        ...metadata,
-        properties: {
-          ...metadata.properties,
-          address: memberAddress,
-          role: {
-            id: Number(role),
-            roleName
-          },
-          tokenId: tokenId,
-          commitmentDescription: CommitmentMessages(Number(commitment)),
-          commitment: commitment,
-          isAdmin: isAdminResponse.data
-        }
-      });
-      members.push(member);
-    } catch (error) {
-      // handle error
-    }
-  }
-  return {
-    data: members
-  };
+export const ArchetypeIcons = {
+  [NovaArchetype.Size]: Size,
+  [NovaArchetype.Growth]: Growth,
+  [NovaArchetype.Performance]: Performance,
+  [NovaArchetype.Reputation]: Reputation,
+  [NovaArchetype.Conviction]: Conviction
 };
 
-const getCommunity = async (daoAddress: string, api: BaseQueryApi) => {
-  const sdk = AutSDK.getInstance();
-  sdk.nova = sdk.initService<Nova>(Nova, daoAddress);
-
-  const response = await sdk.nova.contract.metadata.getMetadataUri();
-
-  if (!response.isSuccess) {
-    return {
-      error: response.errorMessage
-    };
-  }
-
-  const metadata = await fetchMetadata<Community>(
-    response.data,
-    environment.nftStorageUrl
-  );
-
-  const adminResponse = await sdk.nova.contract.admins.getAdmins();
-  return {
-    data: {
-      community: new Community(metadata),
-      admin: adminResponse.data[0]
-    }
-  };
-};
+export enum Markets {
+  "Open-Source & DeFi" = 1,
+  "Art, Events & NFTs" = 2,
+  "Local Projects & DAOs" = 3
+}
 
 const getAllNovas = async (body: any, api: BaseQueryApi) => {
-  // const response = await axios.get(`${environment.apiUrl}/autID/user/daos`);
+  const sdk = AutSDK.getInstance();
+  try {
+    const fetchNovas = gql`
+      query GetNovas {
+        novaDAOs(skip: 0, first: 100) {
+          id
+          deployer
+          address
+          market
+          metadataUri
+          minCommitment
+        }
+      }
+    `;
 
-  // const daos: any[] = response.data;
+    const novaeResponse = await apolloClient.query<any>({
+      query: fetchNovas
+    });
 
-  // const daoData: NovaDAO[] = [];
+    const { novaDAOs } = novaeResponse.data;
 
-  // for (let i = 0; i < daos.length; i++) {
-  //   const {
-  //     daoAddress,
-  //     admin,
-  //     onboardingQuestAddress,
-  //     daoMetadataUri,
-  //     quests
-  //   } = daos[i];
+    const enrichedNovae = [];
 
-  //   const metadata = await fetchMetadata<NovaDAO>(
-  //     daoMetadataUri,
-  //     environment.nftStorageUrl
-  //   );
+    for (let i = 0; i < novaDAOs.length; i++) {
+      const novaDAO = novaDAOs[i];
+      const novaMetadata = await fetchMetadata<any>(
+        novaDAO.metadataUri,
+        environment.ipfsGatewayUrl
+      );
+      debugger;
+      const nova: Nova = sdk.initService<Nova>(Nova, novaDAO.address);
+      const localReputation: LocalReputation = sdk.localReputation;
 
-  //   metadata.properties.quests = [];
-  //   for (let j = 0; j < quests.length; j++) {
-  //     const quest = quests[j];
-  //     const questMetadata = await fetchMetadata(
-  //       quest.metadataUri,
-  //       environment.nftStorageUrl
-  //     );
-  //     quest.metadata = questMetadata;
-  //     metadata.properties.quests.push(quest);
-  //   }
+      debugger;
+      const archetypeResponse = await nova.contract.getArchetype();
+      const stats = await localReputation.contract.getNovaLocalReputationStats(
+        novaDAO.address
+      );
+      debugger;
+      const enrichedNova = new Community({
+        ...novaDAO,
+        ...novaMetadata,
+        properties: {
+          archetype: archetypeResponse.data,
+          roles: novaMetadata.properties.rolesSets[0].roles,
+          stats: stats?.data,
+          ...novaMetadata.properties,
+          address: novaDAO.address,
+          marketId: novaDAO.market
+        }
+      } as unknown as Community);
+      enrichedNovae.push(enrichedNova);
+      debugger;
+    }
+  } catch (e) {
+    debugger;
+    console.log(e);
+  }
 
-  //   const novaDAO = new NovaDAO({
-  //     ...metadata,
-  //     daoAddress,
-  //     admin,
-  //     onboardingQuestAddress
-  //   });
-  //   daoData.push(novaDAO);
-  // }
+  debugger;
+
   await new Promise((resolve) => setTimeout(resolve, 2000));
   const mockDaos = [
     {
-      address: "0x123",
+      address: "0x09Ed23BB6F9Ccc3Fd9b3BC4C859D049bf4AB4D43",
       name: "DAO1",
       onboardingQuestAddress: "0x456",
       properties: {
@@ -481,12 +114,14 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
         absoluteValue: "18",
         prestige: 66,
         members: 14,
-        description: "Description for DAO1",
+        description:
+          "Sphinx of black quartz, judge my vow. Sphinx of black quartz, judge my vow. Sphinx of black quartz, judge my vow. Sphinx of black quartz, judge my vow. ",
         image:
           "ipfs://bafkreihrhccb2qvrnb2zcgyjnl4z6asv7qtgzshzuj6hk7tpm4lywxb7fi",
         roles: [
           { name: "Role1", id: "1" },
-          { name: "Role2", id: "2" }
+          { name: "Role2", id: "2" },
+          { name: "Role3", id: "3" }
         ],
         socials: [
           { type: "discord", link: "", metadata: {} },
@@ -497,7 +132,7 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
       }
     },
     {
-      address: "0x789",
+      address: "0x09Ed23BB6F9Ccc3Fd9b3BC4C859D049bf4AB4D43",
       name: "DAO2",
       onboardingQuestAddress: "0xabc",
       properties: {
@@ -506,12 +141,14 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
         absoluteValue: "44",
         prestige: 76,
         members: 45,
-        description: "Description for DAO2",
+        description:
+          "Sphinx of black quartz, judge my vow. Sphinx of black quartz, judge my vow. Sphinx of black quartz, judge my vow. Sphinx of black quartz, judge my vow. ",
         image:
           "https://ipfs.nftstorage.link/ipfs/bafkreiddqyd46fvb5ffpbi3lgv7lea2s3mtpyjoh2ti4mj7r56nu4zydwe",
         roles: [
           { name: "Role3", id: "3" },
-          { name: "Role4", id: "4" }
+          { name: "Role4", id: "4" },
+          { name: "Role3", id: "3" }
         ],
         socials: [
           { type: "discord", link: "", metadata: {} },
@@ -629,13 +266,6 @@ export const communityApi = createApi({
   keepUnusedDataFor: KEEP_DATA_UNUSED,
   baseQuery: async (args, api, extraOptions) => {
     const { url, body } = args;
-    if (url === "getAllMembers") {
-      return getMembers(body, api);
-    }
-
-    if (url === "getCommunity") {
-      return getCommunity(body, api);
-    }
 
     if (url === "getAllNovas") {
       return getAllNovas(body, api);

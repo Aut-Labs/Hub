@@ -1,12 +1,14 @@
-import { Box, Button, Link, Typography, styled } from "@mui/material";
+import { Avatar, Box, Button, Link, Typography, styled } from "@mui/material";
 import { memo, useEffect, useMemo, useState } from "react";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import Flipcard from "@components/Flipcard";
 import FlipIcon from "@assets/flip.svg";
 import FlipClockCountdown from "@leenguyen/react-flip-clock-countdown";
-import { ApplyOrWithdrawFromQuest } from "./ApplyOrWithdrawFromQuest";
 import { NovaDAO } from "@api/community.model";
 import { useNavigate } from "react-router-dom";
+import AutIconLabel from "./AutIconLabel";
+import { ArchetypeIcons, Markets, NovaArchetype } from "@api/community.api";
+import { ReactComponent as ArrowIcon } from "@assets/autos/move-right.svg";
 
 const getRoleName = (daoData, quest) => {
   const role = daoData.properties.rolesSets[0].roles.find(
@@ -161,36 +163,20 @@ export const NovaCard = ({ daoData }: { daoData: any }) => {
               {daoData.name}
             </Typography>
             <Box
-              display="flex"
-              justifyContent="flex-end"
-              alignItems="center"
-              marginTop="auto"
-              width="60%"
-              marginBottom="10px"
+              sx={{
+                maxWidth: "600px",
+                width: "60%",
+                display: "flex",
+                alignItems: "space-between",
+                justifyContent: "space-between"
+              }}
             >
-              {daoData.properties.roles.map((role: any) => (
-                <Button
-                  key={role.id}
-                  sx={{
-                    flex: "1",
-                    color: "white",
-                    backgroundColor: "transparent",
-                    "&:hover": {
-                      backgroundColor: "white",
-                      color: "black"
-                    }
-                  }}
-                >
-                  {role.name}
-                </Button>
-              ))}
-            </Box>
-            <Box sx={{ maxWidth: "600px", display: "flex" }}>
               <Box
                 sx={{
                   display: "flex",
-                  marginRight: "16px",
-                  flexDirection: "column"
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center"
                 }}
               >
                 <Typography
@@ -210,7 +196,7 @@ export const NovaCard = ({ daoData }: { daoData: any }) => {
                   fontFamily="FractulAltBold"
                   variant="body"
                   sx={{
-                    mt: "25px",
+                    mt: "4px",
                     mb: "0px",
                     color: "white"
                   }}
@@ -222,7 +208,9 @@ export const NovaCard = ({ daoData }: { daoData: any }) => {
                 sx={{
                   display: "flex",
                   marginRight: "16px",
-                  flexDirection: "column"
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center"
                 }}
               >
                 <Typography
@@ -242,7 +230,7 @@ export const NovaCard = ({ daoData }: { daoData: any }) => {
                   fontFamily="FractulAltBold"
                   variant="body"
                   sx={{
-                    mt: "25px",
+                    mt: "4px",
                     mb: "0px",
                     color: "white"
                   }}
@@ -251,13 +239,40 @@ export const NovaCard = ({ daoData }: { daoData: any }) => {
                 </Typography>
               </Box>
             </Box>
+            <Box
+              display="flex"
+              justifyContent="flex-end"
+              alignItems="center"
+              marginTop="auto"
+              width="80%"
+              marginBottom="10px"
+            >
+              {daoData.properties.roles.map((role: any) => (
+                <Button
+                  key={role.id}
+                  sx={{
+                    flex: "1",
+                    color: "white",
+                    borderRadius: "24px",
+                    border: "1px",
+                    borderColor: "white",
+                    "&:hover": {
+                      backgroundColor: "white",
+                      color: "black"
+                    }
+                  }}
+                >
+                  {role.name}
+                </Button>
+              ))}
+            </Box>
             <div
               style={{
                 marginTop: "auto",
                 marginBottom: "10px",
                 width: "100%",
                 display: "flex",
-                justifyContent: "flex-end"
+                justifyContent: "center"
               }}
             >
               <img
@@ -274,38 +289,100 @@ export const NovaCard = ({ daoData }: { daoData: any }) => {
         </AutCardFront>
         <AutCardBack className="aut-card-back">
           <AutCardContainer className={`aut-card-container back`}>
-            <img
-              src={ipfsCIDToHttpUrl(daoData.properties?.image)}
-              alt="Dao image"
-              style={{
-                marginTop: "15px",
-                width: "100px",
-                height: "100px"
-              }}
-            />
-            <Typography
-              fontWeight="bold"
-              fontFamily="FractulAltBold"
-              variant="subtitle1"
+            <Box
               sx={{
-                mt: "25px",
-                mb: "0px",
-                color: "white"
+                display: "flex",
+                flexDirection: "row",
+                gap: "12px",
+                justifyContent: "space-between",
+                width: "100%",
+                alignItems: "center",
+                marginTop: "24px",
+                padding: "0px 34px"
               }}
             >
-              {daoData.name}
-            </Typography>
+              <Avatar
+                sx={{
+                  height: {
+                    xs: "60px",
+                    md: "70px",
+                    xxl: "70px"
+                  },
+                  borderRadius: "0",
+                  width: {
+                    xs: "60px",
+                    md: "70px",
+                    xxl: "70px"
+                  },
+                  bgcolor: "purple"
+                }}
+                aria-label="avatar"
+                src={ipfsCIDToHttpUrl(daoData?.properties.image as string)}
+              />
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center"
+                }}
+              >
+                <Typography
+                  color="offWhite.main"
+                  textAlign="left"
+                  lineHeight={1}
+                  variant="h3"
+                >
+                  {daoData?.name}
+                </Typography>
+              </div>
+            </Box>
             <Typography
-              fontFamily="FractulAltBold"
-              variant="body"
+              fontFamily="FractulRegular"
+              variant="caption"
               sx={{
                 mt: "25px",
-                mb: "0px",
+                padding: "0px 24px",
                 color: "white"
               }}
             >
               {daoData.properties.description}
             </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                gap: "12px",
+                justifyContent: "center",
+                alignItems: "center",
+                width: "100%",
+                padding: "0px 14px",
+                marginTop: "auto"
+              }}
+            >
+              <AutIconLabel
+                sx={{
+                  flex: "1",
+                  flexBasis: "50%"
+                  // marginTop: theme.spacing(2)
+                }}
+                icon={<ArrowIcon />}
+                label={Markets[daoData?.properties.archetype]}
+              ></AutIconLabel>
+              <AutIconLabel
+                sx={{
+                  flex: "1",
+                  flexBasis: "50%"
+                  // marginTop: theme.spacing(2)
+                }}
+                icon={
+                  <img
+                    src={ArchetypeIcons[daoData?.properties.archetype]}
+                    width="22px"
+                    height="22px"
+                  />
+                }
+                label={NovaArchetype[daoData?.properties.archetype]}
+              ></AutIconLabel>
+            </Box>
 
             <div
               style={{
@@ -313,7 +390,7 @@ export const NovaCard = ({ daoData }: { daoData: any }) => {
                 marginBottom: "10px",
                 width: "100%",
                 display: "flex",
-                justifyContent: "flex-end"
+                justifyContent: "center"
               }}
             >
               <img

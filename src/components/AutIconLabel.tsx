@@ -27,7 +27,7 @@ const AutIconLabel = ({ icon, label, sx = null }: AutIconLabelProps) => {
         marginLeft={1}
         color="offWhite.main"
         lineHeight={1}
-        variant="body"
+        variant="caption"
       >
         {label}
       </Typography>

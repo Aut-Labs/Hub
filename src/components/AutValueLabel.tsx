@@ -8,7 +8,7 @@ interface AutValueLabelProps {
 }
 
 const AutValueLabelContainer = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(1),
+  padding: "8px 0px",
   textAlign: "center",
   color: theme.palette.offWhite.main,
   display: "flex",
@@ -31,10 +31,10 @@ const AutValueLabel = ({ value, label, sx = null }: AutValueLabelProps) => {
       <Typography
         align="center"
         marginLeft={1}
-        whiteSpace={"nowrap"}
+        // whiteSpace={"nowrap"}
         color="offWhite"
         lineHeight={1}
-        variant="body"
+        variant="caption"
       >
         {label}
       </Typography>

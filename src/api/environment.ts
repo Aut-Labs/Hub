@@ -29,7 +29,12 @@ export const swEnvVariables = {
   discordRedirectUri: "REACT_APP_DISCORD_REDIRECT_URL",
   discordApiUrl: "REACT_APP_DISCORD_API_URL",
   discordBotAddress: "REACT_APP_DISCORD_BOT_ADDRESS",
-  discordBotUrl: "REACT_APP_DISCORD_BOT_API_URL"
+  discordBotUrl: "REACT_APP_DISCORD_BOT_API_URL",
+
+  // IPFS storage
+  ipfsApiKey: "REACT_APP_IPFS_API_KEY",
+  ipfsApiSecret: "REACT_APP_IPFS_API_SECRET",
+  ipfsGatewayUrl: "REACT_APP_IPFS_GATEWAY_URL"
 };
 
 export const environment: typeof swEnvVariables =

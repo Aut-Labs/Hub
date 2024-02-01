@@ -19,10 +19,8 @@ import {
   useMediaQuery,
   useTheme
 } from "@mui/material";
-import PublicQuest from "./PublicQuest";
 import { Route, Routes, useLocation, useSearchParams } from "react-router-dom";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import { useGetAllPluginDefinitionsByDAOQuery } from "@api/plugin-registry.api";
 import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import { TOOLBAR_HEIGHT } from "./ToolbarConnector";
 import { useSelector } from "react-redux";
@@ -31,7 +29,13 @@ import { IsAuthorised } from "@store/WalletProvider/WalletProvider";
 import CommunityInfo from "./CommunityInfo";
 
 import backgroundImage from "@assets/autos/background.png";
-import { useGetAllNovasQuery, useGetNovaTasksQuery } from "@api/community.api";
+import {
+  ArchetypeIcons,
+  Markets,
+  NovaArchetype,
+  useGetAllNovasQuery,
+  useGetNovaTasksQuery
+} from "@api/community.api";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import { ReactComponent as DiscordIcon } from "@assets/SocialIcons/DiscordIcon.svg";
@@ -61,11 +65,11 @@ const socialIcons = {
 
 const AutContainer = styled("div")(() => ({
   display: "flex",
-  height: "100%",
-  backgroundImage: `url(${backgroundImage})`,
-  backgroundBlendMode: "hard-light",
-  backgroundSize: "cover",
-  backgroundRepeat: "repeat-y"
+  height: "100%"
+  // backgroundImage: `url(${backgroundImage})`,
+  // backgroundBlendMode: "hard-light",
+  // backgroundSize: "cover",
+  // backgroundRepeat: "repeat-y"
 }));
 
 const LeftWrapper = styled(Box)(({ theme }) => ({
@@ -74,7 +78,7 @@ const LeftWrapper = styled(Box)(({ theme }) => ({
   alignItems: "center",
   justifyContent: "center",
   height: "100%",
-  width: "30%"
+  width: "40%"
 }));
 
 const RightWrapper = styled(Box)(({ theme }) => ({
@@ -89,13 +93,16 @@ const RightWrapper = styled(Box)(({ theme }) => ({
   marginLeft: "25px",
   height: "100%",
   position: "relative",
-  width: "70%"
+  width: "60%"
 }));
 
 export const IconContainer = styled("div")(({ theme }) => ({
   display: "flex",
   minHeight: "25px",
   height: "40px",
+
+  flex: "1",
+  flexBasis: "50%",
 
   [theme.breakpoints.down("md")]: {
     height: "35px",
@@ -165,7 +172,11 @@ const TableListItem = memo((data: any) => {
         </Typography>
       </StyledTableCell>
       <StyledTableCell align="left">
-        <AutOsButton>Verify</AutOsButton>
+        <AutOsButton>
+          <Typography variant="body" fontWeight="normal" color="white">
+            Verify
+          </Typography>
+        </AutOsButton>
       </StyledTableCell>
     </StyledTableRow>
   );
@@ -282,219 +293,223 @@ const NovaDetails = () => {
       }}
     >
       <AutContainer>
-        <>
-          <LeftWrapper>
-            <Stack>
-              <Box
+        <LeftWrapper>
+          <Stack
+            sx={{
+              width: "60%",
+              maxWidth: "360px"
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                gap: "12px",
+                justifyContent: "center"
+              }}
+            >
+              <Avatar
                 sx={{
+                  flex: "1",
+                  height: {
+                    xs: "140px",
+                    md: "150px",
+                    xxl: "150px"
+                  },
+                  borderRadius: "0",
+                  width: {
+                    xs: "140px",
+                    md: "150px",
+                    xxl: "150px"
+                  },
+                  bgcolor: "purple"
+                }}
+                aria-label="avatar"
+                src={ipfsCIDToHttpUrl(nova?.properties.image as string)}
+              />
+              <div
+                style={{
+                  flex: "1",
                   display: "flex",
-                  flexDirection: "row",
-                  gap: "12px",
-                  justifyContent: "center",
-                  alignItems: "center"
+                  alignItems: "flex-start"
                 }}
               >
-                <Avatar
+                <Typography
+                  color="offWhite.main"
+                  textAlign="left"
+                  lineHeight={1}
+                  variant="h2"
+                >
+                  {nova?.name}
+                </Typography>
+              </div>
+            </Box>
+
+            <Stack
+              sx={{
+                marginTop: theme.spacing(2)
+              }}
+            >
+              <div>
+                <Box
                   sx={{
-                    flex: "1",
-                    height: {
-                      xs: "140px",
-                      md: "150px",
-                      xxl: "150px"
-                    },
-                    borderRadius: "0",
-                    width: {
-                      xs: "140px",
-                      md: "150px",
-                      xxl: "150px"
-                    },
-                    bgcolor: "purple"
-                  }}
-                  aria-label="avatar"
-                  src={ipfsCIDToHttpUrl(nova?.properties.image as string)}
-                />
-                <div
-                  style={{
-                    flex: "1",
                     display: "flex",
-                    alignItems: "flex-start"
+                    flexDirection: "row",
+                    gap: "12px",
+                    justifyContent: "center",
+                    alignItems: "center"
                   }}
                 >
-                  <Typography
-                    color="offWhite.main"
-                    textAlign="left"
-                    lineHeight={1}
-                    variant="h2"
-                  >
-                    {nova?.name}
-                  </Typography>
-                </div>
-              </Box>
-
-              <Stack
-                sx={{
-                  marginTop: theme.spacing(2)
-                }}
-              >
-                <div>
-                  <Box
+                  <Stack
                     sx={{
-                      display: "flex",
-                      flexDirection: "row",
-                      gap: "12px",
-                      justifyContent: "center",
-                      alignItems: "center"
+                      flex: "1",
+                      flexBasis: "50%",
+                      width: "100%"
                     }}
+                    direction="row"
+                    alignItems="center"
                   >
-                    <Stack
-                      sx={{
-                        flex: "1",
-                        marginTop: theme.spacing(2)
-                      }}
-                      direction="row"
-                      alignItems="center"
-                    >
-                      <CopyAddress address={nova?.address} />
-                      {/* {selectedNetworkConfig?.name && (
-                      <Tooltip
-                        title={`Explore in ${selectedNetworkConfig?.name}`}
-                      >
-                        <IconButton
-                          sx={{ p: 0, ml: 1 }}
-                          href={`${blockExplorer}/address/${selectedCommunity?.properties?.address}`}
-                          target="_blank"
-                          color="offWhite"
-                        >
-                          <OpenInNewIcon
-                            sx={{ cursor: "pointer", width: "20px" }}
-                          />
-                        </IconButton>
-                      </Tooltip>
-                    )} */}
-                    </Stack>
-                    <AutValueLabel
-                      sx={{ flex: "1", marginTop: theme.spacing(2) }}
-                      value={nova?.properties.absoluteValue}
-                      label="Absolute Value"
-                    ></AutValueLabel>
-                  </Box>
-                </div>
-              </Stack>
+                    <CopyAddress address={nova?.address} />
+                  </Stack>
+                  <AutValueLabel
+                    sx={{
+                      flex: "1",
+                      flexBasis: "50%"
+                    }}
+                    value={nova?.properties.absoluteValue}
+                    label="Absolute Value"
+                  ></AutValueLabel>
+                </Box>
+              </div>
+            </Stack>
 
-              <Box
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                gap: "12px",
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <AutIconLabel
                 sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  gap: "12px",
-                  justifyContent: "center",
-                  alignItems: "center"
-                }}
-              >
-                <AutIconLabel
-                  sx={{ flex: "1", marginTop: theme.spacing(2) }}
-                  icon={<ArrowIcon />}
-                  label={nova?.properties.archetype}
-                ></AutIconLabel>
-                <AutIconLabel
-                  sx={{ flex: "1", marginTop: theme.spacing(2) }}
-                  icon={<ArrowIcon />}
-                  label={nova?.properties.archetype}
-                ></AutIconLabel>
-              </Box>
-              <Box
-                sx={{
-                  marginTop: theme.spacing(2),
-                  display: "flex",
-                  flexDirection: "row",
-                  gap: "12px",
-                  justifyContent: "center",
-                  alignItems: "center"
-                }}
-              >
-                <IconContainer>
-                  {nova?.properties.socials.map((social, index) => {
-                    const AutIcon =
-                      socialIcons[Object.keys(socialIcons)[index]];
-
-                    return (
-                      <Link
-                        key={`social-icon-${index}`}
-                        {...(!!social.link && {
-                          component: "a",
-                          href: social.link,
-                          target: "_blank",
-                          sx: {
-                            svg: {
-                              color: theme.palette.offWhite.main
-                            }
-                          }
-                        })}
-                        {...((!social.link ||
-                          social.link === socialUrls[social.type].prefix) && {
-                          sx: {
-                            // display: "none",
-                            svg: {
-                              color: theme.palette.divider
-                            }
-                          },
-                          component: "button",
-                          disabled: true
-                        })}
-                      >
-                        <SvgIcon
-                          sx={{
-                            marginTop: theme.spacing(2),
-                            height: {
-                              xs: "25px",
-                              xxl: "30px"
-                            },
-                            width: {
-                              xs: "25px",
-                              xxl: "30px"
-                            },
-                            mr: {
-                              xs: "10px",
-                              xxl: "15px"
-                            }
-                          }}
-                          key={`socials.${index}.icon`}
-                          component={AutIcon}
-                        />
-                      </Link>
-                    );
-                  })}
-                </IconContainer>
-
-                <AutValueLabel
-                  sx={{ flex: "1", marginTop: theme.spacing(2) }}
-                  value={nova?.properties.members}
-                  label="Members"
-                ></AutValueLabel>
-              </Box>
-              <Box
-                sx={{
+                  flex: "1",
+                  flexBasis: "50%",
                   marginTop: theme.spacing(2)
                 }}
-              >
-                <Box>
-                  <Typography
-                    sx={{ flex: "1" }}
-                    color="offWhite.main"
-                    textAlign="left"
-                    variant="body"
-                  >
-                    {nova?.properties.description || "No description yet..."}
-                  </Typography>
-                </Box>
+                icon={<ArrowIcon />}
+                label={Markets[nova?.properties.archetype]}
+              ></AutIconLabel>
+              <AutIconLabel
+                sx={{
+                  flex: "1",
+                  flexBasis: "50%",
+                  marginTop: theme.spacing(2)
+                }}
+                icon={
+                  <img
+                    src={ArchetypeIcons[nova?.properties.archetype]}
+                    width="22px"
+                    height="22px"
+                  />
+                }
+                label={NovaArchetype[nova?.properties.archetype]}
+              ></AutIconLabel>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                gap: "12px",
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <IconContainer>
+                {nova?.properties.socials.map((social, index) => {
+                  const AutIcon = socialIcons[Object.keys(socialIcons)[index]];
+
+                  return (
+                    <Link
+                      key={`social-icon-${index}`}
+                      {...(!!social.link && {
+                        component: "a",
+                        href: social.link,
+                        target: "_blank",
+                        sx: {
+                          svg: {
+                            color: theme.palette.offWhite.main
+                          }
+                        }
+                      })}
+                      {...((!social.link ||
+                        social.link === socialUrls[social.type].prefix) && {
+                        sx: {
+                          // display: "none",
+                          svg: {
+                            color: theme.palette.divider
+                          }
+                        },
+                        component: "button",
+                        disabled: true
+                      })}
+                    >
+                      <SvgIcon
+                        sx={{
+                          marginTop: theme.spacing(2),
+                          height: {
+                            xs: "25px",
+                            xxl: "30px"
+                          },
+                          width: {
+                            xs: "25px",
+                            xxl: "30px"
+                          },
+                          mr: {
+                            xs: "10px",
+                            xxl: "15px"
+                          }
+                        }}
+                        key={`socials.${index}.icon`}
+                        component={AutIcon}
+                      />
+                    </Link>
+                  );
+                })}
+              </IconContainer>
+
+              <AutValueLabel
+                sx={{
+                  flex: "1",
+                  flexBasis: "50%",
+                  marginTop: theme.spacing(2)
+                }}
+                value={nova?.properties.members}
+                label="Members"
+              ></AutValueLabel>
+            </Box>
+            <Box
+              sx={{
+                marginTop: theme.spacing(2)
+              }}
+            >
+              <Box>
+                <Typography
+                  sx={{ flex: "1" }}
+                  color="offWhite.main"
+                  textAlign="left"
+                  variant="body"
+                >
+                  {nova?.properties.description || "No description yet..."}
+                </Typography>
               </Box>
-            </Stack>
-          </LeftWrapper>
-          <RightWrapper>
-            {!!tasks && !!nova && (
-              <AutUserTabs nova={nova} tasks={tasks.tasks} />
-            )}
-          </RightWrapper>
-        </>
+            </Box>
+          </Stack>
+        </LeftWrapper>
+        <RightWrapper>
+          {!!tasks && !!nova && <AutUserTabs nova={nova} tasks={tasks.tasks} />}
+        </RightWrapper>
       </AutContainer>
     </PerfectScrollbar>
   );

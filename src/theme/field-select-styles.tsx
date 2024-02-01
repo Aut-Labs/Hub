@@ -3,6 +3,7 @@ import {
   ComponentsOverrides,
   ComponentsProps,
   ComponentsVariants,
+  InputLabel,
   PaletteColor,
   Select,
   SelectProps,
@@ -46,7 +47,17 @@ export const AutSelectField = ({
   const theme = useTheme();
   return (
     <SelectWrapper sx={sx}>
+      <InputLabel
+        id="select-label"
+        sx={{
+          color: "white",
+          "&.MuiInputBase-colorPrimary": generateColors(theme.palette.offWhite)
+        }}
+      >
+        {props.label}
+      </InputLabel>
       <Select
+        labelId="select-label"
         className={clsx(className, {
           ["aut-selected"]: !isNullEmptyOrUndefined(props.value)
         })}
@@ -92,7 +103,11 @@ const generateColors = (color: PaletteColor) => ({
   },
   "&.MuiInputBase-root:hover:not(.Mui-disabled):before": {
     borderColor: color.dark
-  }
+  },
+  ".MuiInputBase-root.Mui-focused:before, .MuiInputBase-root.Mui-focused fieldset":
+    {
+      color: "white"
+    }
 });
 
 export default (theme: Theme) =>
@@ -100,6 +115,7 @@ export default (theme: Theme) =>
     ...theme.components.MuiSelect,
     styleOverrides: {
       root: {
+        borderRadius: "4px",
         color: theme.palette.offWhite.dark,
         ".MuiInput-input": {
           textAlign: "left"

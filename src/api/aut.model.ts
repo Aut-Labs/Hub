@@ -2,7 +2,7 @@ import { AutSocial, HolderData } from "./api.model";
 import { Community } from "./community.model";
 import { BaseNFTModel } from "@aut-labs/sdk/dist/models/baseNFTModel";
 import { httpUrlToIpfsCID } from "./storage.api";
-import { Role } from "@aut-labs/sdk/dist/models/dao";
+import { Role } from "@aut-labs/sdk/dist/models/nova";
 import { CommitmentMessages } from "@utils/misc";
 
 export const socialUrls = {

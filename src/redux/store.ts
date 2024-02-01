@@ -1,8 +1,8 @@
 import { Action, configureStore } from "@reduxjs/toolkit";
 import logger from "redux-logger";
 import { reducers } from "./reducers";
-import { pluginRegistryApi } from "@api/plugin-registry.api";
-import { onboardingApi } from "@api/onboarding.api";
+// import { pluginRegistryApi } from "@api/plugin-registry.api";
+// import { onboardingApi } from "@api/onboarding.api";
 import { communityApi } from "@api/community.api";
 // import storage from "redux-persist/lib/storage";
 // import {
@@ -50,8 +50,8 @@ export const store = configureStore({
       immutableCheck: false
     }).concat(
       logger,
-      pluginRegistryApi.middleware,
-      onboardingApi.middleware,
+      // pluginRegistryApi.middleware,
+      // onboardingApi.middleware,
       communityApi.middleware
     ),
   reducer: rootReducer

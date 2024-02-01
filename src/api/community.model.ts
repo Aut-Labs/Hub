@@ -1,7 +1,7 @@
 import { CommitmentMessages } from "@utils/misc";
 import { httpUrlToIpfsCID } from "./storage.api";
 import { BaseNFTModel } from "@aut-labs/sdk/dist/models/baseNFTModel";
-import { NovaProperties, Role, RoleSet } from "@aut-labs/sdk/dist/models/dao";
+import { NovaProperties, Role, RoleSet } from "@aut-labs/sdk/dist/models/nova";
 import { AutSocial } from "./api.model";
 import { socialUrls } from "./aut.model";
 import { Quest } from "@aut-labs/sdk";
