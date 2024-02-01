@@ -11,8 +11,8 @@ export default (theme: Theme) =>
     styleOverrides: {
       paper: {}
     } as ComponentsOverrides<Theme>["MuiMenu"]
-  } as {
+  }) as {
     defaultProps?: ComponentsProps["MuiMenu"];
     styleOverrides?: ComponentsOverrides<Theme>["MuiMenu"];
     variants?: ComponentsVariants["MuiMenu"];
-  });
+  };

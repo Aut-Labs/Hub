@@ -1,6 +1,5 @@
 import AutSDK, { PluginDefinition, fetchMetadata } from "@aut-labs/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
-import { REHYDRATE } from "redux-persist";
 import { environment } from "./environment";
 import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 

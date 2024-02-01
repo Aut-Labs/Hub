@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import axios from "axios";
 import { CommitmentMessages } from "@utils/misc";
 import { Community, NovaDAO, findRoleName } from "./community.model";

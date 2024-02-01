@@ -11,11 +11,11 @@ import AutTheme from "./theme/theme";
 import { ApolloProvider } from "@apollo/client";
 import { apolloClient } from "@store/graphql";
 import "./App.scss";
-// import { PersistGate } from "redux-persist/integration/react";
-// import { persistStore } from "redux-persist";
-// import AutLoading from "@components/AutLoading";
 import CssBaseline from "@mui/material/CssBaseline";
-import markerSDK from "@marker.io/browser";
+import { config } from "@api/ProviderFactory/setup.config";
+import { ConfirmDialogProvider } from "react-mui-confirm";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { WagmiProvider } from "wagmi";
 
 // markerSDK.loadWidget({
 //   project: `${process.env.REACT_APP_MARKER}`,
@@ -24,54 +24,57 @@ import markerSDK from "@marker.io/browser";
 //     fullName: "Nova Showcase"
 //   }
 // });
-
+const queryClient = new QueryClient();
 const container = document.getElementById("root");
 const root = createRoot(container);
-import { ConfirmDialogProvider } from "react-mui-confirm";
 
 // const persistor = persistStore(store);
 
 root.render(
-  <ApolloProvider client={apolloClient}>
-    <StyledEngineProvider injectFirst>
-      <ThemeProvider theme={AutTheme}>
-        <CssBaseline />
-        <Provider store={store}>
-          {/* <PersistGate loading={<AutLoading />} persistor={persistor}> */}
-          <Router>
-            {/* @ts-ignore */}
-            <ConfirmDialogProvider
-              dialogProps={{
-                PaperProps: {
-                  sx: {
-                    borderRadius: "16px",
-                    borderColor: "divider"
-                  }
-                }
-              }}
-              dialogTitleProps={{
-                variant: "subtitle1",
-                color: "white"
-              }}
-              confirmButtonProps={{
-                color: "error",
-                variant: "outlined"
-              }}
-              confirmButtonText="Delete"
-              cancelButtonProps={{
-                color: "offWhite",
-                variant: "outlined"
-              }}
-              cancelButtonText="Dismiss"
-            >
-              <App />
-            </ConfirmDialogProvider>
-          </Router>
-          {/* </PersistGate> */}
-        </Provider>
-      </ThemeProvider>
-    </StyledEngineProvider>
-  </ApolloProvider>
+  <WagmiProvider config={config}>
+    <QueryClientProvider client={queryClient}>
+      <ApolloProvider client={apolloClient}>
+        <StyledEngineProvider injectFirst>
+          <ThemeProvider theme={AutTheme}>
+            <CssBaseline />
+            <Provider store={store}>
+              {/* <PersistGate loading={<AutLoading />} persistor={persistor}> */}
+              <Router>
+                {/* @ts-ignore */}
+                <ConfirmDialogProvider
+                  dialogProps={{
+                    PaperProps: {
+                      sx: {
+                        borderRadius: "16px",
+                        borderColor: "divider"
+                      }
+                    }
+                  }}
+                  dialogTitleProps={{
+                    variant: "subtitle1",
+                    color: "white"
+                  }}
+                  confirmButtonProps={{
+                    color: "error",
+                    variant: "outlined"
+                  }}
+                  confirmButtonText="Delete"
+                  cancelButtonProps={{
+                    color: "offWhite",
+                    variant: "outlined"
+                  }}
+                  cancelButtonText="Dismiss"
+                >
+                  <App />
+                </ConfirmDialogProvider>
+              </Router>
+              {/* </PersistGate> */}
+            </Provider>
+          </ThemeProvider>
+        </StyledEngineProvider>
+      </ApolloProvider>
+    </QueryClientProvider>
+  </WagmiProvider>
 );
 ensureVariablesExist(environment, swEnvVariables);
 reportWebVitals(null);

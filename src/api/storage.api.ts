@@ -30,12 +30,12 @@ export function ipfsCIDToHttpUrl(url: string, isJson = false) {
   }
   if (!url.includes("https://"))
     return isJson
-      ? `${environment.nftStorageUrl}/${replaceAll(
+      ? `${environment.ipfsGatewayUrl}/${replaceAll(
           url,
           "ipfs://",
           ""
         )}/metadata.json`
-      : `${environment.nftStorageUrl}/${replaceAll(url, "ipfs://", "")}`;
+      : `${environment.ipfsGatewayUrl}/${replaceAll(url, "ipfs://", "")}`;
   return url;
 }
 

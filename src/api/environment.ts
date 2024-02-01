@@ -18,10 +18,6 @@ export const swEnvVariables = {
   // Networks
   networkEnv: "REACT_APP_NETWORK_ENV",
 
-  // NFT storage
-  nftStorageKey: "REACT_APP_NFT_STORAGE_KEY",
-  nftStorageUrl: "REACT_APP_IPFS_URL",
-
   // discord
   discordClientId: "REACT_APP_DISCORD_CLIENT_ID",
   discordClientSecret: "REACT_APP_DISCORD_CLIENT_SECRET",

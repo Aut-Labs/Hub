@@ -3,7 +3,7 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { Box } from "@mui/material";
-import { useConnect, useDisconnect, useAccount, useNetwork } from "wagmi";
+import { useConnect, useDisconnect, useAccount } from "wagmi";
 import CopyAddress from "@components/CopyAddress";
 import DialogWrapper from "@components/Dialog/DialogWrapper";
 
@@ -13,8 +13,7 @@ const Profile: React.FC<{ isOpen: boolean; closeModal?: () => void }> = ({
 }) => {
   const { reset } = useConnect();
   const { disconnect } = useDisconnect();
-  const { chain } = useNetwork();
-  const { address, isConnected, connector } = useAccount();
+  const { address } = useAccount();
   const [shouldDisconnect, setShouldDisconnect] = useState(false);
 
   useEffect(() => {

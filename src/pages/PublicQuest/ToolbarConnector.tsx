@@ -13,12 +13,10 @@ import { useAppDispatch } from "@store/store.model";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ethers } from "ethers";
 import AppTitle from "@components/AppTitle";
 import { changeConnectStatus } from "@auth/auth.reducer";
-import Logo from "@assets/logo.svg";
 import { useEthersSigner } from "@api/ProviderFactory/ethers";
-import { useAccount, useConnect, useChainId, useDisconnect } from "wagmi";
+import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { ReactComponent as WalletConnectLogo } from "@assets/aut/wallet-connect.svg";
 import { ReactComponent as MetamaskLogo } from "@assets/aut/metamask.svg";
 import { communityUpdateState } from "@store/Community/community.reducer";
@@ -61,7 +59,7 @@ export const ToolbarConnector = () => {
   const [searchParams] = useSearchParams();
   const networks = useSelector(NetworksConfig);
   const { connector, isReconnecting, isConnecting, isConnected } = useAccount();
-  const { connectAsync, connectors, error, isLoading } = useConnect();
+  const { connectAsync, connectors, error, isPending } = useConnect();
   // const chainId = useChainId();
   const multiSigner = useEthersSigner();
   const { disconnectAsync } = useDisconnect();
@@ -106,7 +104,7 @@ export const ToolbarConnector = () => {
         pluginRegistryAddress: network.contracts.pluginRegistryAddress
       });
     };
-    if (connector?.ready && isConnected && multiSigner) {
+    if (isConnected && multiSigner) {
       const start = async () => {
         const [network] = networks.filter((d) => !d.disabled);
         const itemsToUpdate = {
@@ -133,14 +131,7 @@ export const ToolbarConnector = () => {
       };
       start();
     }
-  }, [
-    dispatch,
-    isConnected,
-    connector?.ready,
-    multiSigner,
-    networks,
-    searchParams
-  ]);
+  }, [dispatch, isConnected, multiSigner, networks, searchParams]);
 
   return (
     <Box>
@@ -163,13 +154,13 @@ export const ToolbarConnector = () => {
             }}
             variant="h2"
           />
-          {(isLoading || isConnecting) && (
+          {(isPending || isConnecting) && (
             <div style={{ position: "relative", flex: 1 }}>
               <AutLoading width="130px" height="130px" />
             </div>
           )}
 
-          {!isLoading && (
+          {!isPending && (
             <>
               <Typography color="white" variant="subtitle1">
                 Connect your wallet
@@ -177,15 +168,12 @@ export const ToolbarConnector = () => {
               <DialogInnerContent>
                 {connectors.map((c) => (
                   <Button
-                    disabled={
-                      !c.ready || isReconnecting || c.id === connector?.id
-                    }
+                    disabled={isReconnecting || c.id === connector?.id}
                     key={c.id}
                     onClick={async () => {
                       await dispatch(changeConnectStatus("connecting"));
                       await connectAsync({
-                        connector: c,
-                        chainId: c.chains[0].id
+                        connector: c
                       });
                     }}
                     startIcon={btnConfig[c.id]?.icon}
