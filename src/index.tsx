@@ -31,7 +31,7 @@ const root = createRoot(container);
 // const persistor = persistStore(store);
 
 root.render(
-  <WagmiProvider config={config}>
+  <WagmiProvider config={config} reconnectOnMount={true}>
     <QueryClientProvider client={queryClient}>
       <ApolloProvider client={apolloClient}>
         <StyledEngineProvider injectFirst>

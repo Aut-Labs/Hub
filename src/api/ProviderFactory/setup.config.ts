@@ -12,7 +12,10 @@ declare module "wagmi" {
 export const config = createConfig({
   chains: [polygonMumbai, polygon],
   connectors: [
-    injected(),
+    injected({
+      shimDisconnect: false,
+      target: "metaMask"
+    }),
     walletConnect({ projectId: "938429658f5e53a8eaf88dc70e4a8367" })
   ],
   transports: {

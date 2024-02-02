@@ -10,7 +10,7 @@ import {
   updateWalletProviderState
 } from "@store/WalletProvider/WalletProvider";
 import { useAppDispatch } from "@store/store.model";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import AppTitle from "@components/AppTitle";
@@ -65,6 +65,13 @@ export const ToolbarConnector = () => {
   const { disconnectAsync } = useDisconnect();
   const isOpen = useSelector(NetworkSelectorIsOpen);
 
+  const filteredConnectors = useMemo(() => {
+    if (connectors?.length) {
+      return connectors.filter((c) => !!btnConfig[c.id]);
+    }
+    return [];
+  }, [connectors]);
+
   const closeAndDisconnect = async () => {
     const itemsToUpdate = {
       isAuthorised: false,
@@ -88,22 +95,22 @@ export const ToolbarConnector = () => {
     }
   };
 
+  const initialiseSDK = async (
+    network: NetworkConfig,
+    multiSigner: MultiSigner
+  ) => {
+    const sdk = AutSDK.getInstance();
+    return sdk.init(multiSigner, {
+      novaAddress: searchParams.get(RequiredQueryParams.DaoAddress),
+      daoTypesAddress: network.contracts.daoTypesAddress,
+      novaRegistryAddress: network.contracts.novaRegistryAddress,
+      autIDAddress: network.contracts.autIDAddress,
+      daoExpanderRegistryAddress: network.contracts.daoExpanderRegistryAddress,
+      pluginRegistryAddress: network.contracts.pluginRegistryAddress
+    });
+  };
+
   useEffect(() => {
-    const initialiseSDK = async (
-      network: NetworkConfig,
-      multiSigner: MultiSigner
-    ) => {
-      const sdk = AutSDK.getInstance();
-      return sdk.init(await multiSigner, {
-        novaAddress: searchParams.get(RequiredQueryParams.DaoAddress),
-        daoTypesAddress: network.contracts.daoTypesAddress,
-        novaRegistryAddress: network.contracts.novaRegistryAddress,
-        autIDAddress: network.contracts.autIDAddress,
-        daoExpanderRegistryAddress:
-          network.contracts.daoExpanderRegistryAddress,
-        pluginRegistryAddress: network.contracts.pluginRegistryAddress
-      });
-    };
     if (isConnected && multiSigner) {
       const start = async () => {
         const [network] = networks.filter((d) => !d.disabled);
@@ -114,6 +121,8 @@ export const ToolbarConnector = () => {
           selectedNetwork: network
         };
 
+        const signers = await multiSigner;
+        await initialiseSDK(network, signers);
         if (searchParams?.get(RequiredQueryParams.DaoAddress)) {
           await dispatch(
             communityUpdateState({
@@ -123,7 +132,6 @@ export const ToolbarConnector = () => {
             })
           );
         }
-        await initialiseSDK(network, await multiSigner);
         await dispatch(changeConnectStatus("connected"));
         setTimeout(async () => {
           await dispatch(updateWalletProviderState(itemsToUpdate));
@@ -166,7 +174,7 @@ export const ToolbarConnector = () => {
                 Connect your wallet
               </Typography>
               <DialogInnerContent>
-                {connectors.map((c) => (
+                {filteredConnectors.map((c) => (
                   <Button
                     disabled={isReconnecting || c.id === connector?.id}
                     key={c.id}
