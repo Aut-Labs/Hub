@@ -6,11 +6,11 @@
     "build": "react-app-rewired build",
     "deploy": "gh-pages -d build",
     "eject": "react-app-rewired eject",
-    "lint:fix": "eslint --fix \"src/**/*.{js,jsx,ts,tsx}\"",
-    "start": "react-app-rewired start",
-    "test": "react-app-rewired test",
     "lint": "eslint --fix \"src/**/*.{js,jsx,ts,tsx}\"",
-    "prettier-format": "prettier --config .prettierrc.json \"src/**/*.{js,jsx,ts,tsx}\" --write"
+    "lint:fix": "eslint --fix \"src/**/*.{js,jsx,ts,tsx}\"",
+    "prettier-format": "prettier --config .prettierrc.json \"src/**/*.{js,jsx,ts,tsx}\" --write",
+    "start": "react-app-rewired start",
+    "test": "react-app-rewired test"
   },
   "browserslist": {
     "production": [
@@ -30,11 +30,14 @@
       "react-app/jest"
     ]
   },
+  "resolutions": {
+    "react-query": "4.0.0-beta.23"
+  },
   "dependencies": {
     "@apollo/client": "^3.9.1",
-    "@aut-labs/abi-types": "^0.0.72-dev",
-    "@aut-labs/d-aut": "^1.0.109-dev",
-    "@aut-labs/sdk": "^0.0.145-dev",
+    "@aut-labs/abi-types": "^0.0.74-dev",
+    "@aut-labs/d-aut": "^1.0.115-dev",
+    "@aut-labs/sdk": "^0.0.149-dev",
     "@aut-labs/sdk-biconomy": "^0.0.2",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
@@ -108,8 +111,5 @@
     "tsc-watch": "^6.0.4",
     "typescript": "^4.9.5",
     "web-vitals": "^3.5.2"
-  },
-  "resolutions": {
-    "react-query": "4.0.0-beta.23"
   }
 }

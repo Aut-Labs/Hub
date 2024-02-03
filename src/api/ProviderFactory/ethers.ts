@@ -16,9 +16,9 @@ export interface MultiSigner {
 export async function walletClientToSigner(walletClient): Promise<MultiSigner> {
   const { account, chain, transport } = walletClient;
   const network = {
-    chainId: chain.id,
-    name: chain.name,
-    ensAddress: chain.contracts?.ensRegistry?.address
+    chainId: chain?.id,
+    name: chain?.name,
+    ensAddress: chain?.contracts?.ensRegistry?.address
   };
 
   const provider = new BrowserProvider(transport as any, network);
