@@ -42,8 +42,8 @@ export enum Markets {
 }
 
 const getAllNovas = async (body: any, api: BaseQueryApi) => {
-  const sdk = AutSDK.getInstance();
   try {
+    const sdk = AutSDK.getInstance();
     const fetchNovas = gql`
       query GetNovas {
         novaDAOs(skip: 0, first: 100) {
@@ -71,100 +71,99 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
         novaDAO.metadataUri,
         environment.ipfsGatewayUrl
       );
-      debugger;
-      const nova: Nova = sdk.initService<Nova>(Nova, novaDAO.address);
-      const localReputation: LocalReputation = sdk.localReputation;
+      //TODO: Fix archetypes and find AV
+      // const nova: Nova = sdk.initService<Nova>(Nova, novaDAO.address);
+      // const localReputation: LocalReputation = sdk.localReputation;
 
-      debugger;
-      const archetypeResponse = await nova.contract.getArchetype();
-      const stats = await localReputation.contract.getNovaLocalReputationStats(
-        novaDAO.address
-      );
-      debugger;
+      // const archetypeResponse = await nova.contract.getArchetype();
+      // const stats = await localReputation.contract.getNovaLocalReputationStats(
+      //   novaDAO.address
+      // );
+      // debugger;
       const enrichedNova = new Community({
         ...novaDAO,
         ...novaMetadata,
         properties: {
-          archetype: archetypeResponse.data,
-          roles: novaMetadata.properties.rolesSets[0].roles,
-          stats: stats?.data,
           ...novaMetadata.properties,
+          archetype: Math.floor(Math.random() * 5) + 1,
+          roles: novaMetadata.properties.rolesSets[0].roles,
+          absoluteValue: Math.floor(Math.random() * 100) + 1,
+          prestige: Math.floor(Math.random() * 100) + 1,
+          members: Math.floor(Math.random() * 100) + 1,
           address: novaDAO.address,
           marketId: novaDAO.market
         }
       } as unknown as Community);
       enrichedNovae.push(enrichedNova);
-      debugger;
     }
+
+    return {
+      data: { daos: enrichedNovae }
+    };
   } catch (e) {
-    debugger;
-    console.log(e);
+    return {
+      error: e
+    };
   }
 
-  debugger;
-
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-  const mockDaos = [
-    {
-      address: "0x09Ed23BB6F9Ccc3Fd9b3BC4C859D049bf4AB4D43",
-      name: "DAO1",
-      onboardingQuestAddress: "0x456",
-      properties: {
-        market: 1,
-        archetype: 1,
-        absoluteValue: "18",
-        prestige: 66,
-        members: 14,
-        description:
-          "Sphinx of black quartz, judge my vow. Sphinx of black quartz, judge my vow. Sphinx of black quartz, judge my vow. Sphinx of black quartz, judge my vow. ",
-        image:
-          "ipfs://bafkreihrhccb2qvrnb2zcgyjnl4z6asv7qtgzshzuj6hk7tpm4lywxb7fi",
-        roles: [
-          { name: "Role1", id: "1" },
-          { name: "Role2", id: "2" },
-          { name: "Role3", id: "3" }
-        ],
-        socials: [
-          { type: "discord", link: "", metadata: {} },
-          { type: "ens", link: "", metadata: {} },
-          { type: "twitter", link: "", metadata: {} },
-          { type: "github", link: "", metadata: {} }
-        ]
-      }
-    },
-    {
-      address: "0x09Ed23BB6F9Ccc3Fd9b3BC4C859D049bf4AB4D43",
-      name: "DAO2",
-      onboardingQuestAddress: "0xabc",
-      properties: {
-        market: 2,
-        archetype: 2,
-        absoluteValue: "44",
-        prestige: 76,
-        members: 45,
-        description:
-          "Sphinx of black quartz, judge my vow. Sphinx of black quartz, judge my vow. Sphinx of black quartz, judge my vow. Sphinx of black quartz, judge my vow. ",
-        image:
-          "https://ipfs.nftstorage.link/ipfs/bafkreiddqyd46fvb5ffpbi3lgv7lea2s3mtpyjoh2ti4mj7r56nu4zydwe",
-        roles: [
-          { name: "Role3", id: "3" },
-          { name: "Role4", id: "4" },
-          { name: "Role3", id: "3" }
-        ],
-        socials: [
-          { type: "discord", link: "", metadata: {} },
-          { type: "ens", link: "", metadata: {} },
-          { type: "twitter", link: "", metadata: {} },
-          { type: "github", link: "", metadata: {} }
-        ]
-      }
-    }
-    // Add more DAOs as needed
-  ];
-
-  return {
-    data: { daos: mockDaos }
-  };
+  // await new Promise((resolve) => setTimeout(resolve, 2000));
+  // const mockDaos = [
+  //   {
+  //     address: "0x09Ed23BB6F9Ccc3Fd9b3BC4C859D049bf4AB4D43",
+  //     name: "DAO1",
+  //     onboardingQuestAddress: "0x456",
+  //     properties: {
+  //       market: 1,
+  //       archetype: 1,
+  //       absoluteValue: "18",
+  //       prestige: 66,
+  //       members: 14,
+  //       description:
+  //         "Sphinx of black quartz, judge my vow. Sphinx of black quartz, judge my vow. Sphinx of black quartz, judge my vow. Sphinx of black quartz, judge my vow. ",
+  //       image:
+  //         "ipfs://bafkreihrhccb2qvrnb2zcgyjnl4z6asv7qtgzshzuj6hk7tpm4lywxb7fi",
+  //       roles: [
+  //         { name: "Role1", id: "1" },
+  //         { name: "Role2", id: "2" },
+  //         { name: "Role3", id: "3" }
+  //       ],
+  //       socials: [
+  //         { type: "discord", link: "", metadata: {} },
+  //         { type: "ens", link: "", metadata: {} },
+  //         { type: "twitter", link: "", metadata: {} },
+  //         { type: "github", link: "", metadata: {} }
+  //       ]
+  //     }
+  //   },
+  //   {
+  //     address: "0x09Ed23BB6F9Ccc3Fd9b3BC4C859D049bf4AB4D43",
+  //     name: "DAO2",
+  //     onboardingQuestAddress: "0xabc",
+  //     properties: {
+  //       market: 2,
+  //       archetype: 2,
+  //       absoluteValue: "44",
+  //       prestige: 76,
+  //       members: 45,
+  //       description:
+  //         "Sphinx of black quartz, judge my vow. Sphinx of black quartz, judge my vow. Sphinx of black quartz, judge my vow. Sphinx of black quartz, judge my vow. ",
+  //       image:
+  //         "https://ipfs.nftstorage.link/ipfs/bafkreiddqyd46fvb5ffpbi3lgv7lea2s3mtpyjoh2ti4mj7r56nu4zydwe",
+  //       roles: [
+  //         { name: "Role3", id: "3" },
+  //         { name: "Role4", id: "4" },
+  //         { name: "Role3", id: "3" }
+  //       ],
+  //       socials: [
+  //         { type: "discord", link: "", metadata: {} },
+  //         { type: "ens", link: "", metadata: {} },
+  //         { type: "twitter", link: "", metadata: {} },
+  //         { type: "github", link: "", metadata: {} }
+  //       ]
+  //     }
+  //   }
+  //   // Add more DAOs as needed
+  // ];
 };
 
 const getNovaTasks = async (body: any, api: BaseQueryApi) => {
@@ -172,85 +171,40 @@ const getNovaTasks = async (body: any, api: BaseQueryApi) => {
 
   const tasks = [
     {
-      name: "Write a Blog Post",
+      name: "Opt Out Writing",
       description:
-        "Contribute to our blog by sharing your insights on the latest crypto trends and developments.",
+        "Participate and get published in our Opt Out writing program in partnership with Hackernoon",
       startDate: new Date("2022-01-01"),
       endDate: new Date("2022-01-05"),
-      role: "Role 1"
+      role: "Creative"
     },
     {
-      name: "Code Review Session",
+      name: "Bounty Program",
       description:
-        "Help review and optimize a fellow developer's smart contract. Your expertise is valuable to the community.",
+        "Complete a bounty from our Dework page, and get it approved.",
       startDate: new Date("2022-02-01"),
       endDate: new Date("2022-02-10"),
-      role: "Role 1"
+      role: "Tech"
     },
     {
-      name: "Task 3",
-      description: "Description for task 3",
+      name: "Connectors Program",
+      description:
+        "Join our Connectors program, let’s have an interesting conversation - and you’re in!",
       startDate: new Date("2022-03-01"),
       endDate: new Date("2022-03-10"),
-      role: "Role 1"
-    },
-    {
-      name: "Write a Blog Post",
-      description:
-        "Contribute to our blog by sharing your insights on the latest crypto trends and developments.",
-      startDate: new Date("2022-01-01"),
-      endDate: new Date("2022-01-05"),
-      role: "Role 2"
-    },
-    {
-      name: "Code Review Session",
-      description:
-        "Help review and optimize a fellow developer's smart contract. Your expertise is valuable to the community.",
-      startDate: new Date("2022-02-01"),
-      endDate: new Date("2022-02-10"),
-      role: "Role 2"
-    },
-    {
-      name: "Task 3",
-      description: "Description for task 3",
-      startDate: new Date("2022-03-01"),
-      endDate: new Date("2022-03-10"),
-      role: "Role 2"
-    },
-    {
-      name: "Task 4",
-      description: "Description for task 4",
-      startDate: new Date("2022-04-01"),
-      endDate: new Date("2022-04-10"),
-      role: "Role 2"
-    },
-    {
-      name: "Write a Blog Post",
-      description:
-        "Contribute to our blog by sharing your insights on the latest crypto trends and developments.",
-      startDate: new Date("2022-01-01"),
-      endDate: new Date("2022-01-05"),
-      role: "Role 3"
-    },
-    {
-      name: "Code Review Session",
-      description:
-        "Help review and optimize a fellow developer's smart contract. Your expertise is valuable to the community.",
-      startDate: new Date("2022-02-01"),
-      endDate: new Date("2022-02-10"),
-      role: "Role 3"
-    },
-    {
-      name: "Task 3",
-      description: "Description for task 3",
-      startDate: new Date("2022-03-01"),
-      endDate: new Date("2022-03-10"),
-      role: "Role 2"
+      role: "Community"
     }
   ];
 
   return {
     data: { tasks }
+  };
+};
+
+const checkOnboardingAllowlist = async (body: any, api: BaseQueryApi) => {
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  return {
+    data: { isAllowed: true }
   };
 };
 
@@ -274,6 +228,9 @@ export const communityApi = createApi({
 
     if (url === "getNovaTasks") {
       return getNovaTasks(body, api);
+    }
+    if (url === "checkOnboardingAllowlist") {
+      return checkOnboardingAllowlist(body, api);
     }
     return {
       data: "Test"
@@ -318,6 +275,19 @@ export const communityApi = createApi({
         };
       }
     }),
+    checkOnboardingAllowlist: builder.query<
+      {
+        isAllowed: boolean;
+      },
+      string
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "checkOnboardingAllowlist"
+        };
+      }
+    }),
     getNovaTasks: builder.query<
       {
         tasks: any[];
@@ -338,5 +308,6 @@ export const {
   useGetAllMembersQuery,
   useGetCommunityQuery,
   useGetAllNovasQuery,
-  useGetNovaTasksQuery
+  useGetNovaTasksQuery,
+  useLazyCheckOnboardingAllowlistQuery
 } = communityApi;

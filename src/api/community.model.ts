@@ -1,7 +1,7 @@
 import { CommitmentMessages } from "@utils/misc";
 import { httpUrlToIpfsCID } from "./storage.api";
 import { BaseNFTModel } from "@aut-labs/sdk/dist/models/baseNFTModel";
-import { NovaProperties, Role, RoleSet } from "@aut-labs/sdk/dist/models/nova";
+import { NovaProperties, RoleSet } from "@aut-labs/sdk/dist/models/nova";
 import { AutSocial } from "./api.model";
 import { socialUrls } from "./aut.model";
 import { Quest } from "@aut-labs/sdk";
@@ -31,9 +31,19 @@ export const findRoleName = (roleId: string, rolesSets: RoleSet[]) => {
   }
 };
 
+interface Role {
+  id: number;
+  roleName: string;
+}
+
 export class CommunityProperties extends NovaProperties {
   address?: string;
-
+  prestige?: number;
+  archetype?: number;
+  marketId?: number;
+  members?: number;
+  absoluteValue?: number;
+  roles: Role[];
   socials: AutSocial[];
 
   userData?: {
@@ -55,8 +65,14 @@ export class CommunityProperties extends NovaProperties {
       this.market = MarketTemplates[data.market]?.title;
       this.commitment = data.commitment;
       this.rolesSets = data.rolesSets;
+      this.roles = data.roles;
       this.address = data.address;
       this.socials = data.socials;
+      this.archetype = data.archetype;
+      this.prestige = data.prestige;
+      this.members = data.members;
+      this.marketId = data.marketId;
+      this.absoluteValue = data.absoluteValue;
       this.additionalProps = data.additionalProps;
       this.userData =
         JSON.parse(JSON.stringify(data?.userData || {})) ||

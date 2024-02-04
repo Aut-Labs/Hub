@@ -1,5 +1,4 @@
-import { Suspense, lazy, memo, useEffect, useMemo, useRef } from "react";
-import AutLoading from "@components/AutLoading";
+import { memo, useEffect, useRef } from "react";
 import {
   Avatar,
   Box,
@@ -19,22 +18,18 @@ import {
   useMediaQuery,
   useTheme
 } from "@mui/material";
-import { Route, Routes, useLocation, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import { PluginDefinitionType } from "@aut-labs/sdk/dist/models/plugin";
 import { TOOLBAR_HEIGHT } from "./ToolbarConnector";
-import { useSelector } from "react-redux";
 import CopyAddress from "@components/CopyAddress";
-import { IsAuthorised } from "@store/WalletProvider/WalletProvider";
-import CommunityInfo from "./CommunityInfo";
 
-import backgroundImage from "@assets/autos/background.png";
 import {
   ArchetypeIcons,
   Markets,
   NovaArchetype,
   useGetAllNovasQuery,
-  useGetNovaTasksQuery
+  useGetNovaTasksQuery,
+  useLazyCheckOnboardingAllowlistQuery
 } from "@api/community.api";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
@@ -43,17 +38,15 @@ import { ReactComponent as GitHubIcon } from "@assets/SocialIcons/GitHubIcon.svg
 import { ReactComponent as LensfrensIcon } from "@assets/SocialIcons/LensfrensIcon.svg";
 import { ReactComponent as TelegramIcon } from "@assets/SocialIcons/TelegramIcon.svg";
 import { ReactComponent as TwitterIcon } from "@assets/SocialIcons/TwitterIcon.svg";
-import { ReactComponent as WebsiteIcon } from "@assets/SocialIcons/WebsiteIcon.svg";
-import { autUrls } from "@api/environment";
-import { useAccount, useChainId } from "wagmi";
-import { novaSocialUrls, socialUrls } from "@api/aut.model";
-import theme from "@theme/theme";
+import { socialUrls } from "@api/aut.model";
 import AutUserTabs from "./AutNovaTabs/AutUserTabs";
 import { ReactComponent as ArrowIcon } from "@assets/autos/move-right.svg";
 import moment from "moment";
-import { AutButton, AutOsButton } from "@components/AutButton";
+import { AutOsButton } from "@components/AutButton";
 import AutIconLabel from "@components/AutIconLabel";
 import AutValueLabel from "@components/AutValueLabel";
+import LoadingDialog from "@components/Dialog/LoadingPopup";
+import { EnvMode, environment } from "@api/environment";
 
 const socialIcons = {
   discord: DiscordIcon,
@@ -78,7 +71,11 @@ const LeftWrapper = styled(Box)(({ theme }) => ({
   alignItems: "center",
   justifyContent: "center",
   height: "100%",
-  width: "40%"
+  width: "40%",
+  backdropFilter: "blur(50px)",
+  boxShadow: "0px 3px 6px #00000029",
+  borderRadius: "30px",
+  margin: "60px"
 }));
 
 const RightWrapper = styled(Box)(({ theme }) => ({
@@ -133,6 +130,31 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 const TableListItem = memo((data: any) => {
   const { row } = data;
   const theme = useTheme();
+
+  const [checkOnboardingAllowlist, { data: result, isLoading, isError }] =
+    useLazyCheckOnboardingAllowlistQuery();
+
+  const handleClick = () => {
+    const event = new CustomEvent("aut-open", {
+      composed: true,
+      cancelable: true,
+      bubbles: true
+      // detail: payload
+    });
+    window.dispatchEvent(event);
+  };
+
+  const handleDialogClose = () => {
+    console.log("Verify task close");
+  };
+
+  useEffect(() => {
+    if (result && result?.isAllowed) {
+      debugger;
+      document.dispatchEvent(new CustomEvent("aut-open"));
+    }
+  }, [isLoading, result]);
+
   return (
     <StyledTableRow
       sx={{
@@ -151,6 +173,11 @@ const TableListItem = memo((data: any) => {
         }
       }}
     >
+      <LoadingDialog
+        handleClose={handleDialogClose}
+        open={isLoading}
+        message="Verifying task..."
+      />
       <StyledTableCell align="left">
         <Stack>
           <Typography variant="subtitle1" fontWeight="normal" color="white">
@@ -172,7 +199,7 @@ const TableListItem = memo((data: any) => {
         </Typography>
       </StyledTableCell>
       <StyledTableCell align="left">
-        <AutOsButton>
+        <AutOsButton onClick={() => handleClick()}>
           <Typography variant="body" fontWeight="normal" color="white">
             Verify
           </Typography>
@@ -267,14 +294,50 @@ const NovaDetails = () => {
   const { data: nova } = useGetAllNovasQuery(null, {
     selectFromResult: ({ data }) => ({
       data: (data?.daos || []).find(
-        (d) => d.address === searchParams.get(RequiredQueryParams.DaoAddress)
+        (d) =>
+          d.properties.address ===
+          searchParams.get(RequiredQueryParams.DaoAddress)
       )
     })
   });
 
-  const { data: tasks } = useGetNovaTasksQuery(nova?.address, {
-    skip: !nova?.address
+  const { data: tasks } = useGetNovaTasksQuery(nova?.properties.address, {
+    skip: !nova?.properties.address
   });
+
+  const handleDialogClose = () => {};
+
+  useEffect(() => {
+    const autDiv = document.querySelector("div.aut");
+    const button = autDiv?.querySelector("button");
+    debugger;
+    if (button) {
+      button.style.display = "none";
+    }
+
+    // return () => {
+    //   if (button) {
+    //     button.style.display = ""; // Reset the style when the component unmounts
+    //   }
+    // };
+  }, []);
+
+  useEffect(() => {
+    // window.addEventListener("aut_profile", onAutMenuProfile);
+    // window.addEventListener("aut-Init", onAutInit);
+    // window.addEventListener("aut-onConnected", onAutLogin);
+    // window.addEventListener("aut-onDisconnected", onDisconnected);
+
+    return () => {
+      // window.removeEventListener("aut_profile", onAutMenuProfile);
+      // window.removeEventListener("aut-Init", onAutInit);
+      // window.removeEventListener("aut-onConnected", onAutLogin);
+      // window.removeEventListener("aut-onDisconnected", onAutLogin);
+      // if (abort.current) {
+      //   abort.current.abort();
+      // }
+    };
+  }, []);
 
   return (
     <PerfectScrollbar
@@ -292,6 +355,23 @@ const NovaDetails = () => {
         flexDirection: "column"
       }}
     >
+      <d-aut
+        style={{
+          // display: "none",
+          position: "absolute",
+          zIndex: 99999,
+          left: "-9999px",
+          top: "-9999px"
+        }}
+        use-dev={environment.env == EnvMode.Development}
+        id="d-aut"
+        // allowed-role-id={3}
+        hide-button={true}
+        menu-items='[{"name":"Profile","actionType":"event_emit","eventName":"aut_profile"}]'
+        flow-config='{"mode" : "tryAut", "customCongratsMessage": ""}'
+        nova-address={searchParams.get(RequiredQueryParams.DaoAddress)}
+        ipfs-gateway={environment.ipfsGatewayUrl}
+      />
       <AutContainer>
         <LeftWrapper>
           <Stack
@@ -325,7 +405,7 @@ const NovaDetails = () => {
                   bgcolor: "purple"
                 }}
                 aria-label="avatar"
-                src={ipfsCIDToHttpUrl(nova?.properties.image as string)}
+                src={ipfsCIDToHttpUrl(nova?.image as string)}
               />
               <div
                 style={{
@@ -369,7 +449,7 @@ const NovaDetails = () => {
                     direction="row"
                     alignItems="center"
                   >
-                    <CopyAddress address={nova?.address} />
+                    <CopyAddress address={nova?.properties.address} />
                   </Stack>
                   <AutValueLabel
                     sx={{
@@ -501,7 +581,7 @@ const NovaDetails = () => {
                   textAlign="left"
                   variant="body"
                 >
-                  {nova?.properties.description || "No description yet..."}
+                  {nova?.description || "No description yet..."}
                 </Typography>
               </Box>
             </Box>

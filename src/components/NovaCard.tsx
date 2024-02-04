@@ -142,7 +142,7 @@ export const NovaCard = ({ daoData }: { daoData: any }) => {
           <AutCardContainer className={`aut-card-container front`}>
             {" "}
             <img
-              src={ipfsCIDToHttpUrl(daoData.properties?.image)}
+              src={ipfsCIDToHttpUrl(daoData?.image)}
               alt="Dao image"
               style={{
                 marginTop: "15px",
@@ -262,7 +262,7 @@ export const NovaCard = ({ daoData }: { daoData: any }) => {
                     }
                   }}
                 >
-                  {role.name}
+                  {role.roleName}
                 </Button>
               ))}
             </Box>
@@ -418,7 +418,7 @@ export const NovaCard = ({ daoData }: { daoData: any }) => {
           size="normal"
           color="offWhite"
           onClick={() => {
-            navigate(`/dao?daoAddress=${daoData.address}`);
+            navigate(`/dao?daoAddress=${daoData.properties.address}`);
           }}
         >
           Join

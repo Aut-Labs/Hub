@@ -4,7 +4,7 @@ import { Box } from "@mui/material";
 import { Route, Routes } from "react-router-dom";
 import { useAppDispatch } from "@store/store.model";
 import SWSnackbar from "./components/snackbar";
-import { environment } from "@api/environment";
+import { EnvMode, environment } from "@api/environment";
 import { setNetworks } from "@store/WalletProvider/WalletProvider";
 import { getAppConfig } from "@api/aut.api";
 import AutSDK from "@aut-labs/sdk";
@@ -13,7 +13,9 @@ import { ToolbarConnector } from "./pages/PublicQuest/ToolbarConnector";
 import { DaoList } from "./pages/PublicQuest/DaoList";
 import Callback from "./pages/Oauth2Callback/Callback";
 import NovaDetails from "./pages/PublicQuest/NovaDetails";
-import backgroundImage from "@assets/autos/background.png";
+import backgroundImage from "@assets/autos/background.svg";
+import background1 from "@assets/autos/background1.png";
+import { Init } from "@aut-labs/d-aut";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -21,10 +23,34 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const config = {
+      defaultText: "Connect Wallet",
+      textAlignment: "right",
+      menuTextAlignment: "left",
+      theme: {
+        color: "offWhite",
+        // color: 'nightBlack',
+        // color: colors.amber['500'],
+        // color: '#7b1fa2',
+        type: "main"
+      },
+      // size: "default" // large & extraLarge or see below
+      size: {
+        width: 240,
+        height: 50,
+        padding: 3
+      }
+    };
+
+    Init({
+      config
+    });
+  }, []);
+
+  useEffect(() => {
     getAppConfig()
       .then(async (res) => {
         dispatch(setNetworks(res));
-        setLoading(false);
         const [network] = res.filter((d) => !d.disabled);
         const sdk = new AutSDK({
           ipfs: {
@@ -33,6 +59,7 @@ function App() {
             gatewayUrl: environment.ipfsGatewayUrl
           }
         });
+        setLoading(false);
       })
       .catch(() => {
         setLoading(false);
@@ -50,7 +77,7 @@ function App() {
             sx={{
               // height: "100%",
               // backgroundColor: "transparent"
-              backgroundImage: `url(${backgroundImage})`,
+              backgroundImage: `url(${backgroundImage}), url(${background1})`,
               backgroundAttachment: "fixed",
               backgroundSize: "cover",
               backgroundPosition: "center",

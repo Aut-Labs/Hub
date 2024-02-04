@@ -21,9 +21,9 @@ const LoadingDialog = ({ open, message = null, fullScreen = false }: any) => {
               textAlign: "center",
               mt: 2
             }}
-            className="text-secondary"
             component="div"
-            variant="subtitle1"
+            color="offWhite.main"
+            variant="subtitle2"
           >
             {message}
           </Typography>
@@ -34,7 +34,7 @@ const LoadingDialog = ({ open, message = null, fullScreen = false }: any) => {
             position: "relative"
           }}
         >
-          <AutLoading width="130px" height="130px" />
+          <AutLoading width="200px" height="200px" />
         </div>
       </div>
     </DialogWrapper>
