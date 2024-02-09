@@ -12,7 +12,9 @@ import {
   Switch,
   MenuItem,
   Select,
-  FormControl
+  FormControl,
+  InputAdornment,
+  CircularProgress
 } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -43,6 +45,9 @@ import backgroundImage from "@assets/autos/background.png";
 import { AutSelectField } from "@theme/field-select-styles";
 import { Community } from "@api/community.model";
 import { gql, useQuery } from "@apollo/client";
+import { ReactComponent as Filters } from "@assets/icons/filters.svg";
+import { ReactComponent as Markets } from "@assets/icons/markets.svg";
+import { ReactComponent as Archetypes } from "@assets/icons/archetype.svg";
 
 const AutContainer = styled("div")(() => ({
   display: "flex",
@@ -71,11 +76,10 @@ export const GridBox = styled(Box)(({ theme }) => ({
   }
 }));
 
-export const DaoList = () => {
+export const NovaList = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [selectedQuest, setSelectedQuest] = useState(null);
-  const [openApplySuccess, setOpenApplySuccess] = useState(false);
   const [searchParams] = useSearchParams();
   const connectStatus = useSelector(ConnectStatus);
   const theme = useTheme();
@@ -86,10 +90,13 @@ export const DaoList = () => {
   const [marketFilter, setMarkerFilter] = useState("");
   const [archetypeFilter, setArchetypeFilter] = useState("");
 
-  const { data, isLoading, isFetching } = useGetAllNovasQuery(null, {
-    refetchOnMountOrArgChange: true,
-    skip: false
-  });
+  const { data, isLoading, isFetching } = useGetAllNovasQuery(
+    { marketFilter },
+    {
+      refetchOnMountOrArgChange: true,
+      skip: false
+    }
+  );
 
   return (
     <PerfectScrollbar
@@ -108,106 +115,108 @@ export const DaoList = () => {
     >
       <AutContainer>
         <ErrorDialog handleClose={() => null} open={null} message={null} />
-        <SuccessDialog
-          open={openApplySuccess}
-          message="Congrats!"
-          titleVariant="h2"
-          subtitle="Whoop! You successfully applied for the quest!"
-          subtitleVariant="subtitle1"
-          handleClose={() => {
-            setOpenApplySuccess(false);
-          }}
-        ></SuccessDialog>
         <Box
           sx={{
             display: "flex",
             justifyContent: "center",
             alignItems: "flex-start",
-            gap: "30px",
-            width: "60%",
+            gap: "25px",
+            width: "70%",
             mt: "100px"
           }}
         >
-          <FormControl
-            sx={{
-              flex: 1,
-              mx: 1
-            }}
+          <AutSelectField
+            value={activeOnboardingFilter}
+            color="offWhite"
+            defaultValue={""}
+            placeholder="Onboarding Status"
+            onChange={(e) =>
+              setActiveOnboardingFilter(e.target.value as string)
+            }
+            startAdornment={
+              <InputAdornment
+                position="start"
+                sx={{ width: "30px", height: "30px" }}
+              >
+                <Filters />
+              </InputAdornment>
+            }
           >
-            <AutSelectField
-              value={activeOnboardingFilter}
-              color="offWhite"
-              label="Onboarding Status"
-              onChange={(e) =>
-                setActiveOnboardingFilter(e.target.value as string)
-              }
-            >
-              <MenuItem value="All">
-                <em>All Novae</em>
-              </MenuItem>
-              <MenuItem value="Active">
-                <em>Active</em>
-              </MenuItem>
-              <MenuItem value="Inactive">
-                <em>Inactive</em>
-              </MenuItem>
-            </AutSelectField>
-          </FormControl>
-
-          <FormControl
-            sx={{
-              flex: 1,
-              mx: 1
-            }}
+            <MenuItem value="">
+              <em>All Novae</em>
+            </MenuItem>
+            <MenuItem value="Active">
+              <em>Active</em>
+            </MenuItem>
+            <MenuItem value="Inactive">
+              <em>Inactive</em>
+            </MenuItem>
+          </AutSelectField>
+          <AutSelectField
+            value={marketFilter}
+            color="offWhite"
+            onChange={(e) => setMarkerFilter(e.target.value as string)}
+            startAdornment={
+              <InputAdornment
+                position="start"
+                sx={{ width: "30px", height: "30px" }}
+              >
+                <Markets />
+              </InputAdornment>
+            }
           >
-            <AutSelectField
-              value={marketFilter}
-              color="offWhite"
-              label="Market"
-              onChange={(e) => setMarkerFilter(e.target.value as string)}
-            >
-              <MenuItem value="Infra, Defi & DAO Tooling">
-                <em>Infra, Defi & DAO Tooling</em>
-              </MenuItem>
-              <MenuItem value="Art, Events & NFTs">
-                <em>Art, Events & NFTs</em>
-              </MenuItem>
-              <MenuItem value="Governance & Public Goods">
-                <em>Governance & Public Goods</em>
-              </MenuItem>
-            </AutSelectField>
-          </FormControl>
-
-          <FormControl
-            sx={{
-              flex: 1,
-              mx: 1
-            }}
+            <MenuItem value="">
+              <em>All Markets</em>
+            </MenuItem>
+            <MenuItem value="1">
+              <em>Open-Source & Infra</em>
+            </MenuItem>
+            <MenuItem value="2">
+              <em>Art, Events & NFTs</em>
+            </MenuItem>
+            <MenuItem value="3">
+              <em>Social, Gaming & DeFi</em>
+            </MenuItem>
+            <MenuItem value="4">
+              <em>ReFi & Public Goods</em>
+            </MenuItem>
+          </AutSelectField>
+          <AutSelectField
+            value={archetypeFilter}
+            color="offWhite"
+            onChange={(e) => setArchetypeFilter(e.target.value as string)}
+            startAdornment={
+              <InputAdornment
+                position="start"
+                sx={{ width: "30px", height: "30px" }}
+              >
+                <Archetypes />
+              </InputAdornment>
+            }
           >
-            <AutSelectField
-              value={archetypeFilter}
-              color="offWhite"
-              onChange={(e) => setArchetypeFilter(e.target.value as string)}
-              label="Archetype"
-            >
-              <MenuItem value="Growth">
-                <em>Growth</em>
-              </MenuItem>
-              <MenuItem value="Performance">
-                <em>Performance</em>
-              </MenuItem>
-              <MenuItem value="Size">
-                <em>Size</em>
-              </MenuItem>
-              <MenuItem value="Reputation">
-                <em>Reputation</em>
-              </MenuItem>
-              <MenuItem value="Conviction">
-                <em>Conviction</em>
-              </MenuItem>
-            </AutSelectField>
-          </FormControl>
+            <MenuItem value="">
+              <em>Archetype</em>
+            </MenuItem>
+            <MenuItem value="Growth">
+              <em>Growth</em>
+            </MenuItem>
+            <MenuItem value="Performance">
+              <em>Performance</em>
+            </MenuItem>
+            <MenuItem value="Size">
+              <em>Size</em>
+            </MenuItem>
+            <MenuItem value="Reputation">
+              <em>Reputation</em>
+            </MenuItem>
+            <MenuItem value="Conviction">
+              <em>Conviction</em>
+            </MenuItem>
+          </AutSelectField>
         </Box>
+        {isLoading && (
+          <CircularProgress size={23} color="secondary"></CircularProgress>
+        )}
 
         {!isLoading && !(data?.daos || [])?.length && (
           <Box

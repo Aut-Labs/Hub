@@ -3,16 +3,21 @@ import {
   ComponentsOverrides,
   ComponentsProps,
   ComponentsVariants,
+  FormControl,
+  Input,
+  InputAdornment,
   InputLabel,
   PaletteColor,
   Select,
   SelectProps,
+  SvgIcon,
   Theme,
   darken,
   styled,
   useTheme
 } from "@mui/material";
 import clsx from "clsx";
+import { ReactComponent as FlipIcon } from "@assets/flip.svg";
 
 const isNullEmptyOrUndefined = (v: any) =>
   v === null || v === "" || v === undefined;
@@ -42,21 +47,31 @@ export const AutSelectField = ({
   helperText,
   sx,
   className,
+  startAdornment,
   ...props
 }: AutSelectProps) => {
   const theme = useTheme();
   return (
-    <SelectWrapper sx={sx}>
-      <InputLabel
-        id="select-label"
-        sx={{
-          color: "white",
-          "&.MuiInputBase-colorPrimary": generateColors(theme.palette.offWhite)
-        }}
-      >
-        {props.label}
-      </InputLabel>
+    <SelectWrapper
+      sx={{
+        ".MuiInputBase-root": {
+          maxHeight: "48px",
+          minWidth: "270px"
+        },
+        ...sx
+      }}
+    >
       <Select
+        displayEmpty
+        startAdornment={startAdornment}
+        sx={{
+          "& .MuiOutlinedInput-notchedOutline": {
+            border: "none"
+          },
+          borderRadius: "10px",
+          border: "3px solid #000000",
+          backgroundColor: "white"
+        }}
         labelId="select-label"
         className={clsx(className, {
           ["aut-selected"]: !isNullEmptyOrUndefined(props.value)
@@ -96,7 +111,7 @@ const generateColors = (color: PaletteColor) => ({
     }
   },
   ".MuiSvgIcon-root": {
-    color: color.light
+    color: color.dark
   },
   "&.MuiInputBase-root:before": {
     borderColor: color.dark

@@ -3,6 +3,7 @@ import DialogWrapper from "./DialogWrapper";
 import CloseIcon from "@mui/icons-material/Close";
 import { TwitterShareButton } from "react-share";
 import { AutButton } from "@components/buttons";
+import { AutOsButton } from "@components/AutButton";
 
 const SuccessDialog = ({
   open,
@@ -12,7 +13,8 @@ const SuccessDialog = ({
   fullScreen,
   titleVariant,
   subtitleVariant,
-  twitterProps
+  twitterProps,
+  action
 }: any) => {
   return (
     <DialogWrapper open={open} onClose={handleClose} fullScreen={fullScreen}>
@@ -52,6 +54,17 @@ const SuccessDialog = ({
             {subtitle}
           </Typography>
         </Stack>
+        {action && (
+          <AutOsButton
+            onClick={() => {
+              action();
+            }}
+          >
+            <Typography variant="body" fontWeight="normal" color="white">
+              Mint
+            </Typography>
+          </AutOsButton>
+        )}
       </div>
     </DialogWrapper>
   );

@@ -1,10 +1,13 @@
 import { Paper, SxProps, Typography, styled } from "@mui/material";
 import { ReactNode } from "react";
+import { ReactComponent as Social } from "@assets/icons/social.svg";
+// import { MarketIcons } from "@api/community.api";
 
 interface AutIconLabelProps {
   icon: ReactNode;
   label: string;
   sx?: SxProps;
+  textColor?: string;
 }
 
 const AutIconLabelContainer = styled(Paper)(({ theme }) => ({
@@ -18,16 +21,30 @@ const AutIconLabelContainer = styled(Paper)(({ theme }) => ({
   alignItems: "center"
 }));
 
-const AutIconLabel = ({ icon, label, sx = null }: AutIconLabelProps) => {
+const AutIconLabel = ({
+  textColor = "offwhite.main",
+  icon,
+  label,
+  sx = null
+}: AutIconLabelProps) => {
   return (
-    <AutIconLabelContainer sx={sx}>
+    <AutIconLabelContainer
+      sx={{
+        backgroundColor: "#000",
+        ...sx
+      }}
+    >
       {icon}
       <Typography
         align="center"
+        width="100%"
         marginLeft={1}
-        color="offWhite.main"
+        color={textColor}
         lineHeight={1}
         variant="caption"
+        sx={{
+          fontSize: "10px !important"
+        }}
       >
         {label}
       </Typography>

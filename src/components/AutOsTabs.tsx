@@ -96,9 +96,9 @@ function AutOsTabs(props: AutOsTabsParams) {
               width: {
                 xs: "100%",
                 md: "50%"
-              },
-              background: "rgba(240, 245, 255, 0.01)",
-              backdropFilter: "blur(12px)"
+              }
+              // background: "rgba(240, 245, 255, 0.01)",
+              // backdropFilter: "blur(12px)"
             },
             ".MuiButtonBase-root": {
               height: {

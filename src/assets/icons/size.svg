@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 21 21">
+  <g id="arrow-expand" transform="translate(-36.48 -36.48)">
+    <path id="Path_29116" data-name="Path 29116" d="M104.12,43.942l4.193-4.187-3.275-3.275h8.4v8.4l-3.275-3.275L105.977,45.8Z" transform="translate(-55.959)" fill="#fff"/>
+    <path id="Path_29117" data-name="Path 29117" d="M104.12,105.977l4.193,4.187-3.275,3.275h8.4v-8.4l-3.275,3.275-4.187-4.193Z" transform="translate(-55.959 -55.959)" fill="#fff"/>
+    <path id="Path_29118" data-name="Path 29118" d="M45.8,105.977l-4.193,4.187,3.275,3.275h-8.4v-8.4l3.275,3.275,4.187-4.193Z" transform="translate(0 -55.959)" fill="#fff"/>
+    <path id="Path_29119" data-name="Path 29119" d="M45.8,43.942l-4.193-4.187L44.88,36.48h-8.4v8.4l3.275-3.275L43.942,45.8Z" fill="#fff"/>
+  </g>
+</svg>

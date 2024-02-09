@@ -3,7 +3,7 @@ import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import AutSDK from "@aut-labs/sdk";
 import AutLoading from "@components/AutLoading";
 import DialogWrapper from "@components/Dialog/DialogWrapper";
-import { Box, Button, Toolbar, Typography, styled } from "@mui/material";
+import { Box, Button, Link, Toolbar, Typography, styled } from "@mui/material";
 import {
   NetworkSelectorIsOpen,
   NetworksConfig,
@@ -250,14 +250,39 @@ export const ToolbarConnector = () => {
           alt="Āut Logo"
         /> */}
         <AppTitle
-          mb={{
-            xs: "16px",
-            lg: "24px",
-            xxl: "32px"
-          }}
-          variant="h2"
+        // mb={{
+        //   xs: "16px",
+        //   lg: "24px",
+        //   xxl: "32px"
+        // }}
+        // variant="h2"
         />
         <div>
+          <Link
+            fontSize={24}
+            color="#FFF"
+            href="https://aut.id/"
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{ textDecoration: "none", cursor: "pointer" }}
+          >
+            Āut Labs
+          </Link>
+          <Link
+            fontSize={24}
+            color="#FFF"
+            href="https://docs.aut.id/v2/intro/what-is-aut"
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{
+              textDecoration: "none",
+              cursor: "pointer",
+              ml: "33px",
+              mr: "33px"
+            }}
+          >
+            Docs
+          </Link>
           <Button
             onClick={handleButtonClick}
             sx={{

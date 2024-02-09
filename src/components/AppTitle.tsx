@@ -3,17 +3,11 @@ import { ReactComponent as AutIcon } from "@assets/aut_logo_offwhite.svg";
 const AppTitle = (props: TypographyProps) => {
   return (
     <Stack direction="row" alignItems="center" justifyContent="center">
-      <AutIcon
-        style={{ marginBottom: "14px", marginRight: "22px" }}
-        width={50}
-        height={50}
-      />
+      <AutIcon style={{ marginRight: "22px" }} width={72} height={72} />
       <Typography
-        marginTop="14px"
-        fontWeight="300"
         fontFamily="FractulAltLight"
-        component="h1"
-        variant="h1"
+        fontWeight={700}
+        variant="h3"
         color="white"
         whiteSpace="nowrap"
         marginStart="14px"

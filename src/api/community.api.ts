@@ -5,7 +5,12 @@ import { Community, NovaDAO, findRoleName } from "./community.model";
 import { Web3ThunkProviderFactory } from "./ProviderFactory/web3-thunk.provider";
 import { ipfsCIDToHttpUrl, isValidUrl } from "./storage.api";
 import { AutID, DAOMember } from "./aut.model";
-import AutSDK, { LocalReputation, Nova, fetchMetadata } from "@aut-labs/sdk";
+import AutSDK, {
+  Allowlist,
+  LocalReputation,
+  Nova,
+  fetchMetadata
+} from "@aut-labs/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { base64toFile } from "@utils/to-base-64";
 import { environment } from "./environment";
@@ -18,6 +23,7 @@ import Conviction from "@assets/archetypes/deal.png";
 import { gql } from "@apollo/client";
 import { apolloClient } from "@store/graphql";
 import { BaseNFTModel } from "@aut-labs/sdk/dist/models/baseNFTModel";
+import AllowlistContract from "@aut-labs/sdk/dist/contracts/allowlist.contract";
 
 export enum NovaArchetype {
   "Size" = 1,
@@ -27,38 +33,70 @@ export enum NovaArchetype {
   "Growth" = 5
 }
 
-export const ArchetypeIcons = {
-  [NovaArchetype.Size]: Size,
-  [NovaArchetype.Growth]: Growth,
-  [NovaArchetype.Performance]: Performance,
-  [NovaArchetype.Reputation]: Reputation,
-  [NovaArchetype.Conviction]: Conviction
-};
-
 export enum Markets {
-  "Open-Source & DeFi" = 1,
+  "Open-Source & Infra" = 1,
   "Art, Events & NFTs" = 2,
-  "Local Projects & DAOs" = 3
+  "Social, Gaming & DeFi" = 3,
+  "ReFi & Public Goods" = 4
 }
 
+// export const MarketIcons = {
+//   1: OpenSource,
+//   2: ArtEvents,
+//   3: Social,
+//   4: Refi
+// };
+
+interface Filters {
+  marketFilter: string;
+}
 const getAllNovas = async (body: any, api: BaseQueryApi) => {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
   try {
     const sdk = AutSDK.getInstance();
-    const fetchNovas = gql`
-      query GetNovas {
-        novaDAOs(skip: 0, first: 100) {
-          id
-          deployer
-          address
-          market
-          metadataUri
-          minCommitment
+    let fetchNovas;
+    if (body?.marketFilter) {
+      fetchNovas = gql`
+        query GetNovas {
+          novaDAOs(skip: 0, first: 100, where: { market: ${body.marketFilter}}) {
+            id
+            deployer
+            address
+            market
+            metadataUri
+            minCommitment
+          }
+        }
+      `;
+    } else {
+      fetchNovas = gql`
+        query GetNovas {
+          novaDAOs(skip: 0, first: 100) {
+            id
+            deployer
+            address
+            market
+            metadataUri
+            minCommitment
+          }
+        }
+      `;
+    }
+
+    const fetchAutIds = gql`
+      query GetAutIds {
+        autIDs(skip: 0, first: 100) {
+          novaAddress
         }
       }
     `;
 
     const novaeResponse = await apolloClient.query<any>({
       query: fetchNovas
+    });
+    const autIdsResponse = await apolloClient.query<any>({
+      query: fetchAutIds,
+      variables: {}
     });
 
     const { novaDAOs } = novaeResponse.data;
@@ -88,8 +126,10 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
           archetype: Math.floor(Math.random() * 5) + 1,
           roles: novaMetadata.properties.rolesSets[0].roles,
           absoluteValue: Math.floor(Math.random() * 100) + 1,
-          prestige: Math.floor(Math.random() * 100) + 1,
-          members: Math.floor(Math.random() * 100) + 1,
+          prestige: 100,
+          members: autIdsResponse.data.autIDs.filter(
+            (a) => a.novaAddress === novaDAO.address
+          ).length,
           address: novaDAO.address,
           marketId: novaDAO.market
         }
@@ -167,7 +207,7 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
 };
 
 const getNovaTasks = async (body: any, api: BaseQueryApi) => {
-  await new Promise((resolve) => setTimeout(resolve, 2000));
+  // await new Promise((resolve) => setTimeout(resolve, 2000));
 
   const tasks = [
     {
@@ -202,9 +242,28 @@ const getNovaTasks = async (body: any, api: BaseQueryApi) => {
 };
 
 const checkOnboardingAllowlist = async (body: any, api: BaseQueryApi) => {
-  await new Promise((resolve) => setTimeout(resolve, 2000));
+  const sdk = AutSDK.getInstance();
+  // const state = api.getState();
+  // debugger;
+  // const { walletProvider } = state as any;
+  // const networkConfig = walletProvider.networksConfig.find(
+  //   (network) => network.chainId == "80001"
+  // );
+  // const contractAddress = networkConfig.contracts.allowListAddress;
+  const allowlistContract = sdk.initService<Allowlist>(
+    Allowlist,
+    "0xD0336dBF798cE04b547f04B54Ae9247ce544d8b0"
+  );
+  const allowListed = await allowlistContract.contract.functions.isAllowListed(
+    "0x7660aa261d27A2A32d4e7e605C1bc2BA515E5f81"
+  );
+  // debugger;
+  // await new Promise((resolve) => setTimeout(resolve, 2000));
   return {
     data: { isAllowed: true }
+  };
+  return {
+    data: { isAllowed: allowListed }
   };
 };
 
@@ -266,7 +325,7 @@ export const communityApi = createApi({
       {
         daos: any[];
       },
-      void
+      Filters
     >({
       query: (body) => {
         return {

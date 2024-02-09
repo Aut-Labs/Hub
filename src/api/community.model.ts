@@ -18,6 +18,10 @@ export const MarketTemplates = [
   {
     title: "Local Projects & DAOs",
     market: 3
+  },
+  {
+    title: "ReFi & Public Goods",
+    market: 4
   }
 ];
 

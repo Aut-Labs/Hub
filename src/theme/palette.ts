@@ -25,7 +25,7 @@ export default {
     contrastText: "#000000"
   },
   nightBlack: {
-    main: "#262626",
+    main: "#27292B",
     light: "#4e4e4e",
     dark: "#000000",
     contrastText: "#ffffff"
