@@ -23,7 +23,7 @@ export const DialogWrapper = ({
   const isXXL = useMediaQuery(theme.breakpoints.up("xxl"));
   return (
     <Dialog
-      open={open}
+      open={!!open}
       fullScreen={isMobile || fullScreen}
       {...(onClose && {
         onClose

@@ -1,17 +1,12 @@
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef } from "react";
 import {
   Avatar,
   Box,
   CircularProgress,
   Link,
-  Paper,
   Stack,
   SvgIcon,
-  Table,
-  TableBody,
   TableCell,
-  TableContainer,
-  TableHead,
   TableRow,
   Typography,
   styled,
@@ -24,14 +19,12 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import { TOOLBAR_HEIGHT } from "./ToolbarConnector";
 import CopyAddress from "@components/CopyAddress";
 import CalendarIcon from "@assets/icons/calendar.png";
-import { ReactComponent as TaskBackground } from "@assets/autos/taskBackground.svg";
 
 import {
   Markets,
   NovaArchetype,
   useGetAllNovasQuery,
-  useGetNovaTasksQuery,
-  useLazyCheckOnboardingAllowlistQuery
+  useGetNovaTasksQuery
 } from "@api/community.api";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
@@ -40,19 +33,10 @@ import { ReactComponent as GitHubIcon } from "@assets/SocialIcons/GitHubIcon.svg
 import { ReactComponent as LensfrensIcon } from "@assets/SocialIcons/LensfrensIcon.svg";
 import { ReactComponent as TelegramIcon } from "@assets/SocialIcons/TelegramIcon.svg";
 import { ReactComponent as TwitterIcon } from "@assets/SocialIcons/TwitterIcon.svg";
-import Community from "@assets/community.png";
-import Creative from "@assets/creative.png";
-import Tech from "@assets/tech.png";
 import { socialUrls } from "@api/aut.model";
 import AutUserTabs from "./AutNovaTabs/AutUserTabs";
-import { ReactComponent as ArrowIcon } from "@assets/autos/move-right.svg";
-import moment from "moment";
-import { AutOsButton } from "@components/AutButton";
 import AutIconLabel from "@components/AutIconLabel";
-import AutValueLabel from "@components/AutValueLabel";
-import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { EnvMode, environment } from "@api/environment";
-import SuccessDialog from "@components/Dialog/SuccessPopup";
 import { ArchetypeIcons, MarketIcons } from "@components/NovaCard";
 import TaskCard from "@components/TaskCard";
 
@@ -217,23 +201,6 @@ const NovaDetails = () => {
         flexDirection: "column"
       }}
     >
-      <d-aut
-        style={{
-          // display: "none",
-          position: "absolute",
-          zIndex: 99999,
-          left: "-9999px",
-          top: "-9999px"
-        }}
-        use-dev={environment.env == EnvMode.Development}
-        id="d-aut"
-        // allowed-role-id={3}
-        hide-button={true}
-        menu-items='[{"name":"Profile","actionType":"event_emit","eventName":"aut_profile"}]'
-        flow-config='{"mode" : "tryAut", "customCongratsMessage": ""}'
-        nova-address={searchParams.get(RequiredQueryParams.DaoAddress)}
-        ipfs-gateway={environment.ipfsGatewayUrl}
-      />
       {nova ? (
         <AutContainer>
           <LeftWrapper>

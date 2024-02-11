@@ -12,10 +12,10 @@ import { ApolloProvider } from "@apollo/client";
 import { apolloClient } from "@store/graphql";
 import "./App.scss";
 import CssBaseline from "@mui/material/CssBaseline";
-import { config } from "@api/ProviderFactory/setup.config";
 import { ConfirmDialogProvider } from "react-mui-confirm";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
+import { WalletConnectorProvider, wagmiConfig } from "@aut-labs/connector";
 
 // markerSDK.loadWidget({
 //   project: `${process.env.REACT_APP_MARKER}`,
@@ -31,48 +31,50 @@ const root = createRoot(container);
 // const persistor = persistStore(store);
 
 root.render(
-  <WagmiProvider config={config} reconnectOnMount={true}>
+  <WagmiProvider config={wagmiConfig} reconnectOnMount={true}>
     <QueryClientProvider client={queryClient}>
-      <ApolloProvider client={apolloClient}>
-        <StyledEngineProvider injectFirst>
-          <ThemeProvider theme={AutTheme}>
-            <CssBaseline />
-            <Provider store={store}>
-              {/* <PersistGate loading={<AutLoading />} persistor={persistor}> */}
-              <Router>
-                {/* @ts-ignore */}
-                <ConfirmDialogProvider
-                  dialogProps={{
-                    PaperProps: {
-                      sx: {
-                        borderRadius: "16px",
-                        borderColor: "divider"
+      <WalletConnectorProvider>
+        <ApolloProvider client={apolloClient}>
+          <StyledEngineProvider injectFirst>
+            <ThemeProvider theme={AutTheme}>
+              <CssBaseline />
+              <Provider store={store}>
+                {/* <PersistGate loading={<AutLoading />} persistor={persistor}> */}
+                <Router>
+                  {/* @ts-ignore */}
+                  <ConfirmDialogProvider
+                    dialogProps={{
+                      PaperProps: {
+                        sx: {
+                          borderRadius: "16px",
+                          borderColor: "divider"
+                        }
                       }
-                    }
-                  }}
-                  dialogTitleProps={{
-                    variant: "subtitle1",
-                    color: "white"
-                  }}
-                  confirmButtonProps={{
-                    color: "error",
-                    variant: "outlined"
-                  }}
-                  confirmButtonText="Delete"
-                  cancelButtonProps={{
-                    color: "offWhite",
-                    variant: "outlined"
-                  }}
-                  cancelButtonText="Dismiss"
-                >
-                  <App />
-                </ConfirmDialogProvider>
-              </Router>
-              {/* </PersistGate> */}
-            </Provider>
-          </ThemeProvider>
-        </StyledEngineProvider>
-      </ApolloProvider>
+                    }}
+                    dialogTitleProps={{
+                      variant: "subtitle1",
+                      color: "white"
+                    }}
+                    confirmButtonProps={{
+                      color: "error",
+                      variant: "outlined"
+                    }}
+                    confirmButtonText="Delete"
+                    cancelButtonProps={{
+                      color: "offWhite",
+                      variant: "outlined"
+                    }}
+                    cancelButtonText="Dismiss"
+                  >
+                    <App />
+                  </ConfirmDialogProvider>
+                </Router>
+                {/* </PersistGate> */}
+              </Provider>
+            </ThemeProvider>
+          </StyledEngineProvider>
+        </ApolloProvider>
+      </WalletConnectorProvider>
     </QueryClientProvider>
   </WagmiProvider>
 );

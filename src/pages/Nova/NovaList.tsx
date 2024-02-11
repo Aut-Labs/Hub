@@ -1,50 +1,24 @@
 /* eslint-disable max-len */
 import AutLoading from "@components/AutLoading";
 import {
-  Container,
   Box,
   Typography,
   Button,
   useMediaQuery,
   useTheme,
   styled,
-  FormControlLabel,
-  Switch,
   MenuItem,
-  Select,
-  FormControl,
   InputAdornment,
   CircularProgress
 } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import NovaCard from "@components/NovaCard";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useSelector } from "react-redux";
-import {
-  ConnectStatus,
-  IsAuthenticated,
-  changeConnectStatus
-} from "@auth/auth.reducer";
-import { CacheTypes } from "@api/cache.api";
-import { communityUpdateState } from "@store/Community/community.reducer";
-import { useAppDispatch } from "@store/store.model";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
-import SuccessDialog from "@components/Dialog/SuccessPopup";
 import { useGetAllNovasQuery } from "@api/community.api";
 import { TOOLBAR_HEIGHT } from "./ToolbarConnector";
-import { addDays } from "date-fns";
-import { Quest, fetchMetadata, queryParamsAsString } from "@aut-labs/sdk";
-import { useAccount } from "wagmi";
-import {
-  IsAuthorised,
-  updateWalletProviderState
-} from "@store/WalletProvider/WalletProvider";
-import backgroundImage from "@assets/autos/background.png";
 import { AutSelectField } from "@theme/field-select-styles";
-import { Community } from "@api/community.model";
-import { gql, useQuery } from "@apollo/client";
 import { ReactComponent as Filters } from "@assets/icons/filters.svg";
 import { ReactComponent as Markets } from "@assets/icons/markets.svg";
 import { ReactComponent as Archetypes } from "@assets/icons/archetype.svg";
@@ -77,13 +51,7 @@ export const GridBox = styled(Box)(({ theme }) => ({
 }));
 
 export const NovaList = () => {
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  const [selectedQuest, setSelectedQuest] = useState(null);
-  const [searchParams] = useSearchParams();
-  const connectStatus = useSelector(ConnectStatus);
   const theme = useTheme();
-  const { address: account } = useAccount();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [activeOnboardingFilter, setActiveOnboardingFilter] = useState("");

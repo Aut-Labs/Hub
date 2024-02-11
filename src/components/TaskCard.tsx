@@ -1,19 +1,16 @@
-import { Box, Avatar, Typography, Stack, useTheme } from "@mui/material";
+/* eslint-disable max-len */
+import { Box, Avatar, Typography, Stack } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { AutOsButton } from "./AutButton";
-import {
-  communityApi,
-  useLazyCheckOnboardingAllowlistQuery
-} from "@api/community.api";
+import { useLazyCheckOnboardingAllowlistQuery } from "@api/community.api";
 import LoadingDialog from "./Dialog/LoadingPopup";
 import SuccessDialog from "./Dialog/SuccessPopup";
 import Community from "@assets/community.png";
 import Creative from "@assets/creative.png";
 import Tech from "@assets/tech.png";
-import { useAccount } from "wagmi";
-import { updateWalletProviderState } from "@store/WalletProvider/WalletProvider";
-import { useAppDispatch } from "@store/store.model";
 import ErrorDialog from "./Dialog/ErrorPopup";
+import { useWalletConnector } from "@aut-labs/connector";
+import { useAccount } from "wagmi";
 
 const roleIcons = {
   Creative: Creative,
@@ -21,33 +18,40 @@ const roleIcons = {
   Community: Community
 };
 
-const TaskCard = (data: any) => {
-  const { row } = data;
-  const theme = useTheme();
+const TaskCard = ({ row }) => {
   const [openSuccess, setOpenSuccess] = useState(false);
   const [openError, setOpenError] = useState(false);
-  const { connector, isReconnecting, isConnecting, isConnected } = useAccount();
-  const dispatch = useAppDispatch();
+  const { address } = useAccount();
+  const { open } = useWalletConnector();
 
-  const [checkOnboardingAllowlist, { data: result, isLoading, isError }] =
-    useLazyCheckOnboardingAllowlistQuery();
+  const [
+    checkOnboardingAllowlist,
+    { data: result, isLoading, isUninitialized }
+  ] = useLazyCheckOnboardingAllowlistQuery();
 
   const handleClick = async () => {
-    if (!isConnected) {
-      await dispatch(
-        updateWalletProviderState({
-          isOpen: true
-        })
-      );
+    let addressToVerify = address as string;
+    if (!addressToVerify) {
+      const state = await open();
+      addressToVerify = state?.address;
+    }
+
+    if (!addressToVerify) {
+      // show some error that it could not be verified unless user connects to a wallet
     } else {
-      // await dispatch(communityApi.util.resetApiState());
-      checkOnboardingAllowlist(null);
+      checkOnboardingAllowlist(addressToVerify);
     }
   };
 
   const handleDialogClose = () => {
     console.log("Verify task close");
   };
+
+  useEffect(() => {
+    // if (isUninitialized && address) {
+    //   checkOnboardingAllowlist(address);
+    // }
+  }, [isUninitialized, address]);
 
   useEffect(() => {
     if (result && result?.isAllowed) {
@@ -94,11 +98,8 @@ const TaskCard = (data: any) => {
         sx={{
           alignItems: "center",
           justifyContent: "flex-start",
-          // backgroundImage: `url(${TaskBackground})`,
           backdropFilter: "blur(50px)",
           backgroundColor: "rgba(128, 128, 128, 0.05)",
-          // boxShadow: "0px 3px 6px #707070",
-          // borderRadius: "10px",
           backgroundImage: `url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='6' ry='6' stroke='rgb(96,96,96)' stroke-width='2' stroke-dasharray='6%2c 14' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e")`,
           borderRadius: "6px",
           margin: "40px",
@@ -127,7 +128,6 @@ const TaskCard = (data: any) => {
                 xxl: "70px"
               },
               background: "transparent"
-              // bgcolor: "purple",
             }}
             aria-label="avatar"
           >

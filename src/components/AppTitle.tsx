@@ -10,7 +10,7 @@ const AppTitle = (props: TypographyProps) => {
         variant="h3"
         color="white"
         whiteSpace="nowrap"
-        marginStart="14px"
+        marginLeft="14px"
         {...(props as any)}
       >
         Showcase

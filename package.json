@@ -36,7 +36,8 @@
   "dependencies": {
     "@apollo/client": "^3.9.1",
     "@aut-labs/abi-types": "^0.0.74-dev",
-    "@aut-labs/d-aut": "^1.0.115-dev",
+    "@aut-labs/connector": "^0.0.46",
+    "@aut-labs/d-aut": "^1.0.118-dev",
     "@aut-labs/sdk": "^0.0.149-dev",
     "@aut-labs/sdk-biconomy": "^0.0.2",
     "@emotion/react": "^11.11.3",

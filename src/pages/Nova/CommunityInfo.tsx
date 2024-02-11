@@ -10,11 +10,13 @@ import {
   SvgIcon,
   Link
 } from "@mui/material";
-import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import DescriptionIcon from "@mui/icons-material/Description";
-import { NetworksConfig } from "@store/WalletProvider/WalletProvider";
+import {
+  BlockExplorerUrl,
+  SelectedNetwork
+} from "@store/WalletProvider/WalletProvider";
 import { useSelector } from "react-redux";
 import { ReactComponent as DiscordIcon } from "@assets/SocialIcons/DiscordIcon.svg";
 import { ReactComponent as GitHubIcon } from "@assets/SocialIcons/GitHubIcon.svg";
@@ -26,7 +28,7 @@ import { ReactComponent as WebsiteIcon } from "@assets/SocialIcons/WebsiteIcon.s
 import { RequiredQueryParams } from "../../api/RequiredQueryParams";
 import { useGetAllNovasQuery } from "@api/community.api";
 import { autUrls } from "@api/environment";
-import { useAccount, useChainId } from "wagmi";
+import { useAccount } from "wagmi";
 import { novaSocialUrls } from "@api/aut.model";
 import theme from "@theme/theme";
 
@@ -45,22 +47,10 @@ const novaSocialIcons = {
 
 const CommunityInfo = () => {
   const [searchParams] = useSearchParams();
-  const networks = useSelector(NetworksConfig);
+  const network = useSelector(SelectedNetwork);
+  const explorerUrl = useSelector(BlockExplorerUrl);
   const { address: account } = useAccount();
-  const chainId = useChainId();
   const urls = autUrls();
-
-  const selectedNetworkConfig = useMemo(() => {
-    const config = networks.find(
-      (n) => n.chainId?.toString() === chainId?.toString()
-    );
-    return config;
-  }, []);
-  const blockExplorer = useMemo(() => {
-    if (selectedNetworkConfig) {
-      return selectedNetworkConfig.explorerUrls[0];
-    }
-  }, [selectedNetworkConfig]);
 
   const { data } = useGetAllNovasQuery(null, {
     selectFromResult: ({ data }) => ({
@@ -137,10 +127,10 @@ const CommunityInfo = () => {
                 <CopyAddress
                   address={searchParams.get(RequiredQueryParams.DaoAddress)}
                 />
-                <Tooltip title={`Explore in ${selectedNetworkConfig?.name}`}>
+                <Tooltip title={`Explore in ${network?.name}`}>
                   <IconButton
                     sx={{ color: "white", p: 0, ml: 1 }}
-                    href={`${blockExplorer}/address/${searchParams.get(
+                    href={`${explorerUrl}/address/${searchParams.get(
                       RequiredQueryParams.DaoAddress
                     )}`}
                     target="_blank"

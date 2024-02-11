@@ -1,29 +1,13 @@
 /* eslint-disable max-len */
-import axios from "axios";
-import { CommitmentMessages } from "@utils/misc";
-import { Community, NovaDAO, findRoleName } from "./community.model";
-import { Web3ThunkProviderFactory } from "./ProviderFactory/web3-thunk.provider";
-import { ipfsCIDToHttpUrl, isValidUrl } from "./storage.api";
-import { AutID, DAOMember } from "./aut.model";
-import AutSDK, {
-  Allowlist,
-  LocalReputation,
-  Nova,
-  fetchMetadata
-} from "@aut-labs/sdk";
+import { Community } from "./community.model";
+import { DAOMember } from "./aut.model";
+import AutSDK, { Allowlist, fetchMetadata } from "@aut-labs/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
-import { base64toFile } from "@utils/to-base-64";
 import { environment } from "./environment";
-import { createAsyncThunk } from "@reduxjs/toolkit";
-import Size from "@assets/archetypes/people.png";
-import Growth from "@assets/archetypes/seed.png";
-import Performance from "@assets/archetypes/growth.png";
-import Reputation from "@assets/archetypes/reputation-management.png";
-import Conviction from "@assets/archetypes/deal.png";
 import { gql } from "@apollo/client";
 import { apolloClient } from "@store/graphql";
-import { BaseNFTModel } from "@aut-labs/sdk/dist/models/baseNFTModel";
-import AllowlistContract from "@aut-labs/sdk/dist/contracts/allowlist.contract";
+import { RootState } from "@store/store.model";
+import { NetworkConfig } from "./ProviderFactory/network.config";
 
 export enum NovaArchetype {
   "Size" = 1,
@@ -241,29 +225,18 @@ const getNovaTasks = async (body: any, api: BaseQueryApi) => {
   };
 };
 
-const checkOnboardingAllowlist = async (body: any, api: BaseQueryApi) => {
+const checkOnboardingAllowlist = async (address: string, api: BaseQueryApi) => {
   const sdk = AutSDK.getInstance();
-  // const state = api.getState();
-  // debugger;
-  // const { walletProvider } = state as any;
-  // const networkConfig = walletProvider.networksConfig.find(
-  //   (network) => network.chainId == "80001"
-  // );
-  // const contractAddress = networkConfig.contracts.allowListAddress;
+  const state: RootState = api.getState() as RootState;
+  const network: NetworkConfig = state.walletProvider.selectedNetwork;
   const allowlistContract = sdk.initService<Allowlist>(
     Allowlist,
-    "0xD0336dBF798cE04b547f04B54Ae9247ce544d8b0"
+    network.contracts.allowListAddress
   );
-  const allowListed = await allowlistContract.contract.functions.isAllowListed(
-    "0x7660aa261d27A2A32d4e7e605C1bc2BA515E5f81"
-  );
-  // debugger;
-  // await new Promise((resolve) => setTimeout(resolve, 2000));
+  const isAllowed =
+    await allowlistContract.contract.functions.isAllowListed(address);
   return {
-    data: { isAllowed: true }
-  };
-  return {
-    data: { isAllowed: allowListed }
+    data: { isAllowed }
   };
 };
 
