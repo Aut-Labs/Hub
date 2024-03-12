@@ -102,12 +102,13 @@ const TaskCard = ({ row }) => {
           backgroundColor: "rgba(128, 128, 128, 0.05)",
           backgroundImage: `url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='6' ry='6' stroke='rgb(96,96,96)' stroke-width='2' stroke-dasharray='6%2c 14' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e")`,
           borderRadius: "6px",
-          margin: "40px",
           opacity: 1,
           WebkitBackdropFilter: "blur(6px)",
-          height: "365px",
-          width: "270px",
-          padding: "36px 32px",
+          padding: {
+            xs: "36px 32px",
+            md: "24px 24px",
+            xxl: "36px 32px"
+          },
           display: "flex",
           flexDirection: "column"
         }}
@@ -117,14 +118,14 @@ const TaskCard = ({ row }) => {
             sx={{
               flex: "1",
               height: {
-                xs: "60px",
-                md: "70px",
+                xs: "50px",
+                md: "60px",
                 xxl: "70px"
               },
               borderRadius: "6px",
               width: {
-                xs: "60px",
-                md: "70px",
+                xs: "50px",
+                md: "60px",
                 xxl: "70px"
               },
               background: "transparent"
@@ -147,7 +148,7 @@ const TaskCard = ({ row }) => {
               color="offWhite.main"
               textAlign="center"
               lineHeight={1}
-              variant="subtitle1"
+              variant="subtitle2"
               marginLeft={1}
             >
               {row?.name}
@@ -167,10 +168,10 @@ const TaskCard = ({ row }) => {
             color="offWhite.main"
             textAlign="left"
             lineHeight={1}
-            variant="subtitle1"
+            variant="body1"
           >
             <Typography
-              marginTop={4}
+              marginTop={3}
               color="offWhite.main"
               textAlign="center"
               fontFamily="FractulAltLight"
@@ -183,7 +184,7 @@ const TaskCard = ({ row }) => {
           <AutOsButton
             sx={{
               background: "linear-gradient(#244AFF, #1BB8FF) !important",
-              mt: "26px"
+              mt: "24px"
             }}
             onClick={() => handleClick()}
           >

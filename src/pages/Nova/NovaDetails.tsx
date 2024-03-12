@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef } from "react";
+import { memo, useEffect, useMemo, useRef } from "react";
 import {
   Avatar,
   Box,
@@ -39,6 +39,7 @@ import AutIconLabel from "@components/AutIconLabel";
 import { EnvMode, environment } from "@api/environment";
 import { ArchetypeIcons, MarketIcons } from "@components/NovaCard";
 import TaskCard from "@components/TaskCard";
+import { parseNovaTimestamp, parseTimestamp } from "@utils/date-format";
 
 const socialIcons = {
   discord: DiscordIcon,
@@ -48,9 +49,19 @@ const socialIcons = {
   lensfrens: LensfrensIcon
 };
 
-const AutContainer = styled("div")(() => ({
+const AutContainer = styled("div")(({ theme }) => ({
   display: "flex",
-  height: "100%"
+  height: "100%",
+  paddingTop: "32px",
+  gap: "30px",
+  flexDirection: "row",
+  [theme.breakpoints.down("md")]: {
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "20px",
+    width: "100%"
+  }
+
   // backgroundImage: `url(${backgroundImage})`,
   // backgroundBlendMode: "hard-light",
   // backgroundSize: "cover",
@@ -62,13 +73,21 @@ const LeftWrapper = styled(Box)(({ theme }) => ({
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
-  height: "100%",
-  width: "40%",
-  backdropFilter: "blur(50px)",
+  height: "fit-content",
+  width: "30%",
+  backdropFilter: "blur(12px)",
   backgroundColor: "rgba(128, 128, 128, 0.06)",
   boxShadow: "0px 3px 6px #00000029",
-  borderRadius: "30px",
-  margin: "60px"
+  borderRadius: "24px",
+  padding: "32px 16px",
+  marginLeft: "24px",
+  marginRight: "24px",
+
+  [theme.breakpoints.down("md")]: {
+    width: "90%",
+    marginLeft: 0,
+    marginRight: 0
+  }
 }));
 
 const RightWrapper = styled(Box)(({ theme }) => ({
@@ -78,12 +97,16 @@ const RightWrapper = styled(Box)(({ theme }) => ({
   alignItems: "center",
   justifyContent: "flex-start",
   px: "30px",
-  marginTop: "120px",
   marginRight: "25px",
   marginLeft: "25px",
   height: "100%",
   position: "relative",
-  width: "60%"
+  width: "70%",
+  [theme.breakpoints.down("md")]: {
+    width: "100%",
+    marginLeft: 0,
+    marginRight: 0
+  }
 }));
 
 export const IconContainer = styled("div")(({ theme }) => ({
@@ -123,11 +146,34 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 export const CommunityTasksTable = ({ header, tasks }) => {
   const theme = useTheme();
   return (
-    <div>
+    <Box
+      sx={{
+        marginTop: theme.spacing(3),
+        display: "grid",
+        gridTemplateColumns: {
+          xs: "1fr",
+          sm: "1fr 1fr",
+          md: "1fr 1fr 1fr",
+          xl: "1fr 1fr 1fr 1fr"
+        },
+        ml: {
+          xs: theme.spacing(3),
+          md: 0
+        },
+        mr: {
+          xs: theme.spacing(3),
+          md: theme.spacing(2)
+        },
+        gap: {
+          xs: theme.spacing(2),
+          md: theme.spacing(3)
+        }
+      }}
+    >
       {tasks?.map((row, index) => (
         <TaskCard key={`task-item-${row.name}`} row={row} />
       ))}
-    </div>
+    </Box>
   );
 };
 
@@ -185,13 +231,23 @@ const NovaDetails = () => {
     };
   }, []);
 
+  const parsedTimeStamp = useMemo(() => {
+    if (nova?.properties?.timestamp) {
+      return new Intl.DateTimeFormat("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "2-digit"
+      }).format(parseNovaTimestamp(nova?.properties?.timestamp));
+    }
+  }, [nova]);
+
   return (
     <PerfectScrollbar
       containerRef={(el) => (ps.current = el)}
       style={{
         ...(isMobile && {
-          marginTop: `${TOOLBAR_HEIGHT + 70}px`,
-          height: `calc(100% - ${TOOLBAR_HEIGHT + 70 + "px"})`
+          marginTop: `${TOOLBAR_HEIGHT}px`,
+          height: `calc(100% - ${TOOLBAR_HEIGHT + "px"})`
         }),
         ...(!isMobile && {
           marginTop: `${TOOLBAR_HEIGHT}px`,
@@ -222,17 +278,16 @@ const NovaDetails = () => {
                   sx={{
                     flex: "1",
                     height: {
-                      xs: "140px",
-                      md: "150px",
-                      xxl: "150px"
+                      xs: "120px",
+                      md: "120px",
+                      xxl: "130px"
                     },
                     borderRadius: "0",
                     width: {
-                      xs: "140px",
-                      md: "150px",
-                      xxl: "150px"
+                      xs: "120px",
+                      md: "120px",
+                      xxl: "130px"
                     },
-                    bgcolor: "purple",
                     background: "transparent"
                   }}
                   aria-label="avatar"
@@ -246,6 +301,32 @@ const NovaDetails = () => {
                     }}
                   />
                 </Avatar>
+                {/* TODO: Implement when nova sigil is available  */}
+                {/* {nova?.sigil && typeof nova?.sigil == "string" && (
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      cursor: "pointer",
+                      bottom: "-20px",
+                      left: "100px",
+                      transform: "rotate(7deg)",
+                      height: {
+                        xs: "130px",
+                        md: "140px",
+                        xxl: "140px"
+                      }
+                    }}
+                  >
+                    <img
+                      style={{
+                        height: "100%",
+                        width: "100%"
+                      }}
+                      aria-label="card"
+                      src={ipfsCIDToHttpUrl(nova?.sigil as string)}
+                    />
+                  </Box>
+                )} */}
                 <div
                   style={{
                     flex: "1",
@@ -267,7 +348,12 @@ const NovaDetails = () => {
                   <CopyAddress address={nova?.properties.address} />
                 </div>
               </Box>
-              <Stack direction="row">
+              <Stack
+                direction="row"
+                sx={{
+                  marginTop: 3
+                }}
+              >
                 <Stack
                   width="100%"
                   direction="column"
@@ -280,6 +366,7 @@ const NovaDetails = () => {
                     sx={{
                       display: "flex",
                       marginRight: "16px",
+                      mb: "8px",
                       flexDirection: "column",
                       justifyContent: "center",
                       alignItems: "center"
@@ -290,7 +377,6 @@ const NovaDetails = () => {
                       fontFamily="FractulAltBold"
                       variant="subtitle1"
                       sx={{
-                        mt: "20px",
                         mb: "0px",
                         color: "#FFF"
                       }}
@@ -302,12 +388,11 @@ const NovaDetails = () => {
                       fontFamily="FractulRegular"
                       variant="caption"
                       sx={{
-                        mt: "4px",
                         mb: "0px",
                         color: "#A7B1C4"
                       }}
                     >
-                      Members
+                      members
                     </Typography>
                   </Box>
                   <Box
@@ -324,7 +409,6 @@ const NovaDetails = () => {
                       fontFamily="FractulAltBold"
                       variant="subtitle1"
                       sx={{
-                        mt: "20px",
                         mb: "0px",
                         color: "#FFF"
                       }}
@@ -336,12 +420,11 @@ const NovaDetails = () => {
                       fontFamily="FractulRegular"
                       variant="caption"
                       sx={{
-                        mt: "4px",
                         mb: "0px",
                         color: "#A7B1C4"
                       }}
                     >
-                      Prestige
+                      prestige
                     </Typography>
                   </Box>
                 </Stack>
@@ -385,7 +468,7 @@ const NovaDetails = () => {
                   marginTop: theme.spacing(2)
                 }}
               >
-                <Box>
+                <Box sx={{ padding: "8px 0px" }}>
                   <Typography
                     sx={{ flex: "1" }}
                     color="offWhite.main"
@@ -400,6 +483,7 @@ const NovaDetails = () => {
                 marginTop={theme.spacing(2)}
                 sx={{
                   display: "flex",
+                  marginTop: theme.spacing(2),
                   flexDirection: "row",
                   gap: "12px",
                   justifyContent: "center",
@@ -438,7 +522,6 @@ const NovaDetails = () => {
                       >
                         <SvgIcon
                           sx={{
-                            marginTop: theme.spacing(2),
                             height: {
                               xs: "25px",
                               xxl: "30px"
@@ -463,7 +546,6 @@ const NovaDetails = () => {
               <Box
                 marginTop={theme.spacing(2)}
                 sx={{
-                  padding: theme.spacing(1),
                   textAlign: "center",
                   color: theme.palette.offWhite.main,
                   display: "flex",
@@ -480,11 +562,8 @@ const NovaDetails = () => {
                   color="white"
                   lineHeight={1}
                   variant="caption"
-                  sx={{
-                    fontSize: "10px !important"
-                  }}
                 >
-                  Created on 1.26.2024
+                  {`Joined ${parsedTimeStamp}`}
                 </Typography>
               </Box>
             </Stack>

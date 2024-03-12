@@ -30,7 +30,7 @@ const AutIconLabel = ({
   return (
     <AutIconLabelContainer
       sx={{
-        backgroundColor: "#000",
+        backgroundColor: "#27292B",
         ...sx
       }}
     >

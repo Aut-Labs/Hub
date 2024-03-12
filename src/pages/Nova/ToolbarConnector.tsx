@@ -2,7 +2,7 @@ import { Box, Button, Link, Toolbar } from "@mui/material";
 import AppTitle from "@components/AppTitle";
 import { useAutConnector, useWalletConnector } from "@aut-labs/connector";
 
-export const TOOLBAR_HEIGHT = 88;
+export const TOOLBAR_HEIGHT = 84;
 
 export const ToolbarConnector = () => {
   const { isConnected, disconnect } = useAutConnector();
@@ -28,17 +28,23 @@ export const ToolbarConnector = () => {
           backgroundColor: "nightBlack.main",
           boxShadow: 2,
           "&.MuiToolbar-root": {
-            paddingLeft: 6,
-            paddingRight: 6,
+            paddingLeft: {
+              xs: 2,
+              md: 6
+            },
+            paddingRight: {
+              xs: 2,
+              md: 6
+            },
             minHeight: `${TOOLBAR_HEIGHT}px`,
             justifyContent: "space-between",
             alignItems: "center",
             gap: {
               xs: "8px",
-              sm: 0
+              sm: "5px"
             },
             flexDirection: {
-              xs: "column",
+              xs: "row",
               sm: "row"
             },
             py: {
@@ -63,14 +69,27 @@ export const ToolbarConnector = () => {
         // }}
         // variant="h2"
         />
-        <div>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            height: "64px"
+          }}
+        >
           <Link
             fontSize={24}
             color="#FFF"
             href="https://aut.id/"
             target="_blank"
             rel="noopener noreferrer"
-            sx={{ textDecoration: "none", cursor: "pointer" }}
+            sx={{
+              textDecoration: "none",
+              cursor: "pointer",
+              display: {
+                xs: "none",
+                md: "flex"
+              }
+            }}
           >
             Āut Labs
           </Link>
@@ -83,8 +102,18 @@ export const ToolbarConnector = () => {
             sx={{
               textDecoration: "none",
               cursor: "pointer",
-              ml: "33px",
-              mr: "33px"
+              ml: {
+                xs: "12px",
+                md: "33px"
+              },
+              mr: {
+                xs: "12px",
+                md: "33px"
+              },
+              display: {
+                xs: "none",
+                md: "flex"
+              }
             }}
           >
             Docs
@@ -100,7 +129,7 @@ export const ToolbarConnector = () => {
           >
             {isConnected ? "Disconnect" : "Connect"}
           </Button>
-        </div>
+        </Box>
       </Toolbar>
     </Box>
   );
