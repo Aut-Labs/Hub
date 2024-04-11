@@ -66,9 +66,9 @@ function App() {
               >
                 <ToolbarConnector />
                 <Routes>
-                  <Route path="/" element={<NovaList />} />
+                  <Route path="/:novaName?" element={<NovaList />} />
                   <Route path="callback" element={<Callback />} />
-                  <Route path="dao/*" element={<NovaDetails />} />
+                  <Route path="project/:novaName?" element={<NovaDetails />} />
                 </Routes>
               </Box>
             </>

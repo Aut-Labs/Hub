@@ -22,6 +22,7 @@ import { AutSelectField } from "@theme/field-select-styles";
 import { ReactComponent as Filters } from "@assets/icons/filters.svg";
 import { ReactComponent as Markets } from "@assets/icons/markets.svg";
 import { ReactComponent as Archetypes } from "@assets/icons/archetype.svg";
+import { useParams } from "react-router-dom";
 
 const AutContainer = styled("div")(() => ({
   display: "flex",
@@ -53,7 +54,6 @@ export const GridBox = styled(Box)(({ theme }) => ({
 export const NovaList = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
   const [activeOnboardingFilter, setActiveOnboardingFilter] = useState("");
   const [marketFilter, setMarkerFilter] = useState("");
   const [archetypeFilter, setArchetypeFilter] = useState("");
@@ -65,7 +65,7 @@ export const NovaList = () => {
       skip: false
     }
   );
-
+  const { novaName } = useParams();
   return (
     <PerfectScrollbar
       style={{
@@ -222,7 +222,11 @@ export const NovaList = () => {
           <>
             <GridBox sx={{ flexGrow: 1, mt: 4 }}>
               {(data?.daos || []).map((dao, index) => (
-                <NovaCard key={`nova-card-${index}`} daoData={dao} />
+                <NovaCard
+                  key={`nova-card-${index}`}
+                  daoData={dao}
+                  isHighlighted={dao.name === novaName}
+                />
               ))}
             </GridBox>
           </>

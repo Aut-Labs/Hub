@@ -1,4 +1,12 @@
-import { Avatar, Box, Button, Link, Typography, styled } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Button,
+  Link,
+  Typography,
+  styled,
+  keyframes
+} from "@mui/material";
 import { memo, useEffect, useMemo, useState } from "react";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import Flipcard from "@components/Flipcard";
@@ -23,6 +31,7 @@ import { ReactComponent as Conviction } from "@assets/icons/conviction.svg";
 
 import { ReactComponent as Cross } from "@assets/autos/cross.svg";
 import { ReactComponent as Check } from "@assets/autos/check.svg";
+import { RequiredQueryParams } from "@api/RequiredQueryParams";
 
 export const ArchetypeIcons = {
   [NovaArchetype.Size]: <Size />,
@@ -48,6 +57,17 @@ const getRoleName = (daoData, quest) => {
   }
   return "N/A";
 };
+const pulsate = keyframes`
+  0% {
+    box-shadow: 0 0 0 0 rgba(27, 95, 168, 0.9);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(27, 95, 168, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(27, 95, 168, 0);
+  }
+`;
 
 const AutCardFront = styled("div")({
   width: "100%",
@@ -75,53 +95,56 @@ const SeeQuestButton = styled(Button)(({ theme }) => ({
   }
 }));
 
-const AutCardContainer = styled("div")(({ theme }) => ({
-  [theme.breakpoints.up("xs")]: {
-    width: "330px",
-    height: "350px"
-  },
-  [theme.breakpoints.up("sm")]: {
-    width: "330px",
-    height: "350px"
-  },
-  [theme.breakpoints.up("md")]: {
-    width: "330px",
-    height: "350px"
-  },
-  [theme.breakpoints.up("xl")]: {
-    width: "350px",
-    height: "380px"
-  },
-  [theme.breakpoints.up("xxl")]: {
-    width: "350px",
-    height: "430px"
-  },
-  boxShadow:
-    "0px 4px 5px -2px rgba(0,0,0,0.2), 0px 7px 10px 1px rgba(0,0,0,0.14), 0px 2px 16px 1px rgba(0,0,0,0.12)",
-  // boxShadow: "10px 10px 10px black",
-  backgroundColor: "#FFF",
-  borderColor: "#3f3f40",
-  borderStyle: "solid",
-  borderWidth: "3px",
-  padding: "0px 5px",
-  overflow: "hidden",
-  borderRadius: "16px",
-  // borderTopLeftRadius: "16px",
-  // borderTopRightRadius: "16px",
-  // borderBottomLeftRadius: "0",
-  // borderBottomRightRadius: "0",
-  display: "flex",
-  justifyContent: "flex-start",
-  alignItems: "center",
-  flexDirection: "column",
-  "&.highlighted": {
-    boxShadow: "20px 20px 20px #0063a2"
-  },
-  transition: theme.transitions.create(["transform"]),
-  "&:hover": {
-    transform: "scale(1.019)"
-  }
-}));
+const AutCardContainer = styled("div")<{ isHighlighted?: boolean }>(
+  ({ theme, isHighlighted }) => ({
+    [theme.breakpoints.up("xs")]: {
+      width: "330px",
+      height: "350px"
+    },
+    [theme.breakpoints.up("sm")]: {
+      width: "330px",
+      height: "350px"
+    },
+    [theme.breakpoints.up("md")]: {
+      width: "330px",
+      height: "350px"
+    },
+    [theme.breakpoints.up("xl")]: {
+      width: "350px",
+      height: "380px"
+    },
+    [theme.breakpoints.up("xxl")]: {
+      width: "350px",
+      height: "430px"
+    },
+    boxShadow:
+      "0px 4px 5px -2px rgba(0,0,0,0.2), 0px 7px 10px 1px rgba(0,0,0,0.14), 0px 2px 16px 1px rgba(0,0,0,0.12)",
+    // boxShadow: "10px 10px 10px black",
+    backgroundColor: "#FFF",
+    borderColor: "#3f3f40",
+    borderStyle: "solid",
+    borderWidth: "3px",
+    padding: "0px 5px",
+    overflow: "hidden",
+    borderRadius: "16px",
+    // borderTopLeftRadius: "16px",
+    // borderTopRightRadius: "16px",
+    // borderBottomLeftRadius: "0",
+    // borderBottomRightRadius: "0",
+    display: "flex",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    flexDirection: "column",
+    "&.highlighted": {
+      boxShadow: "20px 20px 20px #0063a2"
+    },
+    transition: theme.transitions.create(["transform"]),
+    "&:hover": {
+      transform: "scale(1.019)"
+    },
+    animation: isHighlighted ? `${pulsate} 2s infinite` : "none"
+  })
+);
 
 const AutCardBack = styled("div")({
   height: "100%",
@@ -143,7 +166,13 @@ const Countdown = styled("div")({
   }
 });
 
-export const NovaCard = ({ daoData }: { daoData: any }) => {
+export const NovaCard = ({
+  daoData,
+  isHighlighted
+}: {
+  daoData: any;
+  isHighlighted?: boolean;
+}) => {
   const navigate = useNavigate();
   const [isFlipped, setFlipped] = useState(false);
   const [hasTimePassed, setHasTimePassed] = useState(false);
@@ -170,7 +199,10 @@ export const NovaCard = ({ daoData }: { daoData: any }) => {
         <AutCardFront
           className={`aut-card-front ${isFlipped ? "flipped" : ""}`}
         >
-          <AutCardContainer className={`aut-card-container front`}>
+          <AutCardContainer
+            isHighlighted={isHighlighted}
+            className={`aut-card-container front`}
+          >
             <img
               src={ipfsCIDToHttpUrl(daoData?.image)}
               alt="Dao image"
@@ -502,7 +534,7 @@ export const NovaCard = ({ daoData }: { daoData: any }) => {
           size="normal"
           color="offWhite"
           onClick={() => {
-            navigate(`/dao?daoAddress=${daoData.properties.address}`);
+            navigate(`/project/${daoData.name}`);
           }}
         >
           Join

@@ -14,7 +14,7 @@ import {
   useMediaQuery,
   useTheme
 } from "@mui/material";
-import { useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { TOOLBAR_HEIGHT } from "./ToolbarConnector";
 import CopyAddress from "@components/CopyAddress";
@@ -181,15 +181,13 @@ const NovaDetails = () => {
   const theme = useTheme();
   const ps = useRef<HTMLElement>();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const [searchParams] = useSearchParams();
+
+  const { novaName } = useParams();
 
   const { data: nova } = useGetAllNovasQuery(null, {
     selectFromResult: ({ data }) => ({
       data: (data?.daos || []).find((d) => {
-        return (
-          d.properties.address ===
-          searchParams.get(RequiredQueryParams.DaoAddress)
-        );
+        return d.name === novaName;
       })
     })
   });
