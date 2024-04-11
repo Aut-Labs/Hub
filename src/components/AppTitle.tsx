@@ -1,16 +1,47 @@
-import { Stack, Typography, TypographyProps } from "@mui/material";
+import { Stack, SvgIcon, Typography, TypographyProps } from "@mui/material";
 import { ReactComponent as AutIcon } from "@assets/aut_logo_offwhite.svg";
 const AppTitle = (props: TypographyProps) => {
   return (
-    <Stack direction="row" alignItems="center" justifyContent="center">
-      <AutIcon style={{ marginRight: "22px" }} width={72} height={72} />
+    <Stack
+      alignItems="center"
+      justifyContent="center"
+      sx={{
+        flexDirection: {
+          xs: "column",
+          md: "row"
+        }
+      }}
+    >
+      <SvgIcon
+        sx={{
+          height: {
+            xs: "40px",
+            md: "64px"
+          },
+          width: {
+            xs: "40px",
+            md: "64px"
+          }
+        }}
+        inheritViewBox
+        component={AutIcon}
+      ></SvgIcon>
       <Typography
         fontFamily="FractulAltLight"
         fontWeight={700}
         variant="h3"
         color="white"
         whiteSpace="nowrap"
-        marginLeft="14px"
+        sx={{
+          marginLeft: {
+            xs: "8px",
+            md: "14px"
+          },
+          fontSize: {
+            xs: "24px",
+            md: "32px"
+          }
+        }}
         {...(props as any)}
       >
         Showcase
