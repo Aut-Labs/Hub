@@ -1,12 +1,14 @@
 import { Box, Button, Link, Toolbar } from "@mui/material";
 import AppTitle from "@components/AppTitle";
 import { useAutConnector, useWalletConnector } from "@aut-labs/connector";
+import { useNavigate } from "react-router-dom";
 
 export const TOOLBAR_HEIGHT = 84;
 
 export const ToolbarConnector = () => {
   const { isConnected, disconnect } = useAutConnector();
   const { open } = useWalletConnector();
+  const navigate = useNavigate();
 
   console.log("isConnected: ", isConnected);
   const connectDisconnectToggle = async () => {
@@ -61,14 +63,19 @@ export const ToolbarConnector = () => {
           }}
           alt="Āut Logo"
         /> */}
-        <AppTitle
-        // mb={{
-        //   xs: "16px",
-        //   lg: "24px",
-        //   xxl: "32px"
-        // }}
-        // variant="h2"
-        />
+        <div style={{ cursor: "pointer" }}>
+          <AppTitle
+            onClick={() => {
+              navigate("/");
+            }}
+            // mb={{
+            //   xs: "16px",
+            //   lg: "24px",
+            //   xxl: "32px"
+            // }}
+            // variant="h2"
+          />
+        </div>
         <Box
           sx={{
             display: "flex",

@@ -406,7 +406,10 @@ export const NovaCard = ({
           </AutCardContainer>
         </AutCardFront>
         <AutCardBack className="aut-card-back">
-          <AutCardContainer className={`aut-card-container back`}>
+          <AutCardContainer
+            className={`aut-card-container back`}
+            isHighlighted={isHighlighted}
+          >
             <Box
               sx={{
                 display: "flex",
@@ -432,7 +435,8 @@ export const NovaCard = ({
                     md: "70px",
                     xxl: "70px"
                   },
-                  bgcolor: "purple"
+                  bgcolor: "purple",
+                  background: "transparent"
                 }}
                 aria-label="avatar"
                 src={ipfsCIDToHttpUrl(daoData?.image as string)}

@@ -33,6 +33,8 @@ export enum Markets {
 
 interface Filters {
   marketFilter: string;
+  connectedAddress: string;
+  novaName: string;
 }
 const getAllNovas = async (body: any, api: BaseQueryApi) => {
   await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -83,7 +85,24 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
       variables: {}
     });
 
-    const { novaDAOs } = novaeResponse.data;
+    let { novaDAOs } = novaeResponse.data;
+
+    const copiedObject = {
+      id: "0xdaffe6640b4c5d8086a31536b2c694bdd3e675d7",
+      deployer:
+        "0x" + Math.floor(Math.random() * 1000000000000000000).toString(16),
+      address: "0xdaffe6640b4c5d8086a31536b2c694bdd3e675d7",
+      market: "3",
+      metadataUri: "ipfs://QmSvexNUM1y2A3DkLcvw8X6VgQ6pbVzUe5ApAdoQGuWHBy",
+      minCommitment: "8",
+      __typename: "NovaDAO"
+    };
+
+    const novaDAOsCopy = Array.from({ length: 10 }, () => ({
+      ...copiedObject
+    }));
+
+    novaDAOs = [...novaDAOsCopy, ...novaDAOs];
 
     const enrichedNovae = [];
 
@@ -115,12 +134,32 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
             (a) => a.novaAddress === novaDAO.address
           ).length,
           address: novaDAO.address,
-          marketId: novaDAO.market
+          marketId: novaDAO.market,
+          deployer: novaDAO.deployer
         }
       } as unknown as Community);
       enrichedNovae.push(enrichedNova);
     }
 
+    enrichedNovae.sort((a, b) => {
+      if (a.name === body?.novaName) {
+        return -1;
+      } else if (b.name === body?.novaName) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+    enrichedNovae.sort((a, b) => {
+      if (a.properties.deployer === body?.connectedAddress) {
+        return -1;
+      } else if (b.properties.deployer === body?.connectedAddress) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+    debugger;
     return {
       data: { daos: enrichedNovae }
     };

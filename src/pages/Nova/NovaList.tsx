@@ -52,20 +52,26 @@ export const GridBox = styled(Box)(({ theme }) => ({
 }));
 
 export const NovaList = () => {
+  // should only see novas with more than 0 members
+  // if connected can see their nova that has 0 members so they can join it
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [activeOnboardingFilter, setActiveOnboardingFilter] = useState("");
   const [marketFilter, setMarkerFilter] = useState("");
   const [archetypeFilter, setArchetypeFilter] = useState("");
+  const { novaName } = useParams();
 
   const { data, isLoading, isFetching } = useGetAllNovasQuery(
-    { marketFilter },
+    {
+      marketFilter,
+      connectedAddress: "0x09ed23bb6f9ccc3fd9b3bc4c859d049bf4ab4d43",
+      novaName: novaName
+    },
     {
       refetchOnMountOrArgChange: true,
       skip: false
     }
   );
-  const { novaName } = useParams();
   return (
     <PerfectScrollbar
       style={{

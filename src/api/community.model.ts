@@ -42,6 +42,7 @@ interface Role {
 
 export class CommunityProperties extends NovaProperties {
   address?: string;
+  deployer: string;
   prestige?: number;
   archetype?: number;
   marketId?: number;
@@ -66,6 +67,7 @@ export class CommunityProperties extends NovaProperties {
     if (!data) {
       this.rolesSets = [];
     } else {
+      this.deployer = data.deployer;
       this.market = MarketTemplates[data.market]?.title;
       this.commitment = data.commitment;
       this.rolesSets = data.rolesSets;
@@ -94,7 +96,6 @@ export class CommunityProperties extends NovaProperties {
           +this.userData.commitment
         );
       }
-      // @TODO - Tao to fix
       this.userData.isAdmin = (data as any).isAdmin;
     }
   }
@@ -112,6 +113,7 @@ export class Community extends BaseNFTModel<CommunityProperties> {
       image: httpUrlToIpfsCID(community.image as string),
       properties: {
         market: market?.title || 0,
+        deployer: community.properties.deployer,
         commitment: community.properties.commitment,
         rolesSets: community.properties.rolesSets,
         socials: community.properties.socials.map((social) => {
