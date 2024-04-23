@@ -1,6 +1,7 @@
 import AutOsTabs from "@components/AutOsTabs";
 import { CommunityTasksTable } from "../NovaDetails";
 import { useEffect, useMemo } from "react";
+import Archetypes from "./Archetype/Archetype";
 
 interface AutTaskTabsProps {
   nova: any;
@@ -9,7 +10,15 @@ interface AutTaskTabsProps {
 
 const AutTaskTabs = ({ nova, tasks }: AutTaskTabsProps) => {
   const tabs = useMemo(() => {
-    const tabs = [];
+    const tabs = [
+      {
+        label: "Archetypes",
+        props: {
+          tasks: []
+        },
+        component: Archetypes
+      }
+    ];
     if (tasks) {
       for (let i = 0; i < tasks.length; i++) {
         const task = tasks[i];
@@ -19,7 +28,7 @@ const AutTaskTabs = ({ nova, tasks }: AutTaskTabsProps) => {
             props: {
               tasks: tasks.filter((t) => t.role === task.role)
             },
-            component: CommunityTasksTable
+            component: CommunityTasksTable as any
           });
         }
       }

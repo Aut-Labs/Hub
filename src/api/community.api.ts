@@ -9,13 +9,13 @@ import { apolloClient } from "@store/graphql";
 import { RootState } from "@store/store.model";
 import { NetworkConfig } from "./ProviderFactory/network.config";
 
-export enum NovaArchetype {
-  "Size" = 1,
-  "Reputation" = 2,
-  "Conviction" = 3,
-  "Performance" = 4,
-  "Growth" = 5
-}
+// export enum NovaArchetype {
+//   "Size" = 1,
+//   "Reputation" = 2,
+//   "Conviction" = 3,
+//   "Performance" = 4,
+//   "Growth" = 5
+// }
 
 export enum Markets {
   "Open-Source & Infra" = 1,
@@ -159,7 +159,6 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
         return 0;
       }
     });
-    debugger;
     return {
       data: { daos: enrichedNovae }
     };
@@ -307,6 +306,7 @@ export const communityApi = createApi({
       data: "Test"
     };
   },
+  tagTypes: ["AllNovas"],
   endpoints: (builder) => ({
     getAllMembers: builder.query<DAOMember[], void>({
       query: (body) => {
@@ -344,7 +344,8 @@ export const communityApi = createApi({
           body,
           url: "getAllNovas"
         };
-      }
+      },
+      providesTags: ["AllNovas"]
     }),
     checkOnboardingAllowlist: builder.query<
       {

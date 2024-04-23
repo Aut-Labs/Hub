@@ -3,11 +3,11 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import { SxProps, useTheme } from "@mui/material";
-import PerfectScrollbar from "react-perfect-scrollbar";
 
 interface AutOsTabParams {
-  label: string;
+  label: string | any;
   component: any;
+  disabled?: boolean;
   props: {
     [key: string]: any;
   };
@@ -36,6 +36,7 @@ function TabPanel(props: any) {
         <Box
           className="tab-content"
           sx={{
+            position: "relative",
             borderColor: "divider",
             height: "calc(100%)",
             ...(sx || {})
@@ -67,9 +68,10 @@ function AutOsTabs(props: AutOsTabsParams) {
       className="aut-tabs"
       sx={{
         width: "100%",
+        height: "100%",
         display: "flex",
         flexDirection: "column",
-        marginBottom: theme.spacing(4),
+        // marginBottom: theme.spacing(4),
         ...props.tabStyles
       }}
     >
@@ -93,12 +95,12 @@ function AutOsTabs(props: AutOsTabsParams) {
               alignItems: "center",
               gap: "10px",
               borderRadius: "72px",
-              width: {
-                xs: "100%",
-                md: "50%"
-              }
-              // background: "rgba(240, 245, 255, 0.01)",
-              // backdropFilter: "blur(12px)"
+              // width: {
+              //   xs: "100%",
+              //   md: "50%"
+              // },
+              background: "rgba(240, 245, 255, 0.01)",
+              backdropFilter: "blur(12px)"
             },
             ".MuiButtonBase-root": {
               height: {
@@ -114,19 +116,29 @@ function AutOsTabs(props: AutOsTabsParams) {
               backgroundColor: "transparent",
               textTransform: "inherit",
               color: "offWhite.main",
-              borderBottom: 0,
+              border: `1px solid ${theme.palette.divider}`,
+              transition: theme.transitions.create([
+                "border-color",
+                "background-color",
+                "color"
+              ]),
+              cursor: "pointer",
               ":hover": {
                 border: `1px solid ${theme.palette.offWhite.main}`
               },
               "&.Mui-selected": {
                 bgcolor: "offWhite.main",
                 color: "nightBlack.main"
+              },
+              "&.Mui-disabled": {
+                color: "offWhite.dark",
+                opacity: "0.8"
               }
             }
           }}
         >
-          {props.tabs.map(({ label }) => (
-            <Tab key={label} label={label} />
+          {props.tabs.map(({ label, disabled }) => (
+            <Tab key={label} label={label} disabled={disabled} />
           ))}
         </Tabs>
       </Box>
