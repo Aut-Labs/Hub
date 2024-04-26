@@ -57,7 +57,7 @@ const getRoleName = (daoData, quest) => {
   }
   return "N/A";
 };
-const pulsate = keyframes`
+export const pulsate = keyframes`
   0% {
     box-shadow: 0 0 0 0 rgba(27, 95, 168, 0.9);
   }

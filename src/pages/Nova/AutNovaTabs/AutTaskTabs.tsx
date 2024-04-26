@@ -1,5 +1,5 @@
 import AutOsTabs from "@components/AutOsTabs";
-import { CommunityTasksTable } from "../NovaDetails";
+import { EmptyNovaOnboardingCards, NovaTasksGrid } from "../NovaDetails";
 import { useEffect, useMemo } from "react";
 
 interface AutTaskTabsProps {
@@ -10,6 +10,7 @@ interface AutTaskTabsProps {
 const AutTaskTabs = ({ nova, tasks }: AutTaskTabsProps) => {
   const tabs = useMemo(() => {
     const tabs = [];
+    debugger;
     if (tasks) {
       for (let i = 0; i < tasks.length; i++) {
         const task = tasks[i];
@@ -19,7 +20,21 @@ const AutTaskTabs = ({ nova, tasks }: AutTaskTabsProps) => {
             props: {
               tasks: tasks.filter((t) => t.role === task.role)
             },
-            component: CommunityTasksTable
+            component: NovaTasksGrid
+          });
+        }
+      }
+    } else {
+      const roles = nova?.properties?.roles;
+      for (let i = 0; i < roles?.length; i++) {
+        const role = roles[i];
+        if (!tabs.find((t) => t.label === role.roleName)) {
+          tabs.push({
+            label: role.roleName,
+            props: {
+              role
+            },
+            component: EmptyNovaOnboardingCards
           });
         }
       }
@@ -61,7 +76,7 @@ const AutTaskTabs = ({ nova, tasks }: AutTaskTabsProps) => {
   //         }
   //       ]
   //     },
-  //     component: CommunityTasksTable
+  //     component: NovaTasksGrid
   //   },
   //   {
   //     label: "Art",
@@ -99,7 +114,7 @@ const AutTaskTabs = ({ nova, tasks }: AutTaskTabsProps) => {
   //         }
   //       ]
   //     },
-  //     component: CommunityTasksTable
+  //     component: NovaTasksGrid
   //   },
   //   {
   //     label: "Marketing",
@@ -130,7 +145,7 @@ const AutTaskTabs = ({ nova, tasks }: AutTaskTabsProps) => {
   //         }
   //       ]
   //     },
-  //     component: CommunityTasksTable
+  //     component: NovaTasksGrid
   //   }
   // ];
   return (

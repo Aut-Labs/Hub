@@ -34,12 +34,13 @@ import { ReactComponent as LensfrensIcon } from "@assets/SocialIcons/LensfrensIc
 import { ReactComponent as TelegramIcon } from "@assets/SocialIcons/TelegramIcon.svg";
 import { ReactComponent as TwitterIcon } from "@assets/SocialIcons/TwitterIcon.svg";
 import { socialUrls } from "@api/aut.model";
-import AutUserTabs from "./AutNovaTabs/AutUserTabs";
+import AutTaskTabs from "./AutNovaTabs/AutTaskTabs";
 import AutIconLabel from "@components/AutIconLabel";
 import { EnvMode, environment } from "@api/environment";
 import { ArchetypeIcons, MarketIcons } from "@components/NovaCard";
 import TaskCard from "@components/TaskCard";
 import { parseNovaTimestamp, parseTimestamp } from "@utils/date-format";
+import RoleCard from "@components/RoleCard";
 
 const socialIcons = {
   discord: DiscordIcon,
@@ -143,7 +144,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   }
 }));
 
-export const CommunityTasksTable = ({ header, tasks }) => {
+export const NovaTasksGrid = ({ header, tasks }) => {
   const theme = useTheme();
   return (
     <Box
@@ -173,6 +174,22 @@ export const CommunityTasksTable = ({ header, tasks }) => {
       {tasks?.map((row, index) => (
         <TaskCard key={`task-item-${row.name}`} row={row} />
       ))}
+    </Box>
+  );
+};
+
+export const EmptyNovaOnboardingCards = ({ role }) => {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: "60px",
+        height: "100%"
+      }}
+    >
+      <RoleCard role={role} />
     </Box>
   );
 };
@@ -568,7 +585,7 @@ const NovaDetails = () => {
           </LeftWrapper>
           <RightWrapper>
             {!!tasks && !!nova && (
-              <AutUserTabs nova={nova} tasks={tasks.tasks} />
+              <AutTaskTabs nova={nova} tasks={tasks.tasks} />
             )}
           </RightWrapper>
         </AutContainer>

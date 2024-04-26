@@ -32,19 +32,47 @@ export enum Markets {
 // };
 
 interface Filters {
-  marketFilter: string;
-  connectedAddress: string;
-  novaName: string;
+  marketFilter?: string;
+  archetypeFilter?: string;
+  connectedAddress?: string;
+  novaName?: string;
 }
 const getAllNovas = async (body: any, api: BaseQueryApi) => {
   await new Promise((resolve) => setTimeout(resolve, 1000));
   try {
     const sdk = AutSDK.getInstance();
     let fetchNovas;
-    if (body?.marketFilter) {
+
+    if (body?.marketFilter && body?.archetypeFilter) {
       fetchNovas = gql`
         query GetNovas {
-          novaDAOs(skip: 0, first: 100, where: { market: ${body.marketFilter}}) {
+          novaDAOs(skip: 0, first: 100, where: { market: ${body.marketFilter}, archetype: ${body.archetypeFilter} }) {
+            id
+            deployer
+            address
+            market
+            metadataUri
+            minCommitment
+          }
+        }
+      `;
+    } else if (body?.marketFilter) {
+      fetchNovas = gql`
+        query GetNovas {
+          novaDAOs(skip: 0, first: 100, where: { market: ${body.marketFilter} }) {
+            id
+            deployer
+            address
+            market
+            metadataUri
+            minCommitment
+          }
+        }
+      `;
+    } else if (body?.archetypeFilter) {
+      fetchNovas = gql`
+        query GetNovas {
+          novaDAOs(skip: 0, first: 100, where: { archetype: ${body.archetypeFilter} }) {
             id
             deployer
             address
@@ -77,32 +105,13 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
       }
     `;
 
-    const novaeResponse = await apolloClient.query<any>({
-      query: fetchNovas
-    });
+    const novaeResponse = await apolloClient.query<any>({ query: fetchNovas });
     const autIdsResponse = await apolloClient.query<any>({
       query: fetchAutIds,
       variables: {}
     });
 
-    let { novaDAOs } = novaeResponse.data;
-
-    const copiedObject = {
-      id: "0xdaffe6640b4c5d8086a31536b2c694bdd3e675d7",
-      deployer:
-        "0x" + Math.floor(Math.random() * 1000000000000000000).toString(16),
-      address: "0xdaffe6640b4c5d8086a31536b2c694bdd3e675d7",
-      market: "3",
-      metadataUri: "ipfs://QmSvexNUM1y2A3DkLcvw8X6VgQ6pbVzUe5ApAdoQGuWHBy",
-      minCommitment: "8",
-      __typename: "NovaDAO"
-    };
-
-    const novaDAOsCopy = Array.from({ length: 10 }, () => ({
-      ...copiedObject
-    }));
-
-    novaDAOs = [...novaDAOsCopy, ...novaDAOs];
+    const { novaDAOs } = novaeResponse.data;
 
     const enrichedNovae = [];
 
@@ -159,9 +168,15 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
         return 0;
       }
     });
-    debugger;
+
+    const filteredNovae = enrichedNovae.filter((nova) => {
+      return (
+        nova.properties.members >= 1 ||
+        nova.properties.deployer === body?.connectedAddress
+      );
+    });
     return {
-      data: { daos: enrichedNovae }
+      data: { daos: filteredNovae }
     };
   } catch (e) {
     return {
@@ -229,36 +244,37 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
   // ];
 };
 
-const getNovaTasks = async (body: any, api: BaseQueryApi) => {
+const getNovaTasks = async (address: any, api: BaseQueryApi) => {
   // await new Promise((resolve) => setTimeout(resolve, 2000));
-
-  const tasks = [
-    {
-      name: "Opt Out Writing",
-      description:
-        "Participate and get published in our Opt Out writing program in partnership with Hackernoon",
-      startDate: new Date("2022-01-01"),
-      endDate: new Date("2022-01-05"),
-      role: "Creative"
-    },
-    {
-      name: "Bounty Program",
-      description:
-        "Complete a bounty from our Dework page, and get it approved.",
-      startDate: new Date("2022-02-01"),
-      endDate: new Date("2022-02-10"),
-      role: "Tech"
-    },
-    {
-      name: "Connectors Program",
-      description:
-        "Join our Connectors program, let’s have an interesting conversation - and you’re in!",
-      startDate: new Date("2022-03-01"),
-      endDate: new Date("2022-03-10"),
-      role: "Community"
-    }
-  ];
-
+  let tasks = null;
+  if (address === "0xdaffe6640b4c5d8086a31536b2c694bdd3e675d7") {
+    tasks = [
+      {
+        name: "Opt Out Writing",
+        description:
+          "Participate and get published in our Opt Out writing program in partnership with Hackernoon",
+        startDate: new Date("2022-01-01"),
+        endDate: new Date("2022-01-05"),
+        role: "Creative"
+      },
+      {
+        name: "Bounty Program",
+        description:
+          "Complete a bounty from our Dework page, and get it approved.",
+        startDate: new Date("2022-02-01"),
+        endDate: new Date("2022-02-10"),
+        role: "Tech"
+      },
+      {
+        name: "Connectors Program",
+        description:
+          "Join our Connectors program, let’s have an interesting conversation - and you’re in!",
+        startDate: new Date("2022-03-01"),
+        endDate: new Date("2022-03-10"),
+        role: "Community"
+      }
+    ];
+  }
   return {
     data: { tasks }
   };
