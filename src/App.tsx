@@ -11,12 +11,12 @@ import AutSDK from "@aut-labs/sdk";
 import ErrorPage from "@components/ErrorPage";
 import { ToolbarConnector } from "./pages/Nova/ToolbarConnector";
 import { NovaList } from "./pages/Nova/NovaList";
-import Callback from "./pages/Oauth2Callback/Callback";
 import NovaDetails from "./pages/Nova/NovaDetails";
 import backgroundImage from "@assets/autos/background.svg";
 import background1 from "@assets/autos/background1.png";
 import AutLoading from "@components/AutLoading";
 import AutWallet from "./AutWallet";
+import Callback from "./pages/Oauth2Callback/Callback";
 
 function App() {
   const dispatch = useAppDispatch();
