@@ -85,6 +85,7 @@ const initialState = {
     severity: "success",
     duration: 2000
   },
+  openEditNova: false,
   logs: [],
   previousRoute: "/",
   transactionState: null,
@@ -114,6 +115,9 @@ export const uiSlice = createSlice({
         open: false
       };
     },
+    setOpenEditNova(state, action) {
+      state.openEditNova = action.payload;
+    },
     updateTransactionState(state, action) {
       state.transactionState = action.payload;
     },
@@ -133,9 +137,11 @@ export const {
   setTitle,
   addLog,
   setPreviusRoute,
+  setOpenEditNova,
   updateTransactionState
 } = uiSlice.actions;
 
 export const AppTitle = (state) => state.ui.title as string;
+export const IsEditingNova = (state) => state.ui.openEditNova as boolean;
 
 export default uiSlice.reducer;
