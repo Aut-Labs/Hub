@@ -23,6 +23,7 @@ import { ReactComponent as Filters } from "@assets/icons/filters.svg";
 import { ReactComponent as Markets } from "@assets/icons/markets.svg";
 import { ReactComponent as Archetypes } from "@assets/icons/archetype.svg";
 import { useParams } from "react-router-dom";
+import { useAccount } from "wagmi";
 
 const AutContainer = styled("div")(() => ({
   display: "flex",
@@ -60,11 +61,12 @@ export const NovaList = () => {
   const [marketFilter, setMarkerFilter] = useState("");
   const [archetypeFilter, setArchetypeFilter] = useState("");
   const { novaName } = useParams();
+  const { address } = useAccount();
 
   const { data, isLoading, isFetching } = useGetAllNovasQuery(
     {
       marketFilter,
-      connectedAddress: "0x09ed23bb6f9ccc3fd9b3bc4c859d049bf4ab4d43",
+      connectedAddress: address,
       novaName: novaName
     },
     {

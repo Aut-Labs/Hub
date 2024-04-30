@@ -54,6 +54,7 @@ export class CommunityProperties extends NovaProperties {
   deployer: string;
   prestige?: number;
   marketId?: number;
+  market: string;
   members?: number;
   absoluteValue?: number;
   roles: Role[];
@@ -133,6 +134,7 @@ export class Community extends BaseNFTModel<CommunityProperties> {
         commitment: community.properties.commitment,
         archetype: community.properties.archetype,
         rolesSets: community.properties.rolesSets,
+        timestamp: community.properties.timestamp,
         socials: community.properties.socials.map((social) => {
           social.link = `${socialUrls[social.type]?.prefix}${social.link || ""}`;
           return social;

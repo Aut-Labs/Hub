@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useRef } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import {
   Avatar,
   Box,
@@ -35,8 +35,7 @@ import { ReactComponent as TwitterIcon } from "@assets/SocialIcons/TwitterIcon.s
 import { socialUrls } from "@api/aut.model";
 import AutTaskTabs from "./AutNovaTabs/AutTaskTabs";
 import AutIconLabel from "@components/AutIconLabel";
-import { EnvMode, environment } from "@api/environment";
-import { ArchetypeIcons, MarketIcons } from "@components/NovaCard";
+import { MarketIcons } from "@components/NovaCard";
 import TaskCard from "@components/TaskCard";
 import { parseNovaTimestamp, parseTimestamp } from "@utils/date-format";
 import RoleCard from "@components/RoleCard";
@@ -46,6 +45,8 @@ import { useAppDispatch } from "@store/store.model";
 import { IsEditingNova, setOpenEditNova } from "@store/ui-reducer";
 import { useSelector } from "react-redux";
 import { AutEditNovaDialog } from "@components/AutEditNovaDialog";
+import { ArchetypeTypes } from "@api/archetype.api";
+import { useAccount } from "wagmi";
 
 const socialIcons = {
   discord: DiscordIcon,
@@ -80,17 +81,18 @@ const LeftWrapper = styled(Box)(({ theme }) => ({
   alignItems: "center",
   justifyContent: "center",
   height: "fit-content",
-  width: "30%",
+  width: "100%",
+  maxWidth: "420px",
   backdropFilter: "blur(12px)",
   backgroundColor: "rgba(128, 128, 128, 0.06)",
   boxShadow: "0px 3px 6px #00000029",
   borderRadius: "24px",
   padding: "32px 16px",
+  margin: "auto",
   marginLeft: "24px",
-  marginRight: "24px",
-
   [theme.breakpoints.down("md")]: {
     width: "90%",
+    maxWidth: "unset",
     marginLeft: 0,
     marginRight: 0
   }
@@ -107,7 +109,8 @@ const RightWrapper = styled(Box)(({ theme }) => ({
   marginLeft: "25px",
   height: "100%",
   position: "relative",
-  width: "70%",
+  // width: "70%",
+  flex: 1,
   [theme.breakpoints.down("md")]: {
     width: "100%",
     marginLeft: 0,
@@ -208,16 +211,28 @@ const NovaDetails = () => {
   const ps = useRef<HTMLElement>();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isEditingNova = useSelector(IsEditingNova);
-
   const { novaName } = useParams();
+  const { address } = useAccount();
 
-  const { data: nova } = useGetAllNovasQuery(null, {
-    selectFromResult: ({ data }) => ({
-      data: (data?.daos || []).find((d) => {
-        return d.name === novaName;
+  const { data: nova } = useGetAllNovasQuery(
+    {
+      connectedAddress: address
+    },
+    {
+      selectFromResult: ({ data }) => ({
+        data: (data?.daos || []).find((d) => {
+          return d.name === novaName;
+        })
       })
-    })
-  });
+    }
+  );
+
+  const selectedArchetype = useMemo(() => {
+    if (!nova?.properties?.archetype?.default) {
+      return null;
+    }
+    return ArchetypeTypes[nova?.properties?.archetype?.default];
+  }, [nova]);
 
   const { data: tasks } = useGetNovaTasksQuery(nova?.properties.address, {
     skip: !nova?.properties.address
@@ -288,7 +303,6 @@ const NovaDetails = () => {
         title="Edit Nova"
         onClose={handleClose}
       />
-
       <PerfectScrollbar
         containerRef={(el) => (ps.current = el)}
         style={{
@@ -505,8 +519,13 @@ const NovaDetails = () => {
                         // flex: "1"
                         // marginTop: theme.spacing(2)
                       }}
-                      icon={ArchetypeIcons[nova?.properties.archetype]}
-                      label={""}
+                      icon={
+                        <SvgIcon
+                          component={selectedArchetype?.logo}
+                          inheritViewBox
+                        />
+                      }
+                      label={selectedArchetype?.title}
                     ></AutIconLabel>
                   </Stack>
                 </Stack>
@@ -525,25 +544,6 @@ const NovaDetails = () => {
                       {nova?.description || "No description yet..."}
                     </Typography>
                   </Box>
-                </Box>
-                <Box>
-                  <AutOsButton
-                    onClick={openEditNovaModal}
-                    type="button"
-                    color="primary"
-                    variant="outlined"
-                    sx={{
-                      ml: 3
-                    }}
-                  >
-                    <Typography
-                      fontWeight="700"
-                      fontSize="16px"
-                      lineHeight="26px"
-                    >
-                      Edit Nova
-                    </Typography>
-                  </AutOsButton>
                 </Box>
                 <Box
                   marginTop={theme.spacing(2)}
@@ -632,6 +632,29 @@ const NovaDetails = () => {
                   >
                     {`Joined ${parsedTimeStamp}`}
                   </Typography>
+                </Box>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    marginTop: theme.spacing(2)
+                  }}
+                >
+                  <AutOsButton
+                    onClick={openEditNovaModal}
+                    type="button"
+                    color="primary"
+                    variant="outlined"
+                  >
+                    <Typography
+                      fontWeight="700"
+                      fontSize="16px"
+                      lineHeight="26px"
+                    >
+                      Edit Nova
+                    </Typography>
+                  </AutOsButton>
                 </Box>
               </Stack>
             </LeftWrapper>

@@ -43,6 +43,8 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
     const sdk = AutSDK.getInstance();
     let fetchNovas;
 
+    debugger;
+
     if (body?.marketFilter && body?.archetypeFilter) {
       fetchNovas = gql`
         query GetNovas {
@@ -135,7 +137,7 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
         ...novaMetadata,
         properties: {
           ...novaMetadata.properties,
-          archetype: Math.floor(Math.random() * 5) + 1,
+          market: novaDAO.market,
           roles: novaMetadata.properties.rolesSets[0].roles,
           absoluteValue: Math.floor(Math.random() * 100) + 1,
           prestige: 100,
@@ -172,7 +174,8 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
     const filteredNovae = enrichedNovae.filter((nova) => {
       return (
         nova.properties.members >= 1 ||
-        nova.properties.deployer === body?.connectedAddress
+        nova.properties.deployer?.toLowerCase() ===
+          body?.connectedAddress?.toLowerCase()
       );
     });
     return {

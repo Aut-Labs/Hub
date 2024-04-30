@@ -1,11 +1,50 @@
 import AutSDK, { LocalReputation, Nova } from "@aut-labs/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import {
+  NovaArchetype,
   NovaArchetypeParameters,
   NovaGroupState
 } from "@aut-labs/sdk/dist/models/nova";
 import { communityApi } from "./community.api";
 import { Community } from "./community.model";
+import { ReactComponent as Size } from "@assets/icons/size.svg";
+import { ReactComponent as Growth } from "@assets/icons/growth.svg";
+import { ReactComponent as Performance } from "@assets/icons/performance.svg";
+import { ReactComponent as Reputation } from "@assets/icons/reputation.svg";
+import { ReactComponent as Conviction } from "@assets/icons/conviction.svg";
+
+export const ArchetypeTypes = {
+  [NovaArchetype.SIZE]: {
+    type: NovaArchetype.SIZE,
+    title: "Size",
+    description: "how many members",
+    logo: Size
+  },
+  [NovaArchetype.REPUTATION]: {
+    type: NovaArchetype.REPUTATION,
+    title: "Reputation",
+    description: "avg. reputation of members",
+    logo: Reputation
+  },
+  [NovaArchetype.CONVICTION]: {
+    type: NovaArchetype.CONVICTION,
+    title: "Conviction",
+    description: "avg. commitment level of members",
+    logo: Conviction
+  },
+  [NovaArchetype.PERFORMANCE]: {
+    type: NovaArchetype.PERFORMANCE,
+    title: "Performance",
+    description: "ratio between Created Points and Completed Points",
+    logo: Performance
+  },
+  [NovaArchetype.GROWTH]: {
+    type: NovaArchetype.GROWTH,
+    title: "Growth",
+    description: "% of member’s growth respect to previous period",
+    logo: Growth
+  }
+};
 
 export const getArchetypeAndStats = async (body, api: BaseQueryApi) => {
   const sdk = AutSDK.getInstance();
@@ -57,7 +96,7 @@ export const getArchetypeAndStats = async (body, api: BaseQueryApi) => {
 
 export const setArchetype = async (
   body: {
-    params: {
+    archetype: {
       default: number;
       parameters: NovaArchetypeParameters;
     };
@@ -67,20 +106,19 @@ export const setArchetype = async (
 ) => {
   try {
     const sdk = AutSDK.getInstance();
-    body.nova.properties.archetype = body.params;
+    body.nova.properties.archetype = body.archetype;
     const updatedCommunity = Community.updateCommunity(body.nova);
     const uri = await sdk.client.sendJSONToIPFS(updatedCommunity as any);
     const nova: Nova = sdk.initService<Nova>(
       Nova,
       body.nova.properties.address
     );
-    const response = await nova.contract.metadata.setMetadataUri(uri);
+    await nova.contract.metadata.setMetadataUri(uri);
     api.dispatch(communityApi.util.invalidateTags(["AllNovas"]));
     return {
       data: body.nova.properties.archetype
     };
   } catch (error) {
-    debugger;
     return {
       error: error?.message
     };

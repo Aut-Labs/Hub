@@ -40,6 +40,7 @@ import { useParams, useSearchParams } from "react-router-dom";
 import { useGetAllNovasQuery } from "@api/community.api";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { useAutConnector, useWalletConnector } from "@aut-labs/connector";
+import { ArchetypeDialog } from "./ArchetypeDialog";
 
 const GridCard = styled(Card)(({ theme }) => {
   return {
@@ -155,10 +156,11 @@ const ArchetypeCard = ({
           }}
           aria-label="avatar"
         >
-          <img
+          <SvgIcon component={logo} inheritViewBox />
+          {/* <img
             src={logo}
             style={{ objectFit: "contain", width: "100%", height: "100%" }}
-          />
+          /> */}
         </Avatar>
         <div
           style={{
@@ -566,17 +568,21 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype, stats }) => {
   const { open } = useWalletConnector();
   const { address } = useAutConnector();
   const [initialValues, setInitialValues] = React.useState(true);
-
   const theme = useTheme();
   const [state, setState] = React.useState(archetypeChartValues(archetype));
 
-  const { data: nova } = useGetAllNovasQuery(null, {
-    selectFromResult: ({ data }) => ({
-      data: (data?.daos || []).find((d) => {
-        return d.name === novaName;
+  const { data: nova } = useGetAllNovasQuery(
+    {
+      connectedAddress: address
+    },
+    {
+      selectFromResult: ({ data }) => ({
+        data: (data?.daos || []).find((d) => {
+          return d.name === novaName;
+        })
       })
-    })
-  });
+    }
+  );
 
   const TOTAL_VALUE = 100;
 
@@ -1052,7 +1058,7 @@ const Archetypes = () => {
       stats: data?.stats
     })
   });
-
+  const [isArchetypeOpen, setIsArchetypeOpen] = React.useState(false);
   const [selected, setSelected] = React.useState(null);
   const archetypeData = React.useMemo(() => {
     if (archetype?.archetype === selected?.type) {
@@ -1070,9 +1076,99 @@ const Archetypes = () => {
 
   console.log("archetypeData: ", archetypeData, archetype, selected);
 
+  const showInteractionLayer = true;
+
+  const handleClose = () => {
+    setIsArchetypeOpen(false);
+  };
+
   return (
-    <Container maxWidth="lg" sx={{ py: "20px" }}>
-      {selected && (
+    <Container maxWidth="lg" sx={{ py: "20px", height: "100%" }}>
+      <>
+        <ArchetypeDialog
+          open={isArchetypeOpen}
+          archetype={archetypeData}
+          title="Interactions"
+          onClose={handleClose}
+        />
+        {showInteractionLayer && (
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gridGap: "12px",
+              textAlign: "center",
+              position: "absolute",
+              top: "100px",
+              left: "100px",
+              right: "100px",
+              bottom: "100px",
+              zIndex: 99,
+              backdropFilter: "blur(12px)",
+              background: "rgba(128, 128, 128, 0.06)",
+              borderRadius: "42px"
+            }}
+          >
+            <Typography mb={4} color="white" variant="subtitle2">
+              this project didn’t set an archetype yet.
+              <br />
+              is this your project?
+            </Typography>
+            <AutOsButton
+              onClick={() => setIsArchetypeOpen(true)}
+              type="button"
+              color="primary"
+              size="small"
+              variant="outlined"
+            >
+              <Typography fontWeight="700" fontSize="16px" lineHeight="26px">
+                Set Archetype
+              </Typography>
+            </AutOsButton>
+          </Box>
+        )}
+        <Box
+          className="map-wrapper"
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            position: "relative",
+            width: "100%",
+            height: "100%",
+            "& > DIV": {
+              width: "100%"
+            },
+            // @ts-ignore
+            ...(showInteractionLayer && {
+              mixBlendMode: "plus-lighter",
+              opacity: 0.6,
+              filter: "blur(20px)"
+            })
+          }}
+        >
+          <Box
+            sx={{
+              position: "relative",
+              height: "400px",
+              width: "400px"
+            }}
+          >
+            <ArchetypePieChart archetype={archetype} />
+          </Box>
+
+          {/* {mapData?.centralNode && (
+            <InteractionMap
+              mapData={mapData}
+              isActive={!showInteractionLayer}
+              parentRef={ref}
+            />
+          )} */}
+        </Box>
+      </>
+      {/* {selected && (
         <YourArchetype
           archetype={archetypeData}
           stats={stats}
@@ -1085,7 +1181,7 @@ const Archetypes = () => {
           archetype={archetype}
           setSelected={setSelected}
         ></ChooseYourArchetype>
-      )}
+      )} */}
     </Container>
   );
 };

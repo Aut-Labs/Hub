@@ -29,6 +29,7 @@ import { IsAuthenticated } from "@auth/auth.reducer";
 import { useOAuthSocials } from "./Oauth2/oauth2";
 import { useGetAllNovasQuery } from "@api/community.api";
 import { Community } from "@api/community.model";
+import { useAccount } from "wagmi";
 
 export interface EditDialogProps {
   title: string;
@@ -145,13 +146,19 @@ export function AutEditNovaDialog(props: EditDialogProps) {
   const { getAuthGithub, getAuthX, getAuthDiscord, authenticating } =
     useOAuthSocials();
   const { novaName } = useParams();
-  const { data: nova } = useGetAllNovasQuery(null, {
-    selectFromResult: ({ data }) => ({
-      data: (data?.daos || []).find((d) => {
-        return d.name === novaName;
+  const { address } = useAccount();
+  const { data: nova } = useGetAllNovasQuery(
+    {
+      connectedAddress: address
+    },
+    {
+      selectFromResult: ({ data }) => ({
+        data: (data?.daos || []).find((d) => {
+          return d.name === novaName;
+        })
       })
-    })
-  });
+    }
+  );
   const theme = useTheme();
   const desktop = useMediaQuery(theme.breakpoints.up("md"));
   const dispatch = useAppDispatch();
@@ -201,8 +208,8 @@ export function AutEditNovaDialog(props: EditDialogProps) {
   } = useForm({
     mode: "onChange",
     defaultValues: {
-      name: nova.name,
-      description: nova.description,
+      name: nova?.name,
+      description: nova?.description,
       // email: holderData.properties.email,
       // bio: holderData.properties.bio,
       // avatar: holderData?.properties?.avatar,

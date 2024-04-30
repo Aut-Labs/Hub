@@ -2,45 +2,23 @@ import {
   Avatar,
   Box,
   Button,
-  Link,
   Typography,
   styled,
   keyframes
 } from "@mui/material";
-import { memo, useEffect, useMemo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import Flipcard from "@components/Flipcard";
 import FlipIcon from "@assets/flip.svg";
-import FlipClockCountdown from "@leenguyen/react-flip-clock-countdown";
-import { NovaDAO } from "@api/community.model";
 import { useNavigate } from "react-router-dom";
 import AutIconLabel from "./AutIconLabel";
 import { Markets } from "@api/community.api";
-import { ReactComponent as ArrowIcon } from "@assets/autos/move-right.svg";
-
 import { ReactComponent as OpenSource } from "@assets/icons/opensource.svg";
 import { ReactComponent as ArtEvents } from "@assets/icons/artevents.svg";
 import { ReactComponent as Social } from "@assets/icons/social.svg";
 import { ReactComponent as Refi } from "@assets/icons/refi.svg";
-
-import { ReactComponent as Size } from "@assets/icons/size.svg";
-import { ReactComponent as Growth } from "@assets/icons/growth.svg";
-import { ReactComponent as Performance } from "@assets/icons/performance.svg";
-import { ReactComponent as Reputation } from "@assets/icons/reputation.svg";
-import { ReactComponent as Conviction } from "@assets/icons/conviction.svg";
-
-import { ReactComponent as Cross } from "@assets/autos/cross.svg";
 import { ReactComponent as Check } from "@assets/autos/check.svg";
-import { RequiredQueryParams } from "@api/RequiredQueryParams";
-import { NovaArchetype } from "@aut-labs/sdk/dist/models/nova";
-
-export const ArchetypeIcons = {
-  [NovaArchetype.SIZE]: <Size />,
-  [NovaArchetype.GROWTH]: <Growth />,
-  [NovaArchetype.PERFORMANCE]: <Performance />,
-  [NovaArchetype.REPUTATION]: <Reputation />,
-  [NovaArchetype.CONVICTION]: <Conviction />
-};
+import { ArchetypeTypes } from "@api/archetype.api";
 
 export const MarketIcons = {
   [Markets["Open-Source & Infra"]]: <OpenSource />,
@@ -177,6 +155,13 @@ export const NovaCard = ({
   const navigate = useNavigate();
   const [isFlipped, setFlipped] = useState(false);
   const [hasTimePassed, setHasTimePassed] = useState(false);
+
+  const selectedArchetype = useMemo(() => {
+    if (!daoData?.properties?.archetype?.default) {
+      return null;
+    }
+    return ArchetypeTypes[daoData?.properties?.archetype?.default];
+  }, [daoData]);
 
   const flipCard = () => {
     if (isFlipped) {
@@ -498,8 +483,8 @@ export const NovaCard = ({
                   flexBasis: "50%"
                   // marginTop: theme.spacing(2)
                 }}
-                icon={ArchetypeIcons[daoData?.properties.archetype]}
-                label={""}
+                icon={selectedArchetype?.icon}
+                label={selectedArchetype?.title}
               ></AutIconLabel>
             </Box>
 

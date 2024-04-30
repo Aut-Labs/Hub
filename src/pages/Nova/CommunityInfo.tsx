@@ -52,13 +52,19 @@ const CommunityInfo = () => {
   const { address: account } = useAccount();
   const urls = autUrls();
 
-  const { data } = useGetAllNovasQuery(null, {
-    selectFromResult: ({ data }) => ({
-      data: (data?.daos || []).find(
-        (d) => d.daoAddress === searchParams.get(RequiredQueryParams.DaoAddress)
-      )
-    })
-  });
+  const { data } = useGetAllNovasQuery(
+    {
+      connectedAddress: account
+    },
+    {
+      selectFromResult: ({ data }) => ({
+        data: (data?.daos || []).find(
+          (d) =>
+            d.daoAddress === searchParams.get(RequiredQueryParams.DaoAddress)
+        )
+      })
+    }
+  );
 
   return (
     <Box
