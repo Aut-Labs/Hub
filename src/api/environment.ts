@@ -10,6 +10,7 @@ export const swEnvVariables = {
   rpcUrls: "REACT_APP_MATIC_RPC_URLS",
   env: "REACT_APP_NODE_ENV",
   hideDashboard: "REACT_APP_HIDE_DASHBOARD",
+  graphApiUrl: "REACT_APP_GRAPH_API_URL",
 
   // Aut
   apiUrl: "REACT_APP_API_URL",

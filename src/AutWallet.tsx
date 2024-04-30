@@ -103,6 +103,13 @@ const AutWallet = () => {
       };
       Init({
         config,
+        envConfig: {
+          REACT_APP_API_URL: environment.apiUrl,
+          REACT_APP_GRAPH_API_URL: environment.graphApiUrl,
+          REACT_APP_IPFS_API_KEY: environment.ipfsApiKey,
+          REACT_APP_IPFS_API_SECRET: environment.ipfsApiSecret,
+          REACT_APP_IPFS_GATEWAY_URL: environment.ipfsGatewayUrl
+        },
         connector: {
           connect,
           disconnect,

@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import AutSDK, { LocalReputation, Nova } from "@aut-labs/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import {
@@ -17,31 +18,36 @@ export const ArchetypeTypes = {
   [NovaArchetype.SIZE]: {
     type: NovaArchetype.SIZE,
     title: "Size",
-    description: "how many members",
+    description:
+      "A relative value that represents how “big” a Nova compared to others in the ecosystem. This Archetype encourages the largest projects to verify & maintain a positive influence in the overall ecosystem.",
     logo: Size
   },
   [NovaArchetype.REPUTATION]: {
     type: NovaArchetype.REPUTATION,
     title: "Reputation",
-    description: "avg. reputation of members",
+    description:
+      "The average Participation Score of a Nova’s Contributors. This Archetype gives more insights about the shared trust between members, and their constant effort towards a common goal.",
     logo: Reputation
   },
   [NovaArchetype.CONVICTION]: {
     type: NovaArchetype.CONVICTION,
     title: "Conviction",
-    description: "avg. commitment level of members",
+    description:
+      "The avg. Commitment of the contributors of your Nova. This archetype is for the true believers – reflecting Members’ level of trust and belief in your project’s vision.",
     logo: Conviction
   },
   [NovaArchetype.PERFORMANCE]: {
     type: NovaArchetype.PERFORMANCE,
     title: "Performance",
-    description: "ratio between Created Points and Completed Points",
+    description:
+      "The ratio between tasks created and tasks completed during a given period. This Archetype is for ambitious, coordinated communities set to create real impact and thrive.",
     logo: Performance
   },
   [NovaArchetype.GROWTH]: {
     type: NovaArchetype.GROWTH,
     title: "Growth",
-    description: "% of member’s growth respect to previous period",
+    description:
+      "Everything starts with something. This Archetype is not for the largest Novae, it’s for the ones with a continuous, organic, slow and steady growth determined by their scale.",
     logo: Growth
   }
 };

@@ -31,7 +31,7 @@ export interface InteractionsDialogProps {
 const AutStyledDialog = styled(Dialog)(({ theme }) => ({
   ".MuiPaper-root": {
     margin: "0",
-    width: "85%",
+    width: "80%",
     height: "80%",
     border: "none",
     backgroundColor: "#1E2430",
@@ -75,6 +75,7 @@ const ArchetypeCard = ({
         height: "100%",
         width: "100%",
         minWidth: "170px",
+        minHeight: "190px",
         boxShadow: 3,
         borderRadius: "8.5px",
         padding: theme.spacing(3)
@@ -121,15 +122,15 @@ const ArchetypeCard = ({
           style={{
             flex: "2",
             display: "flex",
-            alignItems: "center",
-            justifyContent: "center"
+            alignItems: "center"
+            // justifyContent: "center"
           }}
         >
           <Typography
             color="offWhite.main"
             textAlign="center"
             lineHeight={1}
-            variant="subtitle1"
+            variant="subtitle2"
             marginLeft={1}
           >
             {title}
@@ -146,24 +147,26 @@ const ArchetypeCard = ({
           width: "100%"
         }}
       >
-        <Typography
-          color="offWhite.main"
-          textAlign="left"
-          lineHeight={1}
-          variant="body1"
+        <Box
+          sx={{
+            background: "#000000",
+            borderRadius: "6px",
+            p: 4,
+            mt: 4,
+            flex: 1
+          }}
         >
           <Typography
             marginTop={3}
             color="offWhite.main"
             textAlign="center"
-            fontFamily="FractulAltLight"
             lineHeight={1}
-            variant="subtitle2"
+            variant="body"
           >
             {description}
           </Typography>
-        </Typography>
-        <AutOsButton
+        </Box>
+        {/* <AutOsButton
           sx={{
             mt: "24px",
             bgcolor: "transparent",
@@ -191,7 +194,7 @@ const ArchetypeCard = ({
           <Typography variant="body" fontWeight="normal" color="white">
             Choose archetype
           </Typography>
-        </AutOsButton>
+        </AutOsButton> */}
       </Stack>
     </Box>
   );
@@ -269,7 +272,7 @@ export function ArchetypeDialog(props: InteractionsDialogProps) {
             sx={{
               minWidth: {
                 xs: "unset",
-                md: "800px"
+                md: "700px"
               },
               padding: "10px",
               display: "grid",
@@ -277,9 +280,10 @@ export function ArchetypeDialog(props: InteractionsDialogProps) {
                 xs: "1fr",
                 sm: "1fr 1fr 1fr",
                 md: "1fr 1fr 1fr",
-                xl: "1fr 1fr 1fr 1fr 1fr"
+                lg: "1fr 1fr 1fr",
+                xxl: "1fr 1fr 1fr 1fr 1fr"
               },
-              gap: theme.spacing(2)
+              gap: theme.spacing(5)
             }}
           >
             <ArchetypeCard
