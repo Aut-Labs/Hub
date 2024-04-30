@@ -11,6 +11,7 @@ const AppTitle = (props: TypographyProps) => {
           md: "row"
         }
       }}
+      {...(props as any)}
     >
       <SvgIcon
         sx={{
@@ -42,7 +43,6 @@ const AppTitle = (props: TypographyProps) => {
             md: "32px"
           }
         }}
-        {...(props as any)}
       >
         Showcase
         {/* <Typography variant="body">(beta)</Typography> */}

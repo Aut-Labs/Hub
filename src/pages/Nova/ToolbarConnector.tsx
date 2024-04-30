@@ -66,6 +66,7 @@ export const ToolbarConnector = () => {
         <div style={{ cursor: "pointer" }}>
           <AppTitle
             onClick={() => {
+              console.log("CLICKED ON APP TITLE!");
               navigate("/");
             }}
             // mb={{

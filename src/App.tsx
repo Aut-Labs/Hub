@@ -61,7 +61,10 @@ function App() {
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                   height: "100vh",
-                  width: "100vw"
+                  width: "100vw",
+                  position: "fixed",
+                  top: 0,
+                  left: 0
                 }}
               >
                 <ToolbarConnector />

@@ -43,37 +43,10 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
     const sdk = AutSDK.getInstance();
     let fetchNovas;
 
-    if (body?.marketFilter && body?.archetypeFilter) {
-      fetchNovas = gql`
-        query GetNovas {
-          novaDAOs(skip: 0, first: 100, where: { market: ${body.marketFilter}, archetype: ${body.archetypeFilter} }) {
-            id
-            deployer
-            address
-            archetype
-            market
-            metadataUri
-            minCommitment
-          }
-        }
-      `;
-    } else if (body?.marketFilter) {
+    if (body?.marketFilter) {
       fetchNovas = gql`
         query GetNovas {
           novaDAOs(skip: 0, first: 100, where: { market: ${body.marketFilter} }) {
-            id
-            deployer
-            address
-            market
-            metadataUri
-            minCommitment
-          }
-        }
-      `;
-    } else if (body?.archetypeFilter) {
-      fetchNovas = gql`
-        query GetNovas {
-          novaDAOs(skip: 0, first: 100, where: { archetype: ${body.archetypeFilter} }) {
             id
             deployer
             address
@@ -149,7 +122,6 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
       } as unknown as Community);
       enrichedNovae.push(enrichedNova);
     }
-
     enrichedNovae.sort((a, b) => {
       if (a.name === body?.novaName) {
         return -1;
@@ -169,13 +141,19 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
       }
     });
 
-    const filteredNovae = enrichedNovae.filter((nova) => {
+    let filteredNovae = enrichedNovae.filter((nova) => {
       return (
         nova.properties.members >= 1 ||
         nova.properties.deployer?.toLowerCase() ===
           body?.connectedAddress?.toLowerCase()
       );
     });
+    if (body.archetypeFilter) {
+      filteredNovae = filteredNovae.filter(
+        (nova) =>
+          nova?.properties?.archetype?.default === Number(body?.archetypeFilter)
+      );
+    }
     return {
       data: { daos: filteredNovae }
     };
@@ -248,7 +226,7 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
 const getNovaTasks = async (address: any, api: BaseQueryApi) => {
   // await new Promise((resolve) => setTimeout(resolve, 2000));
   let tasks = null;
-  if (address === "0x66fb47ac222dde590de4fa3e90f7b7438fc6644b") {
+  if (address === "chosen nova address") {
     tasks = [
       {
         name: "Opt Out Writing",

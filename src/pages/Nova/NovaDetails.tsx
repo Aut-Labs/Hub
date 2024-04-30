@@ -48,6 +48,7 @@ import { ArchetypeTypes } from "@api/archetype.api";
 import { useAccount } from "wagmi";
 import { setNovaAddress } from "@store/WalletProvider/WalletProvider";
 import { MarketTemplates } from "@api/community.model";
+import AutLoading from "@components/AutLoading";
 
 const socialIcons = {
   discord: DiscordIcon,
@@ -712,7 +713,7 @@ const NovaDetails = () => {
             </RightWrapper>
           </AutContainer>
         ) : (
-          <CircularProgress size={23} color="secondary"></CircularProgress>
+          <AutLoading width="130px" height="130px" />
         )}
       </PerfectScrollbar>
     </>

@@ -81,10 +81,10 @@
     "@web3auth/wallet-services-plugin" "^8.0.1"
     "@web3auth/web3auth-wagmi-connector" "^6.0.0"
 
-"@aut-labs/d-aut@^1.0.137-dev":
-  version "1.0.137-dev"
-  resolved "https://registry.npmjs.org/@aut-labs/d-aut/-/d-aut-1.0.137-dev.tgz"
-  integrity sha512-05el52gZsiIS1AtBfC47tmLsb8xJ4beKbyItywU3PlJqZqLqHT/CXyqn+WHLOJZTw/gdwa0H1caXZnITr1GNdA==
+"@aut-labs/d-aut@^1.0.138-dev":
+  version "1.0.138-dev"
+  resolved "https://registry.npmjs.org/@aut-labs/d-aut/-/d-aut-1.0.138-dev.tgz"
+  integrity sha512-z2zkpKMCGMJMN6RoUg0BrhgjY79YowmQW5gO4j1v/ewLWiRbldXTTu41xNi7ETNh5097bGv6oTwGQ0KLxNB8iQ==
   dependencies:
     "@tanstack/react-query" "^5.18.1"
 

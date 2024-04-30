@@ -24,6 +24,7 @@ import { ReactComponent as Markets } from "@assets/icons/markets.svg";
 import { ReactComponent as Archetypes } from "@assets/icons/archetype.svg";
 import { useParams } from "react-router-dom";
 import { useAccount } from "wagmi";
+import { MarketTemplates } from "@api/community.model";
 
 const AutContainer = styled("div")(() => ({
   display: "flex",
@@ -58,7 +59,7 @@ export const NovaList = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [activeOnboardingFilter, setActiveOnboardingFilter] = useState("");
-  const [marketFilter, setMarkerFilter] = useState("");
+  const [marketFilter, setMarketFilter] = useState("");
   const [archetypeFilter, setArchetypeFilter] = useState("");
   const { novaName } = useParams();
   const { address } = useAccount();
@@ -66,6 +67,7 @@ export const NovaList = () => {
   const { data, isLoading, isFetching } = useGetAllNovasQuery(
     {
       marketFilter,
+      archetypeFilter,
       connectedAddress: address,
       novaName: novaName
     },
@@ -78,8 +80,8 @@ export const NovaList = () => {
     <PerfectScrollbar
       style={{
         ...(isMobile && {
-          marginTop: `${TOOLBAR_HEIGHT + 80}px`,
-          height: `calc(100% - ${TOOLBAR_HEIGHT + 80 + "px"})`
+          marginTop: `${TOOLBAR_HEIGHT}px`,
+          height: `calc(100% - ${TOOLBAR_HEIGHT + "px"})`
         }),
         ...(!isMobile && {
           marginTop: `${TOOLBAR_HEIGHT}px`,
@@ -95,10 +97,10 @@ export const NovaList = () => {
           sx={{
             display: "flex",
             justifyContent: "center",
-            alignItems: "flex-start",
+            alignItems: isMobile ? "center" : "flex-start",
             gap: "25px",
-            width: "70%",
-            mt: "100px"
+            mt: isMobile ? "24px" : "100px",
+            flexDirection: isMobile ? "column" : "row"
           }}
         >
           <AutSelectField
@@ -131,7 +133,9 @@ export const NovaList = () => {
           <AutSelectField
             value={marketFilter}
             color="offWhite"
-            onChange={(e) => setMarkerFilter(e.target.value as string)}
+            onChange={(e) => {
+              setMarketFilter(e.target.value as string);
+            }}
             startAdornment={
               <InputAdornment
                 position="start"
@@ -144,23 +148,20 @@ export const NovaList = () => {
             <MenuItem value="">
               <em>All Markets</em>
             </MenuItem>
-            <MenuItem value="1">
-              <em>Open-Source & Infra</em>
-            </MenuItem>
-            <MenuItem value="2">
-              <em>Art, Events & NFTs</em>
-            </MenuItem>
-            <MenuItem value="3">
-              <em>Social, Gaming & DeFi</em>
-            </MenuItem>
-            <MenuItem value="4">
-              <em>ReFi & Public Goods</em>
-            </MenuItem>
+            {MarketTemplates.map((market) => {
+              return (
+                <MenuItem key={market.title} value={market.market}>
+                  <em>{market.title}</em>
+                </MenuItem>
+              );
+            })}
           </AutSelectField>
           <AutSelectField
             value={archetypeFilter}
             color="offWhite"
-            onChange={(e) => setArchetypeFilter(e.target.value as string)}
+            onChange={(e) => {
+              setArchetypeFilter(e.target.value as string);
+            }}
             startAdornment={
               <InputAdornment
                 position="start"
@@ -173,26 +174,23 @@ export const NovaList = () => {
             <MenuItem value="">
               <em>Archetype</em>
             </MenuItem>
-            <MenuItem value="Growth">
-              <em>Growth</em>
-            </MenuItem>
-            <MenuItem value="Performance">
-              <em>Performance</em>
-            </MenuItem>
-            <MenuItem value="Size">
+            <MenuItem value="1">
               <em>Size</em>
             </MenuItem>
-            <MenuItem value="Reputation">
+            <MenuItem value="2">
               <em>Reputation</em>
             </MenuItem>
-            <MenuItem value="Conviction">
+            <MenuItem value="3">
               <em>Conviction</em>
+            </MenuItem>
+            <MenuItem value="4">
+              <em>Performance</em>
+            </MenuItem>
+            <MenuItem value="5">
+              <em>Growth</em>
             </MenuItem>
           </AutSelectField>
         </Box>
-        {isLoading && (
-          <CircularProgress size={23} color="secondary"></CircularProgress>
-        )}
 
         {!isLoading && !(data?.daos || [])?.length && (
           <Box
@@ -224,7 +222,7 @@ export const NovaList = () => {
           </Box>
         )}
 
-        {isLoading ? (
+        {isLoading || isFetching ? (
           <AutLoading width="130px" height="130px" />
         ) : (
           <>
