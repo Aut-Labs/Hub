@@ -140,10 +140,24 @@ export const archetypeChartValues = (archetype: NovaArchetypeParameters) => {
 const ArchetypePieChart = ({
   archetype
 }: {
-  archetype: NovaArchetypeParameters;
+  archetype: {
+    default: number;
+    parameters: NovaArchetypeParameters;
+  };
 }) => {
+  const mappedArchetype: NovaArchetypeParameters = useMemo(() => {
+    return {
+      archetype: archetype.default,
+      size: archetype.default,
+      growth: archetype.default,
+      performance: archetype.default,
+      reputation: archetype.default,
+      conviction: archetype.default
+    };
+  }, [archetype]);
+
   const mappedData = useMemo(() => {
-    const data = archetypeChartValues(archetype);
+    const data = archetypeChartValues(mappedArchetype);
     return Object.keys(data || {}).reduce((prev, curr) => {
       prev = [
         ...prev,
@@ -154,9 +168,7 @@ const ArchetypePieChart = ({
       ];
       return prev;
     }, []);
-  }, [archetype]);
-
-  console.log(mappedData);
+  }, [mappedArchetype]);
 
   const [activeIndex, setActiveIndex] = useState(0);
 

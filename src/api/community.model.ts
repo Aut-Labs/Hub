@@ -7,7 +7,6 @@ import {
   RoleSet
 } from "@aut-labs/sdk/dist/models/nova";
 import { AutSocial } from "./api.model";
-import { socialUrls } from "./aut.model";
 import { Quest } from "@aut-labs/sdk";
 import { ReactComponent as OpenSource } from "@assets/icons/opensource.svg";
 import { ReactComponent as ArtEvents } from "@assets/icons/artevents.svg";
@@ -148,7 +147,6 @@ export class Community extends BaseNFTModel<CommunityProperties> {
         rolesSets: community.properties.rolesSets,
         timestamp: community.properties.timestamp,
         socials: community.properties.socials.map((social) => {
-          social.link = `${socialUrls[social.type]?.prefix}${social.link || ""}`;
           return social;
         })
       }

@@ -19,17 +19,15 @@ import { ReactComponent as CloseIcon } from "@assets/autos/close-icon.svg";
 import { ReactComponent as SocialCheckIcon } from "@assets/autos/social-check.svg";
 import { useAppDispatch } from "@store/store.model";
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { AutTextField } from "@theme/field-text-styles";
-import { ipfsCIDToHttpUrl } from "@api/storage.api";
-import { base64toFile, toBase64 } from "@utils/to-base-64";
-import { CommunityData } from "@store/Community/community.reducer";
 import { useSelector } from "react-redux";
 import { IsAuthenticated } from "@auth/auth.reducer";
 import { useOAuthSocials } from "./Oauth2/oauth2";
-import { useGetAllNovasQuery } from "@api/community.api";
 import { Community } from "@api/community.model";
-import { useAccount } from "wagmi";
+import { useUpdateNovaMutation } from "@api/archetype.api";
+import ErrorDialog from "./Dialog/ErrorPopup";
+import LoadingDialog from "./Dialog/LoadingPopup";
 
 export interface EditDialogProps {
   title: string;
@@ -37,6 +35,7 @@ export interface EditDialogProps {
   open?: boolean;
   onClose?: () => void;
   hideCloseBtn?: boolean;
+  nova: any;
 }
 
 const AutStyledDialog = styled(Dialog)(({ theme }) => ({
@@ -145,20 +144,6 @@ export enum SocialLinkPrefixes {
 export function AutEditNovaDialog(props: EditDialogProps) {
   const { getAuthGithub, getAuthX, getAuthDiscord, authenticating } =
     useOAuthSocials();
-  const { novaName } = useParams();
-  const { address } = useAccount();
-  const { data: nova } = useGetAllNovasQuery(
-    {
-      connectedAddress: address
-    },
-    {
-      selectFromResult: ({ data }) => ({
-        data: (data?.daos || []).find((d) => {
-          return d.name === novaName;
-        })
-      })
-    }
-  );
   const theme = useTheme();
   const desktop = useMediaQuery(theme.breakpoints.up("md"));
   const dispatch = useAppDispatch();
@@ -176,7 +161,7 @@ export function AutEditNovaDialog(props: EditDialogProps) {
   };
 
   const filteredSocials =
-    (nova as Community)?.properties?.socials?.filter(
+    (props.nova as Community)?.properties?.socials?.filter(
       (social) => social.type !== "telegram" && social.type !== "lensfrens"
     ) || [];
 
@@ -200,6 +185,9 @@ export function AutEditNovaDialog(props: EditDialogProps) {
     return value.replace(prefix, "");
   }
 
+  const [updateNova, { error, isError, isLoading, reset }] =
+    useUpdateNovaMutation();
+
   const {
     control,
     handleSubmit,
@@ -208,11 +196,8 @@ export function AutEditNovaDialog(props: EditDialogProps) {
   } = useForm({
     mode: "onChange",
     defaultValues: {
-      name: nova?.name,
-      description: nova?.description,
-      // email: holderData.properties.email,
-      // bio: holderData.properties.bio,
-      // avatar: holderData?.properties?.avatar,
+      name: props.nova?.name,
+      description: props.nova?.description,
       socials: filteredSocials
     }
   });
@@ -229,18 +214,15 @@ export function AutEditNovaDialog(props: EditDialogProps) {
   };
 
   const onEditNova = async (data: any) => {
-    // await dispatch(
-    //   updateProfile({
-    //     ...holderData,
-    //     properties: {
-    //       ...holderData.properties,
-    //       socials: data.socials,
-    //       bio: data.bio,
-    //       email: data.email,
-    //       avatar: data.avatar
-    //     }
-    //   } as AutID)
-    // );
+    updateNova({
+      ...props.nova,
+      name: data.name,
+      properties: {
+        ...props.nova.properties,
+        socials: data.socials,
+        description: data.description
+      }
+    });
     setEditInitiated(false);
   };
 
@@ -251,6 +233,8 @@ export function AutEditNovaDialog(props: EditDialogProps) {
       onClose={props.onClose}
       open={props.open}
     >
+      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
+      <LoadingDialog open={isLoading} message="Updating Nova..." />
       <DialogContent
         sx={{
           border: 0,

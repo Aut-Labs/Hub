@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import { Community } from "./community.model";
 import { DAOMember } from "./aut.model";
-import AutSDK, { Allowlist, fetchMetadata } from "@aut-labs/sdk";
+import AutSDK, { Allowlist, fetchMetadata, Nova } from "@aut-labs/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { environment } from "./environment";
 import { gql } from "@apollo/client";
@@ -123,14 +123,14 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
         environment.ipfsGatewayUrl
       );
       //TODO: Fix archetypes and find AV
-      // const nova: Nova = sdk.initService<Nova>(Nova, novaDAO.address);
-      // const localReputation: LocalReputation = sdk.localReputation;
+      const nova: Nova = sdk.initService<Nova>(Nova, novaDAO.address);
+      let isAdmin = false;
 
-      // const archetypeResponse = await nova.contract.getArchetype();
-      // const stats = await localReputation.contract.getNovaLocalReputationStats(
-      //   novaDAO.address
-      // );
-      // debugger;
+      if (body?.connectedAddress) {
+        isAdmin = await nova.contract.functions.isAdmin(
+          body?.connectedAddress.toLowerCase()
+        );
+      }
       const enrichedNova = new Community({
         ...novaDAO,
         ...novaMetadata,
@@ -140,6 +140,7 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
           roles: novaMetadata.properties.rolesSets[0].roles,
           absoluteValue: Math.floor(Math.random() * 100) + 1,
           prestige: 100,
+          isAdmin,
           members: autIdsResponse.data.autIDs.filter(
             (a) => a.novaAddress === novaDAO.address
           ).length,

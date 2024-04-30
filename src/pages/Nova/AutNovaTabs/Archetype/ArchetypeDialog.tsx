@@ -18,9 +18,7 @@ import {
   useMediaQuery,
   useTheme
 } from "@mui/material";
-import { useAppDispatch } from "@store/store.model";
 import React from "react";
-import { useState } from "react";
 import { archetypeChartValues } from "./ArchetypePieChart";
 import { useSetArchetypeMutation } from "@api/archetype.api";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
@@ -224,6 +222,7 @@ export function ArchetypeDialog(props: InteractionsDialogProps) {
   const [state, setState] = React.useState(
     archetypeChartValues(props.archetype)
   );
+
   const theme = useTheme();
   const desktop = useMediaQuery(theme.breakpoints.up("md"));
 
@@ -231,10 +230,22 @@ export function ArchetypeDialog(props: InteractionsDialogProps) {
     useSetArchetypeMutation();
 
   const updateArchetype = async (selectedArchetype) => {
+    const archetype = state[selectedArchetype.type];
+    const updatedArchetype: Partial<NovaArchetypeParameters> = {
+      size: archetype.defaults[NovaArchetype.SIZE],
+      growth: archetype.defaults[NovaArchetype.GROWTH],
+      conviction: archetype.defaults[NovaArchetype.CONVICTION],
+      performance: archetype.defaults[NovaArchetype.PERFORMANCE],
+      reputation: archetype.defaults[NovaArchetype.REPUTATION]
+    };
+    debugger;
     try {
       setArchetype({
         nova: props.nova,
-        archetype: selectedArchetype
+        archetype: {
+          default: selectedArchetype.type,
+          parameters: updatedArchetype as NovaArchetypeParameters
+        }
       });
     } catch (error) {
       console.error(error);
@@ -288,7 +299,10 @@ export function ArchetypeDialog(props: InteractionsDialogProps) {
           <Grid item xs={12} sm={6} md={4}>
             <ArchetypeCard
               isLoading={isLoading}
-              activeArchetype={props?.archetype?.default === NovaArchetype.SIZE}
+              activeArchetype={
+                props?.nova?.properties?.archetype?.default ===
+                NovaArchetype.SIZE
+              }
               onSelect={updateArchetype}
               {...state[NovaArchetype.SIZE]}
             />
@@ -296,7 +310,8 @@ export function ArchetypeDialog(props: InteractionsDialogProps) {
           <Grid item xs={12} sm={6} md={4}>
             <ArchetypeCard
               activeArchetype={
-                props?.archetype?.default === NovaArchetype.REPUTATION
+                props?.nova?.properties?.archetype?.default ===
+                NovaArchetype.REPUTATION
               }
               isLoading={isLoading}
               onSelect={updateArchetype}
@@ -307,7 +322,8 @@ export function ArchetypeDialog(props: InteractionsDialogProps) {
             <ArchetypeCard
               isLoading={isLoading}
               activeArchetype={
-                props?.archetype?.default === NovaArchetype.CONVICTION
+                props?.nova?.properties?.archetype?.default ===
+                NovaArchetype.CONVICTION
               }
               onSelect={updateArchetype}
               {...state[NovaArchetype.CONVICTION]}
@@ -329,7 +345,8 @@ export function ArchetypeDialog(props: InteractionsDialogProps) {
             <ArchetypeCard
               isLoading={isLoading}
               activeArchetype={
-                props?.archetype?.default === NovaArchetype.PERFORMANCE
+                props?.nova?.properties?.archetype?.default ===
+                NovaArchetype.PERFORMANCE
               }
               onSelect={updateArchetype}
               {...state[NovaArchetype.PERFORMANCE]}
@@ -339,7 +356,8 @@ export function ArchetypeDialog(props: InteractionsDialogProps) {
             <ArchetypeCard
               isLoading={isLoading}
               activeArchetype={
-                props?.archetype?.default === NovaArchetype.GROWTH
+                props?.nova?.properties?.archetype?.default ===
+                NovaArchetype.GROWTH
               }
               onSelect={updateArchetype}
               {...state[NovaArchetype.GROWTH]}
@@ -356,77 +374,6 @@ export function ArchetypeDialog(props: InteractionsDialogProps) {
             md={2}
           />
         </Grid>
-
-        {/* <Box
-          sx={{
-            minWidth: {
-              sm: "100%"
-            },
-            width: {
-              xs: "100%",
-              sm: "unset"
-            },
-            backgroundColor: "transparent",
-            border: "none",
-            my: theme.spacing(3)
-          }}
-        >
-          <Box
-            className="swiper-no-swiping"
-            sx={{
-              minWidth: {
-                xs: "unset",
-                md: "700px"
-              },
-              padding: "10px",
-              display: "grid",
-              gridTemplateColumns: {
-                xs: "1fr",
-                sm: "1fr 1fr 1fr",
-                md: "1fr 1fr 1fr",
-                lg: "1fr 1fr 1fr",
-                xxl: "1fr 1fr 1fr 1fr 1fr"
-              },
-              gap: theme.spacing(5)
-            }}
-          >
-            <ArchetypeCard
-              activeArchetype={
-                props.props?.archetype?.archetype === NovaArchetype.SIZE
-              }
-              onSelect={setSelected}
-              {...state[NovaArchetype.SIZE]}
-            />
-            <ArchetypeCard
-              activeArchetype={
-                props.props?.archetype?.archetype === NovaArchetype.REPUTATION
-              }
-              onSelect={setSelected}
-              {...state[NovaArchetype.REPUTATION]}
-            />
-            <ArchetypeCard
-              activeArchetype={
-                props.archetype?.archetype === NovaArchetype.CONVICTION
-              }
-              onSelect={setSelected}
-              {...state[NovaArchetype.CONVICTION]}
-            />
-            <ArchetypeCard
-              activeArchetype={
-                props.archetype?.archetype === NovaArchetype.PERFORMANCE
-              }
-              onSelect={setSelected}
-              {...state[NovaArchetype.PERFORMANCE]}
-            />
-            <ArchetypeCard
-              activeArchetype={
-                props.archetype?.archetype === NovaArchetype.GROWTH
-              }
-              onSelect={setSelected}
-              {...state[NovaArchetype.GROWTH]}
-            />
-          </Box>
-        </Box> */}
       </DialogContent>
       <DialogActions
         sx={{
