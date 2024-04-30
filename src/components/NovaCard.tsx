@@ -4,7 +4,8 @@ import {
   Button,
   Typography,
   styled,
-  keyframes
+  keyframes,
+  SvgIcon
 } from "@mui/material";
 import { memo, useMemo, useState } from "react";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
@@ -13,19 +14,9 @@ import FlipIcon from "@assets/flip.svg";
 import { useNavigate } from "react-router-dom";
 import AutIconLabel from "./AutIconLabel";
 import { Markets } from "@api/community.api";
-import { ReactComponent as OpenSource } from "@assets/icons/opensource.svg";
-import { ReactComponent as ArtEvents } from "@assets/icons/artevents.svg";
-import { ReactComponent as Social } from "@assets/icons/social.svg";
-import { ReactComponent as Refi } from "@assets/icons/refi.svg";
 import { ReactComponent as Check } from "@assets/autos/check.svg";
 import { ArchetypeTypes } from "@api/archetype.api";
-
-export const MarketIcons = {
-  [Markets["Open-Source & Infra"]]: <OpenSource />,
-  [Markets["Art, Events & NFTs"]]: <ArtEvents />,
-  [Markets["Social, Gaming & DeFi"]]: <Social />,
-  [Markets["ReFi & Public Goods"]]: <Refi />
-};
+import { MarketTemplates } from "@api/community.model";
 
 const getRoleName = (daoData, quest) => {
   const role = daoData.properties.rolesSets[0].roles.find(
@@ -161,6 +152,13 @@ export const NovaCard = ({
       return null;
     }
     return ArchetypeTypes[daoData?.properties?.archetype?.default];
+  }, [daoData]);
+
+  const marketTemplate = useMemo(() => {
+    const marketName = daoData?.properties?.market;
+    return MarketTemplates.find(
+      (v) => v.title === marketName || v.market === marketName
+    );
   }, [daoData]);
 
   const flipCard = () => {
@@ -470,21 +468,44 @@ export const NovaCard = ({
                 textColor="#FFF"
                 sx={{
                   flex: "1",
-                  flexBasis: "50%"
+                  flexBasis: "50%",
+                  minHeight: "42px"
                   // marginTop: theme.spacing(2)
                 }}
-                icon={MarketIcons[daoData?.properties.marketId]}
-                label={Markets[daoData?.properties.marketId]}
+                icon={
+                  <SvgIcon
+                    sx={{
+                      width: "16px"
+                    }}
+                    inheritViewBox
+                    component={marketTemplate?.icon}
+                  ></SvgIcon>
+                }
+                label={marketTemplate?.title}
               ></AutIconLabel>
               <AutIconLabel
                 textColor="#FFF"
                 sx={{
                   flex: "1",
-                  flexBasis: "50%"
+                  flexBasis: "50%",
+                  minHeight: "42px",
+                  ...(!selectedArchetype?.title && {
+                    ".MuiSvgIcon-root": {
+                      display: "none"
+                    }
+                  })
                   // marginTop: theme.spacing(2)
                 }}
-                icon={selectedArchetype?.icon}
-                label={selectedArchetype?.title}
+                icon={
+                  <SvgIcon
+                    sx={{
+                      width: "16px"
+                    }}
+                    inheritViewBox
+                    component={selectedArchetype?.logo}
+                  ></SvgIcon>
+                }
+                label={selectedArchetype?.title ?? "N/A"}
               ></AutIconLabel>
             </Box>
 

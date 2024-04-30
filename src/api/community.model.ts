@@ -9,23 +9,37 @@ import {
 import { AutSocial } from "./api.model";
 import { socialUrls } from "./aut.model";
 import { Quest } from "@aut-labs/sdk";
+import { ReactComponent as OpenSource } from "@assets/icons/opensource.svg";
+import { ReactComponent as ArtEvents } from "@assets/icons/artevents.svg";
+import { ReactComponent as Social } from "@assets/icons/social.svg";
+import { ReactComponent as Refi } from "@assets/icons/refi.svg";
+import { ReactComponent as Check } from "@assets/autos/check.svg";
 
 export const MarketTemplates = [
   {
-    title: "Open-Source & DeFi",
-    market: 1
+    title: "Open-Source & Infra",
+    market: 1,
+    icon: OpenSource
   },
   {
-    title: "Art, Events & NFTs",
-    market: 2
+    title: "DeFi & Payments",
+    market: 2,
+    icon: ArtEvents
   },
   {
-    title: "Local Projects & DAOs",
-    market: 3
+    title: "ReFi & Governance",
+    market: 3,
+    icon: Social
   },
   {
-    title: "ReFi & Public Goods",
-    market: 4
+    title: "Social, Art & Gaming",
+    market: 4,
+    icon: Refi
+  },
+  {
+    title: "Identity & Reputation",
+    market: 5,
+    icon: Check
   }
 ];
 
@@ -53,7 +67,6 @@ export class CommunityProperties extends NovaProperties {
   address?: string;
   deployer: string;
   prestige?: number;
-  marketId?: number;
   market: string;
   members?: number;
   absoluteValue?: number;
@@ -93,7 +106,6 @@ export class CommunityProperties extends NovaProperties {
       this.archetype = data.archetype;
       this.prestige = data.prestige;
       this.members = data.members;
-      this.marketId = data.marketId;
       this.absoluteValue = data.absoluteValue;
       this.additionalProps = data.additionalProps;
       this.archetype = data.archetype;
