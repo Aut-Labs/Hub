@@ -608,8 +608,6 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype, stats }) => {
       max = activeState.min;
     }
 
-    console.log(min, max, sliderId, selectedArchetype, activeState);
-
     if (newValue >= min && newValue <= max) {
       setState((prevState) => ({
         ...prevState,
@@ -1045,54 +1043,33 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype, stats }) => {
 };
 
 const Archetypes = ({ nova }) => {
-  const {
-    archetype,
-    stats,
-    isLoading: isLoadingArchetype,
-    isFetching: isFetchingArchetype
-  } = useGetArchetypeAndStatsQuery(null, {
-    selectFromResult: ({ data, isLoading, isFetching }) => ({
-      isLoading,
-      isFetching,
-      archetype: data?.archetype,
-      stats: data?.stats
-    })
-  });
   const [isArchetypeOpen, setIsArchetypeOpen] = React.useState(false);
-  const [selected, setSelected] = React.useState(null);
-  const archetypeData = React.useMemo(() => {
-    if (archetype?.archetype === selected?.type) {
-      return archetype;
-    }
-    return {
-      archetype: NovaArchetype.NONE,
-      size: 0,
-      reputation: 0,
-      conviction: 0,
-      performance: 0,
-      growth: 0
-    };
-  }, [archetype, selected]);
-
-  console.log("archetypeData: ", archetypeData, archetype, selected);
-
-  const showInteractionLayer = true;
-
   const handleClose = () => {
     setIsArchetypeOpen(false);
   };
+
+  const { address } = useAutConnector();
+
+  const canSetArchetype = React.useMemo(() => {
+    if (
+      nova.properties?.userData?.isAdmin ||
+      address === nova?.properties?.deployer
+    ) {
+      return true;
+    }
+  }, [nova, address]);
 
   return (
     <Container maxWidth="lg" sx={{ py: "20px", height: "100%" }}>
       <>
         <ArchetypeDialog
           open={isArchetypeOpen}
-          archetype={archetypeData}
-          title="Interactions"
+          archetype={nova?.properties?.archetype}
+          title="Archetype"
           onClose={handleClose}
           nova={nova}
         />
-        {showInteractionLayer && (
+        {!nova?.properties?.archetype && (
           <Box
             sx={{
               display: "flex",
@@ -1102,10 +1079,10 @@ const Archetypes = ({ nova }) => {
               gridGap: "12px",
               textAlign: "center",
               position: "absolute",
-              top: "100px",
-              left: "100px",
-              right: "100px",
-              bottom: "100px",
+              top: "60px",
+              left: "60px",
+              right: "60px",
+              bottom: "60px",
               zIndex: 99,
               backdropFilter: "blur(12px)",
               background: "rgba(128, 128, 128, 0.06)",
@@ -1135,7 +1112,7 @@ const Archetypes = ({ nova }) => {
           sx={{
             display: "flex",
             justifyContent: "center",
-            alignItems: "center",
+            // alignItems: "center",
             position: "relative",
             width: "100%",
             height: "100%",
@@ -1143,7 +1120,7 @@ const Archetypes = ({ nova }) => {
               width: "100%"
             },
             // @ts-ignore
-            ...(showInteractionLayer && {
+            ...(!nova?.properties?.archetype && {
               mixBlendMode: "plus-lighter",
               opacity: 0.6,
               filter: "blur(20px)"
@@ -1157,32 +1134,55 @@ const Archetypes = ({ nova }) => {
               width: "400px"
             }}
           >
-            <ArchetypePieChart archetype={archetype} />
-          </Box>
+            <ArchetypePieChart archetype={nova?.properties?.archetype} />
 
-          {/* {mapData?.centralNode && (
-            <InteractionMap
-              mapData={mapData}
-              isActive={!showInteractionLayer}
-              parentRef={ref}
-            />
-          )} */}
+            {!!nova?.properties?.archetype && (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end"
+                }}
+              >
+                <Box
+                  sx={{
+                    background: (theme) => theme.palette.offWhite.main,
+                    borderRadius: "6px",
+                    width: "200px",
+                    height: "180px",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                    gap: "12px",
+                    p: 3
+                  }}
+                >
+                  <Typography variant="caption">
+                    wanna try out another archetype? switch to a new one below
+                  </Typography>
+
+                  <AutOsButton
+                    onClick={() => setIsArchetypeOpen(true)}
+                    type="button"
+                    color="primary"
+                    size="small"
+                    variant="outlined"
+                  >
+                    <Typography
+                      fontWeight="700"
+                      fontSize="16px"
+                      lineHeight="26px"
+                    >
+                      switch archetype
+                    </Typography>
+                  </AutOsButton>
+                </Box>
+              </Box>
+            )}
+          </Box>
         </Box>
       </>
-      {/* {selected && (
-        <YourArchetype
-          archetype={archetypeData}
-          stats={stats}
-          unselect={() => setSelected(null)}
-          selectedArchetype={selected}
-        ></YourArchetype>
-      )}
-      {!selected && (
-        <ChooseYourArchetype
-          archetype={archetype}
-          setSelected={setSelected}
-        ></ChooseYourArchetype>
-      )} */}
     </Container>
   );
 };

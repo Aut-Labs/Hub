@@ -251,6 +251,15 @@ const NovaDetails = () => {
     }
   );
 
+  const canSetArchetype = useMemo(() => {
+    if (
+      nova?.properties?.userData?.isAdmin ||
+      address === nova?.properties?.deployer
+    ) {
+      return true;
+    }
+  }, [nova, address]);
+
   useEffect(() => {
     dispatch(setNovaAddress(nova?.properties.address));
   }, [nova]);
@@ -278,8 +287,6 @@ const NovaDetails = () => {
   const archetype = useMemo(() => {
     return archetypeChartValues(nova?.properties.archetype);
   }, [nova]);
-
-  console.log(archetype, nova, "archetype---------------------");
 
   const openEditNovaModal = () => {
     dispatch(setOpenEditNova(true));
@@ -332,12 +339,15 @@ const NovaDetails = () => {
 
   return (
     <>
-      <AutEditNovaDialog
-        open={isEditingNova}
-        hideCloseBtn={false}
-        title="Edit Nova"
-        onClose={handleClose}
-      />
+      {nova && (
+        <AutEditNovaDialog
+          open={isEditingNova}
+          hideCloseBtn={false}
+          title="Edit Nova"
+          nova={nova}
+          onClose={handleClose}
+        />
+      )}
       <PerfectScrollbar
         containerRef={(el) => (ps.current = el)}
         style={{
@@ -693,6 +703,7 @@ const NovaDetails = () => {
                     onClick={openEditNovaModal}
                     type="button"
                     color="primary"
+                    disabled={!canSetArchetype}
                     variant="outlined"
                   >
                     <Typography

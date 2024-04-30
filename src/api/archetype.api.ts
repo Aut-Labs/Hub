@@ -132,6 +132,25 @@ export const setArchetype = async (
   }
 };
 
+export const updateNova = async (body: Community, api: BaseQueryApi) => {
+  try {
+    debugger;
+    const sdk = AutSDK.getInstance();
+    const updatedCommunity = Community.updateCommunity(body);
+    const uri = await sdk.client.sendJSONToIPFS(updatedCommunity as any);
+    const nova: Nova = sdk.initService<Nova>(Nova, body.properties.address);
+    await nova.contract.metadata.setMetadataUri(uri);
+    api.dispatch(communityApi.util.invalidateTags(["AllNovas"]));
+    return {
+      data: body
+    };
+  } catch (error) {
+    return {
+      error: error?.message
+    };
+  }
+};
+
 export const archetypeApi = createApi({
   reducerPath: "archetypeApi",
   baseQuery: async (args, api, extraOptions) => {
@@ -139,6 +158,10 @@ export const archetypeApi = createApi({
 
     if (url === "getArchetypeAndStats") {
       return getArchetypeAndStats(body, api);
+    }
+
+    if (url === "updateNova") {
+      return updateNova(body, api);
     }
 
     if (url === "setArchetype") {
@@ -162,6 +185,15 @@ export const archetypeApi = createApi({
         return {
           body,
           url: "getArchetypeAndStats"
+        };
+      }
+    }),
+    updateNova: builder.mutation<Community, Community>({
+      invalidatesTags: [],
+      query: (body) => {
+        return {
+          body,
+          url: "updateNova"
         };
       }
     }),
@@ -189,5 +221,8 @@ export const archetypeApi = createApi({
   })
 });
 
-export const { useGetArchetypeAndStatsQuery, useSetArchetypeMutation } =
-  archetypeApi;
+export const {
+  useGetArchetypeAndStatsQuery,
+  useSetArchetypeMutation,
+  useUpdateNovaMutation
+} = archetypeApi;
