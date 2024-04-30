@@ -137,7 +137,7 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
         ...novaMetadata,
         properties: {
           ...novaMetadata.properties,
-          market: novaDAO.market,
+          market: +novaDAO.market - 1,
           roles: novaMetadata.properties.rolesSets[0].roles,
           absoluteValue: Math.floor(Math.random() * 100) + 1,
           prestige: 100,
@@ -145,7 +145,6 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
             (a) => a.novaAddress === novaDAO.address
           ).length,
           address: novaDAO.address,
-          marketId: novaDAO.market,
           deployer: novaDAO.deployer
         }
       } as unknown as Community);

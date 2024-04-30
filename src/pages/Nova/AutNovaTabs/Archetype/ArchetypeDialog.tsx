@@ -1,5 +1,8 @@
 /* eslint-disable max-len */
-import { NovaArchetype } from "@aut-labs/sdk/dist/models/nova";
+import {
+  NovaArchetype,
+  NovaArchetypeParameters
+} from "@aut-labs/sdk/dist/models/nova";
 import { AutOsButton } from "@components/AutButton";
 import {
   Avatar,
@@ -19,6 +22,9 @@ import { useAppDispatch } from "@store/store.model";
 import React from "react";
 import { useState } from "react";
 import { archetypeChartValues } from "./ArchetypePieChart";
+import { useSetArchetypeMutation } from "@api/archetype.api";
+import ErrorDialog from "@components/Dialog/ErrorPopup";
+import LoadingDialog from "@components/Dialog/LoadingPopup";
 
 export interface InteractionsDialogProps {
   title: string;
@@ -26,6 +32,7 @@ export interface InteractionsDialogProps {
   open?: boolean;
   onClose?: () => void;
   archetype: any;
+  nova: any;
 }
 
 const AutStyledDialog = styled(Dialog)(({ theme }) => ({
@@ -58,10 +65,10 @@ const ArchetypeCard = ({
   logo,
   type,
   onSelect,
-  activeArchetype
+  activeArchetype,
+  isLoading
 }) => {
   const theme = useTheme();
-  const [isHovered, setIsHovered] = React.useState(false);
   return (
     <Box
       sx={{
@@ -73,12 +80,18 @@ const ArchetypeCard = ({
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        width: "100%",
-        minWidth: "170px",
+        // width: "100%",
+        // minWidth: "170px",
         minHeight: "190px",
         boxShadow: 3,
         borderRadius: "8.5px",
-        padding: theme.spacing(3)
+        padding: theme.spacing(3),
+        width: {
+          xs: "100%",
+          md: "280px",
+          lg: "320px",
+          xxl: "350px"
+        }
       }}
     >
       <Stack
@@ -130,7 +143,7 @@ const ArchetypeCard = ({
             color="offWhite.main"
             textAlign="center"
             lineHeight={1}
-            variant="subtitle2"
+            variant="subtitle1"
             marginLeft={1}
           >
             {title}
@@ -151,8 +164,8 @@ const ArchetypeCard = ({
           sx={{
             background: "#000000",
             borderRadius: "6px",
-            p: 4,
-            mt: 4,
+            p: 3,
+            mt: 2,
             flex: 1
           }}
         >
@@ -166,7 +179,7 @@ const ArchetypeCard = ({
             {description}
           </Typography>
         </Box>
-        {/* <AutOsButton
+        <AutOsButton
           sx={{
             mt: "24px",
             bgcolor: "transparent",
@@ -179,9 +192,16 @@ const ArchetypeCard = ({
               ]),
               "&:hover": {
                 background: "linear-gradient(#2037e0, #17a1e0)"
-              }
+              },
+              ...(activeArchetype && {
+                background: (theme) => theme.palette.success.main,
+                "&:hover": {
+                  background: (theme) => theme.palette.success.main
+                }
+              })
             }
           }}
+          disabled={!!activeArchetype || isLoading}
           onClick={() =>
             onSelect({
               title,
@@ -192,27 +212,35 @@ const ArchetypeCard = ({
           }
         >
           <Typography variant="body" fontWeight="normal" color="white">
-            Choose archetype
+            {activeArchetype ? "Current Archetype" : "Choose archetype"}
           </Typography>
-        </AutOsButton> */}
+        </AutOsButton>
       </Stack>
     </Box>
   );
 };
 
 export function ArchetypeDialog(props: InteractionsDialogProps) {
-  const dispatch = useAppDispatch();
-  const [editInitiated, setEditInitiated] = useState(false);
   const [state, setState] = React.useState(
     archetypeChartValues(props.archetype)
   );
-
   const theme = useTheme();
   const desktop = useMediaQuery(theme.breakpoints.up("md"));
 
-  const setSelected = (selected) => {
-    // pass
+  const [setArchetype, { error, isError, isLoading, reset }] =
+    useSetArchetypeMutation();
+
+  const updateArchetype = async (selectedArchetype) => {
+    try {
+      setArchetype({
+        nova: props.nova,
+        archetype: selectedArchetype
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
+
   return (
     <AutStyledDialog
       fullScreen={!desktop}
@@ -220,6 +248,8 @@ export function ArchetypeDialog(props: InteractionsDialogProps) {
       onClose={props.onClose}
       open={props.open}
     >
+      <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
+      <LoadingDialog open={isLoading} message="Updating Archertype..." />
       <DialogContent
         sx={{
           border: 0,
@@ -253,7 +283,81 @@ export function ArchetypeDialog(props: InteractionsDialogProps) {
           .
         </Typography>
 
-        <Box
+        <Grid container spacing={3} sx={{ flexGrow: 1, margin: "0 auto" }}>
+          {/* Row 1 */}
+          <Grid item xs={12} sm={6} md={4}>
+            <ArchetypeCard
+              isLoading={isLoading}
+              activeArchetype={props?.archetype?.default === NovaArchetype.SIZE}
+              onSelect={updateArchetype}
+              {...state[NovaArchetype.SIZE]}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={4}>
+            <ArchetypeCard
+              activeArchetype={
+                props?.archetype?.default === NovaArchetype.REPUTATION
+              }
+              isLoading={isLoading}
+              onSelect={updateArchetype}
+              {...state[NovaArchetype.REPUTATION]}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={4}>
+            <ArchetypeCard
+              isLoading={isLoading}
+              activeArchetype={
+                props?.archetype?.default === NovaArchetype.CONVICTION
+              }
+              onSelect={updateArchetype}
+              {...state[NovaArchetype.CONVICTION]}
+            />
+          </Grid>
+
+          {/* Row 2 */}
+          <Grid
+            display={{
+              xs: "none",
+              md: "inherit"
+            }}
+            item
+            xs={false}
+            sm={false}
+            md={2}
+          />
+          <Grid item xs={12} sm={6} md={4}>
+            <ArchetypeCard
+              isLoading={isLoading}
+              activeArchetype={
+                props?.archetype?.default === NovaArchetype.PERFORMANCE
+              }
+              onSelect={updateArchetype}
+              {...state[NovaArchetype.PERFORMANCE]}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={4}>
+            <ArchetypeCard
+              isLoading={isLoading}
+              activeArchetype={
+                props?.archetype?.default === NovaArchetype.GROWTH
+              }
+              onSelect={updateArchetype}
+              {...state[NovaArchetype.GROWTH]}
+            />
+          </Grid>
+          <Grid
+            display={{
+              xs: "none",
+              md: "inherit"
+            }}
+            item
+            xs={false}
+            sm={false}
+            md={2}
+          />
+        </Grid>
+
+        {/* <Box
           sx={{
             minWidth: {
               sm: "100%"
@@ -288,14 +392,14 @@ export function ArchetypeDialog(props: InteractionsDialogProps) {
           >
             <ArchetypeCard
               activeArchetype={
-                props.archetype?.archetype === NovaArchetype.SIZE
+                props.props?.archetype?.archetype === NovaArchetype.SIZE
               }
               onSelect={setSelected}
               {...state[NovaArchetype.SIZE]}
             />
             <ArchetypeCard
               activeArchetype={
-                props.archetype?.archetype === NovaArchetype.REPUTATION
+                props.props?.archetype?.archetype === NovaArchetype.REPUTATION
               }
               onSelect={setSelected}
               {...state[NovaArchetype.REPUTATION]}
@@ -322,7 +426,7 @@ export function ArchetypeDialog(props: InteractionsDialogProps) {
               {...state[NovaArchetype.GROWTH]}
             />
           </Box>
-        </Box>
+        </Box> */}
       </DialogContent>
       <DialogActions
         sx={{

@@ -35,7 +35,6 @@ import { ReactComponent as TwitterIcon } from "@assets/SocialIcons/TwitterIcon.s
 import { socialUrls } from "@api/aut.model";
 import AutTaskTabs from "./AutNovaTabs/AutTaskTabs";
 import AutIconLabel from "@components/AutIconLabel";
-import { MarketIcons } from "@components/NovaCard";
 import TaskCard from "@components/TaskCard";
 import { parseNovaTimestamp, parseTimestamp } from "@utils/date-format";
 import RoleCard from "@components/RoleCard";
@@ -47,6 +46,7 @@ import { useSelector } from "react-redux";
 import { AutEditNovaDialog } from "@components/AutEditNovaDialog";
 import { ArchetypeTypes } from "@api/archetype.api";
 import { useAccount } from "wagmi";
+import { MarketTemplates } from "@api/community.model";
 
 const socialIcons = {
   discord: DiscordIcon,
@@ -232,6 +232,13 @@ const NovaDetails = () => {
       return null;
     }
     return ArchetypeTypes[nova?.properties?.archetype?.default];
+  }, [nova]);
+
+  const marketTemplate = useMemo(() => {
+    const marketName = nova?.properties?.market;
+    return MarketTemplates.find(
+      (v) => v.title === marketName || v.market === marketName
+    );
   }, [nova]);
 
   const { data: tasks } = useGetNovaTasksQuery(nova?.properties.address, {
@@ -501,31 +508,44 @@ const NovaDetails = () => {
                       textColor="#FFF"
                       sx={{
                         border: "1px solid #707070",
-                        height: "36px",
+                        minHeight: "42px",
                         minWidth: "165px"
-                        // height: "45px",
-                        // flex: "1"
-                        // marginTop: theme.spacing(2)
                       }}
-                      icon={MarketIcons[nova?.properties.marketId]}
-                      label={Markets[nova?.properties.marketId]}
+                      icon={
+                        <SvgIcon
+                          sx={{
+                            width: "16px"
+                          }}
+                          inheritViewBox
+                          component={marketTemplate?.icon}
+                        ></SvgIcon>
+                      }
+                      label={marketTemplate?.title}
                     ></AutIconLabel>
                     <AutIconLabel
                       textColor="#FFF"
                       sx={{
                         border: "1px solid #707070",
-                        height: "36px",
-                        minWidth: "165px"
+                        minHeight: "42px",
+                        minWidth: "165px",
+                        ...(!selectedArchetype?.title && {
+                          ".MuiSvgIcon-root": {
+                            display: "none"
+                          }
+                        })
                         // flex: "1"
                         // marginTop: theme.spacing(2)
                       }}
                       icon={
                         <SvgIcon
-                          component={selectedArchetype?.logo}
+                          sx={{
+                            width: "16px"
+                          }}
                           inheritViewBox
-                        />
+                          component={selectedArchetype?.logo}
+                        ></SvgIcon>
                       }
-                      label={selectedArchetype?.title}
+                      label={selectedArchetype?.title ?? "N/A"}
                     ></AutIconLabel>
                   </Stack>
                 </Stack>

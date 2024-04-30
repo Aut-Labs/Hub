@@ -1044,7 +1044,7 @@ const YourArchetype = ({ selectedArchetype, unselect, archetype, stats }) => {
   );
 };
 
-const Archetypes = () => {
+const Archetypes = ({ nova }) => {
   const {
     archetype,
     stats,
@@ -1090,6 +1090,7 @@ const Archetypes = () => {
           archetype={archetypeData}
           title="Interactions"
           onClose={handleClose}
+          nova={nova}
         />
         {showInteractionLayer && (
           <Box

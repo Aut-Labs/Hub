@@ -111,6 +111,7 @@ export const setArchetype = async (
   api: BaseQueryApi
 ) => {
   try {
+    debugger;
     const sdk = AutSDK.getInstance();
     body.nova.properties.archetype = body.archetype;
     const updatedCommunity = Community.updateCommunity(body.nova);
