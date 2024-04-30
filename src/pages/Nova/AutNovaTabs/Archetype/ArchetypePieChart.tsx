@@ -147,12 +147,12 @@ const ArchetypePieChart = ({
 }) => {
   const mappedArchetype: NovaArchetypeParameters = useMemo(() => {
     return {
-      archetype: archetype.default,
-      size: archetype.default,
-      growth: archetype.default,
-      performance: archetype.default,
-      reputation: archetype.default,
-      conviction: archetype.default
+      archetype: archetype?.default,
+      size: archetype?.default,
+      growth: archetype?.default,
+      performance: archetype?.default,
+      reputation: archetype?.default,
+      conviction: archetype?.default
     };
   }, [archetype]);
 

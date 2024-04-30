@@ -232,11 +232,11 @@ export function ArchetypeDialog(props: InteractionsDialogProps) {
   const updateArchetype = async (selectedArchetype) => {
     const archetype = state[selectedArchetype.type];
     const updatedArchetype: Partial<NovaArchetypeParameters> = {
-      size: archetype.defaults[NovaArchetype.SIZE],
-      growth: archetype.defaults[NovaArchetype.GROWTH],
-      conviction: archetype.defaults[NovaArchetype.CONVICTION],
-      performance: archetype.defaults[NovaArchetype.PERFORMANCE],
-      reputation: archetype.defaults[NovaArchetype.REPUTATION]
+      size: archetype?.defaults[NovaArchetype.SIZE],
+      growth: archetype?.defaults[NovaArchetype.GROWTH],
+      conviction: archetype?.defaults[NovaArchetype.CONVICTION],
+      performance: archetype?.defaults[NovaArchetype.PERFORMANCE],
+      reputation: archetype?.defaults[NovaArchetype.REPUTATION]
     };
     debugger;
     try {
