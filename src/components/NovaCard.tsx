@@ -15,7 +15,7 @@ import FlipClockCountdown from "@leenguyen/react-flip-clock-countdown";
 import { NovaDAO } from "@api/community.model";
 import { useNavigate } from "react-router-dom";
 import AutIconLabel from "./AutIconLabel";
-import { Markets, NovaArchetype } from "@api/community.api";
+import { Markets } from "@api/community.api";
 import { ReactComponent as ArrowIcon } from "@assets/autos/move-right.svg";
 
 import { ReactComponent as OpenSource } from "@assets/icons/opensource.svg";
@@ -32,13 +32,14 @@ import { ReactComponent as Conviction } from "@assets/icons/conviction.svg";
 import { ReactComponent as Cross } from "@assets/autos/cross.svg";
 import { ReactComponent as Check } from "@assets/autos/check.svg";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
+import { NovaArchetype } from "@aut-labs/sdk/dist/models/nova";
 
 export const ArchetypeIcons = {
-  [NovaArchetype.Size]: <Size />,
-  [NovaArchetype.Growth]: <Growth />,
-  [NovaArchetype.Performance]: <Performance />,
-  [NovaArchetype.Reputation]: <Reputation />,
-  [NovaArchetype.Conviction]: <Conviction />
+  [NovaArchetype.SIZE]: <Size />,
+  [NovaArchetype.GROWTH]: <Growth />,
+  [NovaArchetype.PERFORMANCE]: <Performance />,
+  [NovaArchetype.REPUTATION]: <Reputation />,
+  [NovaArchetype.CONVICTION]: <Conviction />
 };
 
 export const MarketIcons = {
@@ -498,7 +499,7 @@ export const NovaCard = ({
                   // marginTop: theme.spacing(2)
                 }}
                 icon={ArchetypeIcons[daoData?.properties.archetype]}
-                label={NovaArchetype[daoData?.properties.archetype]}
+                label={""}
               ></AutIconLabel>
             </Box>
 

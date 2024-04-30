@@ -129,7 +129,7 @@ export class AutID extends BaseNFTModel<AutIDProperties> {
         avatar: httpUrlToIpfsCID(autID.properties.avatar as string),
         timestamp: autID.properties.timestamp,
         socials: autID.properties.socials.map((social) => {
-          social.link = `${socialUrls[social.type].prefix}${social.link}`;
+          social.link = `${socialUrls[social.type]?.prefix || ""}${social.link || ""}`;
           return social;
         })
       }

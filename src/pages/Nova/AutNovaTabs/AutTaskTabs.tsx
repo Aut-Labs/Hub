@@ -1,6 +1,7 @@
 import AutOsTabs from "@components/AutOsTabs";
 import { EmptyNovaOnboardingCards, NovaTasksGrid } from "../NovaDetails";
 import { useEffect, useMemo } from "react";
+import Archetypes from "./Archetype/Archetype";
 
 interface AutTaskTabsProps {
   nova: any;
@@ -9,13 +10,20 @@ interface AutTaskTabsProps {
 
 const AutTaskTabs = ({ nova, tasks }: AutTaskTabsProps) => {
   const tabs = useMemo(() => {
-    const tabs = [];
-    debugger;
+    const _tabs: any[] = [
+      {
+        label: "Archetypes",
+        props: {
+          nova
+        },
+        component: Archetypes
+      }
+    ];
     if (tasks) {
       for (let i = 0; i < tasks.length; i++) {
         const task = tasks[i];
-        if (!tabs.find((t) => t.label === task.role)) {
-          tabs.push({
+        if (!_tabs.find((t) => t.label === task.role)) {
+          _tabs.push({
             label: task.role,
             props: {
               tasks: tasks.filter((t) => t.role === task.role)
@@ -28,8 +36,8 @@ const AutTaskTabs = ({ nova, tasks }: AutTaskTabsProps) => {
       const roles = nova?.properties?.roles;
       for (let i = 0; i < roles?.length; i++) {
         const role = roles[i];
-        if (!tabs.find((t) => t.label === role.roleName)) {
-          tabs.push({
+        if (!_tabs.find((t) => t.label === role.roleName)) {
+          _tabs.push({
             label: role.roleName,
             props: {
               role
@@ -39,7 +47,7 @@ const AutTaskTabs = ({ nova, tasks }: AutTaskTabsProps) => {
         }
       }
     }
-    return tabs;
+    return _tabs;
   }, [nova, tasks]);
 
   // useEffect(() => {

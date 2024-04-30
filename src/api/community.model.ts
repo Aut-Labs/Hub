@@ -1,7 +1,11 @@
 import { CommitmentMessages } from "@utils/misc";
 import { httpUrlToIpfsCID } from "./storage.api";
 import { BaseNFTModel } from "@aut-labs/sdk/dist/models/baseNFTModel";
-import { NovaProperties, RoleSet } from "@aut-labs/sdk/dist/models/nova";
+import {
+  NovaArchetypeParameters,
+  NovaProperties,
+  RoleSet
+} from "@aut-labs/sdk/dist/models/nova";
 import { AutSocial } from "./api.model";
 import { socialUrls } from "./aut.model";
 import { Quest } from "@aut-labs/sdk";
@@ -40,11 +44,15 @@ interface Role {
   roleName: string;
 }
 
+export interface CommunityDomains {
+  note: string;
+  domain: string;
+}
+
 export class CommunityProperties extends NovaProperties {
   address?: string;
   deployer: string;
   prestige?: number;
-  archetype?: number;
   marketId?: number;
   members?: number;
   absoluteValue?: number;
@@ -61,6 +69,13 @@ export class CommunityProperties extends NovaProperties {
   };
 
   additionalProps?: any;
+
+  domains: CommunityDomains[];
+
+  archetype: {
+    default: number;
+    parameters: NovaArchetypeParameters;
+  };
 
   constructor(data: CommunityProperties) {
     super(data);
@@ -80,6 +95,7 @@ export class CommunityProperties extends NovaProperties {
       this.marketId = data.marketId;
       this.absoluteValue = data.absoluteValue;
       this.additionalProps = data.additionalProps;
+      this.archetype = data.archetype;
       this.userData =
         JSON.parse(JSON.stringify(data?.userData || {})) ||
         ({} as typeof this.userData);
@@ -115,9 +131,10 @@ export class Community extends BaseNFTModel<CommunityProperties> {
         market: market?.title || 0,
         deployer: community.properties.deployer,
         commitment: community.properties.commitment,
+        archetype: community.properties.archetype,
         rolesSets: community.properties.rolesSets,
         socials: community.properties.socials.map((social) => {
-          social.link = `${socialUrls[social.type].prefix}${social.link}`;
+          social.link = `${socialUrls[social.type]?.prefix}${social.link || ""}`;
           return social;
         })
       }

@@ -22,7 +22,6 @@ import CalendarIcon from "@assets/icons/calendar.png";
 
 import {
   Markets,
-  NovaArchetype,
   useGetAllNovasQuery,
   useGetNovaTasksQuery
 } from "@api/community.api";
@@ -41,6 +40,7 @@ import { ArchetypeIcons, MarketIcons } from "@components/NovaCard";
 import TaskCard from "@components/TaskCard";
 import { parseNovaTimestamp, parseTimestamp } from "@utils/date-format";
 import RoleCard from "@components/RoleCard";
+import { archetypeChartValues } from "./AutNovaTabs/Archetype/ArchetypePieChart";
 
 const socialIcons = {
   discord: DiscordIcon,
@@ -214,6 +214,12 @@ const NovaDetails = () => {
   });
 
   const handleDialogClose = () => {};
+
+  const archetype = useMemo(() => {
+    return archetypeChartValues(nova?.properties.archetype);
+  }, [nova]);
+
+  console.log(archetype, nova, "archetype---------------------");
 
   useEffect(() => {
     const autDiv = document.querySelector("div.aut");
@@ -474,7 +480,7 @@ const NovaDetails = () => {
                       // marginTop: theme.spacing(2)
                     }}
                     icon={ArchetypeIcons[nova?.properties.archetype]}
-                    label={NovaArchetype[nova?.properties.archetype]}
+                    label={""}
                   ></AutIconLabel>
                 </Stack>
               </Stack>
@@ -524,7 +530,7 @@ const NovaDetails = () => {
                           }
                         })}
                         {...((!social.link ||
-                          social.link === socialUrls[social.type].prefix) && {
+                          social.link === socialUrls[social.type]?.prefix) && {
                           sx: {
                             // display: "none",
                             svg: {
