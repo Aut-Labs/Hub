@@ -47,6 +47,7 @@ import { useSelector } from "react-redux";
 import { AutEditNovaDialog } from "@components/AutEditNovaDialog";
 import { ArchetypeTypes } from "@api/archetype.api";
 import { useAccount } from "wagmi";
+import { setNovaAddress } from "@store/WalletProvider/WalletProvider";
 
 const socialIcons = {
   discord: DiscordIcon,
@@ -189,18 +190,40 @@ export const NovaTasksGrid = ({ header, tasks }) => {
   );
 };
 
-export const EmptyNovaOnboardingCards = ({ role }) => {
+export const EmptyNovaOnboardingCards = ({ roles }) => {
+  debugger;
+  const theme = useTheme();
   return (
     <Box
       sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: "60px",
-        height: "100%"
+        marginTop: theme.spacing(3),
+        display: "grid",
+        gridTemplateColumns: {
+          xs: "1fr",
+          sm: "1fr 1fr",
+          md: "1fr 1fr",
+          xl: "1fr 1fr 1fr",
+          xxl: "1fr 1fr 1fr 1fr"
+        },
+        ml: {
+          xs: theme.spacing(3),
+          md: 0
+        },
+        mr: {
+          xs: theme.spacing(3),
+          md: theme.spacing(2)
+        },
+        gap: {
+          xs: theme.spacing(2),
+          md: theme.spacing(3),
+          xl: theme.spacing(4),
+          xxl: theme.spacing(4)
+        }
       }}
     >
-      <RoleCard role={role} />
+      {roles?.map((role, index) => (
+        <RoleCard key={`role-item-${role.roleName}`} role={role} />
+      ))}
     </Box>
   );
 };
@@ -226,6 +249,10 @@ const NovaDetails = () => {
       })
     }
   );
+
+  useEffect(() => {
+    dispatch(setNovaAddress(nova?.properties.address));
+  }, [nova]);
 
   const selectedArchetype = useMemo(() => {
     if (!nova?.properties?.archetype?.default) {

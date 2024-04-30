@@ -43,8 +43,6 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
     const sdk = AutSDK.getInstance();
     let fetchNovas;
 
-    debugger;
-
     if (body?.marketFilter && body?.archetypeFilter) {
       fetchNovas = gql`
         query GetNovas {
@@ -52,6 +50,7 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
             id
             deployer
             address
+            archetype
             market
             metadataUri
             minCommitment
@@ -250,7 +249,7 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
 const getNovaTasks = async (address: any, api: BaseQueryApi) => {
   // await new Promise((resolve) => setTimeout(resolve, 2000));
   let tasks = null;
-  if (address === "0xdaffe6640b4c5d8086a31536b2c694bdd3e675d7") {
+  if (address === "0x66fb47ac222dde590de4fa3e90f7b7438fc6644b") {
     tasks = [
       {
         name: "Opt Out Writing",

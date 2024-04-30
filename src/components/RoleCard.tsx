@@ -12,6 +12,8 @@ import ErrorDialog from "./Dialog/ErrorPopup";
 import { useWalletConnector } from "@aut-labs/connector";
 import { useAccount } from "wagmi";
 import { pulsate } from "./NovaCard";
+import { setSelectedRoleId } from "@store/WalletProvider/WalletProvider";
+import { useAppDispatch } from "@store/store.model";
 
 const roleIcons = {
   Creative: Creative,
@@ -24,6 +26,7 @@ const RoleCard = ({ role }) => {
   const [openError, setOpenError] = useState(false);
   const { address } = useAccount();
   const { open } = useWalletConnector();
+  const dispatch = useAppDispatch();
 
   const [
     checkOnboardingAllowlist,
@@ -31,17 +34,19 @@ const RoleCard = ({ role }) => {
   ] = useLazyCheckOnboardingAllowlistQuery();
 
   const handleClick = async () => {
-    let addressToVerify = address as string;
-    if (!addressToVerify) {
-      const state = await open();
-      addressToVerify = state?.address;
-    }
+    await dispatch(setSelectedRoleId(role?.id));
+    // let addressToVerify = address as string;
+    // if (!addressToVerify) {
+    //   const state = await open();
+    //   addressToVerify = state?.address;
+    // }
 
-    if (!addressToVerify) {
-      // show some error that it could not be verified unless user connects to a wallet
-    } else {
-      checkOnboardingAllowlist(addressToVerify);
-    }
+    // if (!addressToVerify) {
+    //   // show some error that it could not be verified unless user connects to a wallet
+    // } else {
+    //   checkOnboardingAllowlist(addressToVerify);
+    // }
+    handleMint();
   };
 
   const handleDialogClose = () => {

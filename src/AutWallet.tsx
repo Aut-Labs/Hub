@@ -9,14 +9,17 @@ import { MultiSigner } from "@aut-labs/sdk/dist/models/models";
 import { communityUpdateState } from "@store/Community/community.reducer";
 import AutLoading from "@components/AutLoading";
 import AppTitle from "@components/AppTitle";
-import { useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { environment, EnvMode } from "@api/environment";
 import AutSDK from "@aut-labs/sdk";
 import {
   NetworksConfig,
+  NovaAddress,
+  SelectedRoleId,
   updateWalletProviderState
 } from "@store/WalletProvider/WalletProvider";
 import { useAppDispatch } from "@store/store.model";
+import { useGetAllNovasQuery } from "@api/community.api";
 
 const btnConfig = {
   metaMask: true,
@@ -42,13 +45,18 @@ const AutWallet = () => {
     chainId
   } = useAutConnector();
 
+  const novaAddress = useSelector(NovaAddress);
+  const selectedRoleId = useSelector(SelectedRoleId);
+
+  console.log("selectedRoleId", selectedRoleId);
+
   const initialiseSDK = async (
     network: NetworkConfig,
     multiSigner: MultiSigner
   ) => {
     const sdk = AutSDK.getInstance();
     return sdk.init(multiSigner, {
-      novaAddress: searchParams.get(RequiredQueryParams.DaoAddress),
+      novaAddress: novaAddress,
       daoTypesAddress: network.contracts.daoTypesAddress,
       novaRegistryAddress: network.contracts.novaRegistryAddress,
       autIDAddress: network.contracts.autIDAddress,
@@ -82,7 +90,7 @@ const AutWallet = () => {
     if (multiSignerId) {
       start();
     }
-  }, [multiSignerId]); // re-initialiseSDK only when id changes
+  }, [multiSignerId, novaAddress]); // re-initialiseSDK only when id changes
 
   useEffect(() => {
     if (!dAutInitialized.current && multiSignerId) {
@@ -155,7 +163,8 @@ const AutWallet = () => {
         id="d-aut"
         menu-items='[{"name":"Profile","actionType":"event_emit","eventName":"aut_profile"}]'
         flow-config='{"mode" : "signup", "customCongratsMessage": ""}'
-        nova-address={searchParams.get(RequiredQueryParams.DaoAddress)}
+        allowed-role-id={selectedRoleId}
+        nova-address={novaAddress}
         ipfs-gateway={environment.ipfsGatewayUrl}
       />
       <AutWalletConnector

@@ -20,32 +20,22 @@ const AutTaskTabs = ({ nova, tasks }: AutTaskTabsProps) => {
       }
     ];
     if (tasks) {
-      for (let i = 0; i < tasks.length; i++) {
-        const task = tasks[i];
-        if (!_tabs.find((t) => t.label === task.role)) {
-          _tabs.push({
-            label: task.role,
-            props: {
-              tasks: tasks.filter((t) => t.role === task.role)
-            },
-            component: NovaTasksGrid
-          });
-        }
-      }
+      _tabs.push({
+        label: "Tasks",
+        props: {
+          tasks
+        },
+        component: NovaTasksGrid
+      });
     } else {
       const roles = nova?.properties?.roles;
-      for (let i = 0; i < roles?.length; i++) {
-        const role = roles[i];
-        if (!_tabs.find((t) => t.label === role.roleName)) {
-          _tabs.push({
-            label: role.roleName,
-            props: {
-              role
-            },
-            component: EmptyNovaOnboardingCards
-          });
-        }
-      }
+      _tabs.push({
+        label: "Roles",
+        props: {
+          roles
+        },
+        component: EmptyNovaOnboardingCards
+      });
     }
     return _tabs;
   }, [nova, tasks]);
