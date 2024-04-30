@@ -1,5 +1,6 @@
 import { AutID } from "@api/aut.model";
 import { createSelector, createSlice } from "@reduxjs/toolkit";
+import { ResultState } from "@store/result-status";
 
 export interface AuthState {
   isAuthenticated: boolean;

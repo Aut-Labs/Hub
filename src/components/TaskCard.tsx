@@ -107,7 +107,7 @@ const TaskCard = ({ row }) => {
           padding: {
             xs: "36px 32px",
             md: "24px 24px",
-            xxl: "36px 32px"
+            xxl: "24px 32px"
           },
           display: "flex",
           flexDirection: "column"
@@ -165,21 +165,20 @@ const TaskCard = ({ row }) => {
           }}
         >
           <Typography
+            marginTop={3}
             color="offWhite.main"
-            textAlign="left"
+            textAlign="center"
+            fontFamily="FractulAltLight"
             lineHeight={1}
-            variant="body1"
+            fontWeight="bold"
+            fontSize={{
+              xs: "16px",
+              md: "18px",
+              xxl: "20px"
+            }}
+            letterSpacing="0.0025em"
           >
-            <Typography
-              marginTop={3}
-              color="offWhite.main"
-              textAlign="center"
-              fontFamily="FractulAltLight"
-              lineHeight={1}
-              variant="subtitle2"
-            >
-              {row?.description}
-            </Typography>
+            {row?.description}
           </Typography>
           <AutOsButton
             sx={{
