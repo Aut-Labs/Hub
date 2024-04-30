@@ -101,6 +101,18 @@ const AutWallet = () => {
           padding: 3
         }
       };
+
+      const btnConfig = {
+        metaMask: true,
+        walletConnect: true,
+        coinbaseWalletSDK: true,
+        web3auth: true
+      };
+
+      const allowedConnectors = Object.keys(btnConfig)
+        .filter((connector) => btnConfig[connector])
+        .map((connector) => connectors.find((c) => c.id === connector));
+
       Init({
         config,
         envConfig: {
@@ -114,9 +126,10 @@ const AutWallet = () => {
           connect,
           disconnect,
           setStateChangeCallback,
-          connectors: connectors.filter((c) => btnConfig[c.id]),
+          connectors: allowedConnectors,
           networks,
           state: {
+            multiSignerId,
             multiSigner,
             isConnected,
             isConnecting,
