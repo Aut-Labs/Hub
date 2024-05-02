@@ -22,6 +22,7 @@ import CalendarIcon from "@assets/icons/calendar.png";
 
 import {
   Markets,
+  useCheckHasMintedQuery,
   useGetAllNovasQuery,
   useGetNovaTasksQuery
 } from "@api/community.api";
@@ -192,7 +193,6 @@ export const NovaTasksGrid = ({ header, tasks }) => {
 };
 
 export const EmptyNovaOnboardingCards = ({ roles }) => {
-  debugger;
   const theme = useTheme();
   return (
     <Box
@@ -237,6 +237,14 @@ const NovaDetails = () => {
   const isEditingNova = useSelector(IsEditingNova);
   const { novaName } = useParams();
   const { address } = useAccount();
+
+  const {
+    data: result,
+    isLoading,
+    isUninitialized
+  } = useCheckHasMintedQuery(address, {
+    skip: !address
+  });
 
   const { data: nova } = useGetAllNovasQuery(
     {

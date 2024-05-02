@@ -1,8 +1,19 @@
 /* eslint-disable max-len */
-import { Box, Avatar, Typography, Stack } from "@mui/material";
+import {
+  Box,
+  Avatar,
+  Typography,
+  Stack,
+  useTheme,
+  Tooltip
+} from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { AutOsButton } from "./AutButton";
-import { useLazyCheckOnboardingAllowlistQuery } from "@api/community.api";
+import {
+  useCheckHasMintedQuery,
+  useLazyCheckHasMintedQuery,
+  useLazyCheckOnboardingAllowlistQuery
+} from "@api/community.api";
 import LoadingDialog from "./Dialog/LoadingPopup";
 import SuccessDialog from "./Dialog/SuccessPopup";
 import Community from "@assets/community.png";
@@ -14,6 +25,7 @@ import { useAccount } from "wagmi";
 import { pulsate } from "./NovaCard";
 import { setSelectedRoleId } from "@store/WalletProvider/WalletProvider";
 import { useAppDispatch } from "@store/store.model";
+import { add } from "date-fns";
 
 const roleIcons = {
   Creative: Creative,
@@ -24,29 +36,37 @@ const roleIcons = {
 const RoleCard = ({ role }) => {
   const [openSuccess, setOpenSuccess] = useState(false);
   const [openError, setOpenError] = useState(false);
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
   const { open } = useWalletConnector();
   const dispatch = useAppDispatch();
 
-  const [
-    checkOnboardingAllowlist,
-    { data: result, isLoading, isUninitialized }
-  ] = useLazyCheckOnboardingAllowlistQuery();
+  // const [
+  //   checkOnboardingAllowlist,
+  //   { data: result, isLoading, isUninitialized }
+  // ] = useLazyCheckOnboardingAllowlistQuery();
 
+  const [checkHasMinted, { data: result, isLoading, isUninitialized }] =
+    useLazyCheckHasMintedQuery();
+
+  const { isLoading: checkLoading, data: checkResult } = useCheckHasMintedQuery(
+    address,
+    {
+      skip: !address
+    }
+  );
   const handleClick = async () => {
     await dispatch(setSelectedRoleId(role?.id));
-    // let addressToVerify = address as string;
-    // if (!addressToVerify) {
-    //   const state = await open();
-    //   addressToVerify = state?.address;
-    // }
+    if (result && !result?.hasMinted && isConnected) {
+      handleMint();
+    } else {
+      let addressToVerify = address as string;
+      if (!addressToVerify) {
+        const state = await open();
+        addressToVerify = state?.address;
+      }
 
-    // if (!addressToVerify) {
-    //   // show some error that it could not be verified unless user connects to a wallet
-    // } else {
-    //   checkOnboardingAllowlist(addressToVerify);
-    // }
-    handleMint();
+      await checkHasMinted(addressToVerify);
+    }
   };
 
   const handleDialogClose = () => {
@@ -60,10 +80,10 @@ const RoleCard = ({ role }) => {
   }, [isUninitialized, address]);
 
   useEffect(() => {
-    if (result && result?.isAllowed) {
-      setOpenSuccess(true);
-    } else if (result && !result?.isAllowed) {
-      setOpenError(true);
+    if (result && result?.hasMinted) {
+      // setOpenSuccess(true);
+    } else if (result && !result?.hasMinted) {
+      handleMint();
     }
   }, [isLoading, result]);
 
@@ -78,12 +98,14 @@ const RoleCard = ({ role }) => {
     window.dispatchEvent(event);
   };
 
+  const theme = useTheme();
+
   return (
     <>
       <LoadingDialog
         handleClose={openSuccess}
         open={isLoading}
-        message="Verifying task..."
+        message="Checking requirements..."
       />
       <SuccessDialog
         titleVariant="h3"
@@ -96,9 +118,7 @@ const RoleCard = ({ role }) => {
       <ErrorDialog
         handleClose={() => setOpenError(false)}
         open={openError}
-        message={
-          "Looks like your task hasn't been verified yet. Try again later."
-        }
+        message={"You have already minted an ĀutID."}
       />
       <Box
         sx={{
@@ -165,7 +185,8 @@ const RoleCard = ({ role }) => {
               Claim your role in this community as {role?.roleName}
             </Typography>
           </Typography>
-          <AutOsButton
+          {/* <AutOsButton
+            disabled={result?.role == role?.id}
             sx={{
               background: "linear-gradient(#244AFF, #1BB8FF) !important",
               mt: "24px"
@@ -175,7 +196,45 @@ const RoleCard = ({ role }) => {
             <Typography variant="body" fontWeight="normal" color="white">
               Join
             </Typography>
-          </AutOsButton>
+          </AutOsButton> */}
+          <Tooltip title={"Already claimed another role."}>
+            <>
+              <AutOsButton
+                sx={{
+                  mt: "24px",
+                  bgcolor: "transparent",
+                  "&.MuiButton-root": {
+                    background: "linear-gradient(#244AFF, #1BB8FF)",
+                    transition: theme.transitions.create([
+                      "border-color",
+                      "background",
+                      "color"
+                    ]),
+                    "&:hover": {
+                      background: "linear-gradient(#2037e0, #17a1e0)"
+                    },
+                    ...(checkResult?.hasMinted &&
+                      checkResult?.role == role?.id && {
+                        background: (theme) => theme.palette.success.main,
+                        "&:hover": {
+                          background: (theme) => theme.palette.success.main
+                        }
+                      })
+                  }
+                }}
+                onClick={() => handleClick()}
+                disabled={checkResult?.hasMinted || checkLoading}
+              >
+                <Typography variant="body" fontWeight="normal" color="white">
+                  {checkResult?.role == role?.id
+                    ? "Current Role"
+                    : checkResult?.hasMinted
+                      ? "Unavailable"
+                      : "Join"}
+                </Typography>
+              </AutOsButton>
+            </>
+          </Tooltip>
         </Stack>
       </Box>
     </>

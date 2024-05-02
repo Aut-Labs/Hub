@@ -2,6 +2,8 @@ import { Box, Button, Link, Toolbar } from "@mui/material";
 import AppTitle from "@components/AppTitle";
 import { useAutConnector, useWalletConnector } from "@aut-labs/connector";
 import { useNavigate } from "react-router-dom";
+import { useAppDispatch } from "@store/store.model";
+import { communityApi } from "@api/community.api";
 
 export const TOOLBAR_HEIGHT = 84;
 
@@ -9,11 +11,13 @@ export const ToolbarConnector = () => {
   const { isConnected, disconnect } = useAutConnector();
   const { open } = useWalletConnector();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   console.log("isConnected: ", isConnected);
   const connectDisconnectToggle = async () => {
     if (isConnected) {
       disconnect();
+      dispatch(communityApi.util.invalidateTags(["hasMinted"]));
     } else {
       open();
     }
@@ -66,7 +70,6 @@ export const ToolbarConnector = () => {
         <div style={{ cursor: "pointer" }}>
           <AppTitle
             onClick={() => {
-              console.log("CLICKED ON APP TITLE!");
               navigate("/");
             }}
             // mb={{

@@ -276,6 +276,35 @@ const checkOnboardingAllowlist = async (address: string, api: BaseQueryApi) => {
   };
 };
 
+const checkHasMinted = async (address: string, api: BaseQueryApi) => {
+  const sdk = AutSDK.getInstance();
+  const state: RootState = api.getState() as RootState;
+  const network: NetworkConfig = state.walletProvider.selectedNetwork;
+
+  const query = gql`
+  query GetAutID {
+    autID(id: "${address.toLowerCase()}") {
+      id
+      username
+      tokenID
+      novaAddress
+      role
+      commitment
+      metadataUri
+    }
+  }
+`;
+  const response = await apolloClient.query<any>({
+    query
+  });
+
+  const autID = response?.data?.autID;
+
+  return {
+    data: { hasMinted: !!autID, role: autID?.role }
+  };
+};
+
 export const setArchetype = async (
   body: {
     archetype: {
@@ -349,6 +378,9 @@ export const communityApi = createApi({
     if (url === "checkOnboardingAllowlist") {
       return checkOnboardingAllowlist(body, api);
     }
+    if (url === "checkHasMinted") {
+      return checkHasMinted(body, api);
+    }
 
     if (url === "updateNova") {
       return updateNova(body, api);
@@ -362,7 +394,7 @@ export const communityApi = createApi({
       data: "Test"
     };
   },
-  tagTypes: ["AllNovas"],
+  tagTypes: ["AllNovas", "hasMinted"],
   endpoints: (builder) => ({
     getAllMembers: builder.query<DAOMember[], void>({
       query: (body) => {
@@ -415,6 +447,21 @@ export const communityApi = createApi({
           url: "checkOnboardingAllowlist"
         };
       }
+    }),
+    checkHasMinted: builder.query<
+      {
+        hasMinted: boolean;
+        role: string;
+      },
+      string
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "checkHasMinted"
+        };
+      },
+      providesTags: ["hasMinted"]
     }),
     getNovaTasks: builder.query<
       {
@@ -517,6 +564,8 @@ export const communityApi = createApi({
 });
 
 export const {
+  useLazyCheckHasMintedQuery,
+  useCheckHasMintedQuery,
   useGetAllMembersQuery,
   useGetCommunityQuery,
   useSetArchetypeMutation,
