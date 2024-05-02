@@ -130,6 +130,7 @@ export class CommunityProperties extends NovaProperties {
 }
 
 export class Community extends BaseNFTModel<CommunityProperties> {
+  id: string;
   static updateCommunity(updatedCommunity: Community): Partial<Community> {
     const community = new Community(updatedCommunity);
     const market = MarketTemplates.find(
@@ -155,6 +156,7 @@ export class Community extends BaseNFTModel<CommunityProperties> {
 
   constructor(data: Community = {} as Community) {
     super(data);
+    this.id = data.id;
     this.properties = new CommunityProperties(data.properties);
   }
 }

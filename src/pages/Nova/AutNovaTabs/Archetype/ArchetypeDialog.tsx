@@ -20,9 +20,9 @@ import {
 } from "@mui/material";
 import React from "react";
 import { archetypeChartValues } from "./ArchetypePieChart";
-import { useSetArchetypeMutation } from "@api/archetype.api";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
+import { useSetArchetypeMutation } from "@api/community.api";
 
 export interface InteractionsDialogProps {
   title: string;
@@ -238,7 +238,6 @@ export function ArchetypeDialog(props: InteractionsDialogProps) {
       performance: archetype?.defaults[NovaArchetype.PERFORMANCE],
       reputation: archetype?.defaults[NovaArchetype.REPUTATION]
     };
-    debugger;
     try {
       setArchetype({
         nova: props.nova,

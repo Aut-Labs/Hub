@@ -25,9 +25,9 @@ import { useSelector } from "react-redux";
 import { IsAuthenticated } from "@auth/auth.reducer";
 import { useOAuthSocials } from "./Oauth2/oauth2";
 import { Community } from "@api/community.model";
-import { useUpdateNovaMutation } from "@api/archetype.api";
 import ErrorDialog from "./Dialog/ErrorPopup";
 import LoadingDialog from "./Dialog/LoadingPopup";
+import { useUpdateNovaMutation } from "@api/community.api";
 
 export interface EditDialogProps {
   title: string;
@@ -217,10 +217,10 @@ export function AutEditNovaDialog(props: EditDialogProps) {
     updateNova({
       ...props.nova,
       name: data.name,
+      description: data.description,
       properties: {
         ...props.nova.properties,
-        socials: data.socials,
-        description: data.description
+        socials: data.socials
       }
     });
     setEditInitiated(false);

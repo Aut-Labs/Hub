@@ -210,7 +210,6 @@ export const archetypeApi = createApi({
         nova: Community;
       }
     >({
-      invalidatesTags: ["Archetype"],
       query: (body) => {
         return {
           body,
@@ -222,7 +221,7 @@ export const archetypeApi = createApi({
 });
 
 export const {
-  useGetArchetypeAndStatsQuery,
-  useSetArchetypeMutation,
-  useUpdateNovaMutation
+  useGetArchetypeAndStatsQuery
+  // useSetArchetypeMutation,
+  // useUpdateNovaMutation
 } = archetypeApi;

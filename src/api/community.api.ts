@@ -8,6 +8,7 @@ import { gql } from "@apollo/client";
 import { apolloClient } from "@store/graphql";
 import { RootState } from "@store/store.model";
 import { NetworkConfig } from "./ProviderFactory/network.config";
+import { NovaArchetypeParameters } from "@aut-labs/sdk/dist/models/nova";
 
 // export enum NovaArchetype {
 //   "Size" = 1,
@@ -275,11 +276,60 @@ const checkOnboardingAllowlist = async (address: string, api: BaseQueryApi) => {
   };
 };
 
-interface DaoModel {
-  daoAddress: string;
-  onboardingQuestAddress: string;
-  properties: any;
-}
+export const setArchetype = async (
+  body: {
+    archetype: {
+      default: number;
+      parameters: NovaArchetypeParameters;
+    };
+    nova: Community;
+  },
+  api: BaseQueryApi
+) => {
+  try {
+    const sdk = AutSDK.getInstance();
+    const newNova = {
+      ...body.nova,
+      properties: {
+        ...body.nova.properties,
+        archetype: body.archetype
+      }
+    };
+    const updatedCommunity = Community.updateCommunity(newNova);
+    const uri = await sdk.client.sendJSONToIPFS(updatedCommunity as any);
+    const nova: Nova = sdk.initService<Nova>(
+      Nova,
+      body.nova.properties.address
+    );
+    await nova.contract.metadata.setMetadataUri(uri);
+    // api.dispatch(communityApi.util.invalidateTags(["AllNovas"]));
+    return {
+      data: newNova
+    };
+  } catch (error) {
+    return {
+      error: error?.message
+    };
+  }
+};
+
+export const updateNova = async (body: Community, api: BaseQueryApi) => {
+  try {
+    const sdk = AutSDK.getInstance();
+    const updatedCommunity = Community.updateCommunity(body);
+    const uri = await sdk.client.sendJSONToIPFS(updatedCommunity as any);
+    const nova: Nova = sdk.initService<Nova>(Nova, body.properties.address);
+    await nova.contract.metadata.setMetadataUri(uri);
+    // api.dispatch(communityApi.util.invalidateTags(["AllNovas"]));
+    return {
+      data: body
+    };
+  } catch (error) {
+    return {
+      error: error?.message
+    };
+  }
+};
 
 const KEEP_DATA_UNUSED = 10 * 60;
 
@@ -299,6 +349,15 @@ export const communityApi = createApi({
     if (url === "checkOnboardingAllowlist") {
       return checkOnboardingAllowlist(body, api);
     }
+
+    if (url === "updateNova") {
+      return updateNova(body, api);
+    }
+
+    if (url === "setArchetype") {
+      return setArchetype(body, api);
+    }
+
     return {
       data: "Test"
     };
@@ -332,7 +391,7 @@ export const communityApi = createApi({
       //   daos: NovaDAO[];
       // },
       {
-        daos: any[];
+        daos: Community[];
       },
       Filters
     >({
@@ -369,6 +428,90 @@ export const communityApi = createApi({
           url: "getNovaTasks"
         };
       }
+    }),
+    updateNova: builder.mutation<Community, Community>({
+      query: (body) => {
+        return {
+          body,
+          url: "updateNova"
+        };
+      },
+      onQueryStarted: async (arg, { dispatch, queryFulfilled, getState }) => {
+        try {
+          await queryFulfilled;
+          const allQueries = getState().communityApi.queries;
+          Object.entries(allQueries).forEach(([queryKey, queryValue]) => {
+            if (queryKey.includes("getAllNovas")) {
+              dispatch(
+                communityApi.util.updateQueryData(
+                  "getAllNovas",
+                  queryValue.originalArgs,
+                  (draft) => {
+                    debugger;
+                    const index = draft.daos.findIndex(
+                      (dao) => dao.id === arg.id
+                    );
+                    if (index !== -1) {
+                      draft.daos[index] = { ...draft.daos[index], ...arg };
+                    }
+                  }
+                )
+              );
+            }
+          });
+        } catch (error) {
+          // Handle error, possibly undo optimistic updates
+        }
+      }
+    }),
+    setArchetype: builder.mutation<
+      Community,
+      {
+        archetype: {
+          default: number;
+          parameters: NovaArchetypeParameters;
+        };
+        nova: Community;
+      }
+    >({
+      query: (body) => {
+        return {
+          body,
+          url: "setArchetype"
+        };
+      },
+      onQueryStarted: async (arg, { dispatch, queryFulfilled, getState }) => {
+        try {
+          const result = await queryFulfilled;
+          const updatedNova: Community = result.data;
+          const allQueries = getState().communityApi.queries;
+          Object.entries(allQueries).forEach(([queryKey, queryValue]) => {
+            if (queryKey.includes("getAllNovas")) {
+              dispatch(
+                communityApi.util.updateQueryData(
+                  "getAllNovas",
+                  queryValue.originalArgs,
+                  (draft) => {
+                    const index = draft.daos.findIndex(
+                      (dao) => dao.id === updatedNova.id
+                    );
+                    if (index !== -1) {
+                      draft.daos[index] = {
+                        ...draft.daos[index],
+                        ...updatedNova
+                      };
+                    }
+
+                    debugger;
+                  }
+                )
+              );
+            }
+          });
+        } catch (error) {
+          // Handle error, possibly undo optimistic updates
+        }
+      }
     })
   })
 });
@@ -376,6 +519,8 @@ export const communityApi = createApi({
 export const {
   useGetAllMembersQuery,
   useGetCommunityQuery,
+  useSetArchetypeMutation,
+  useUpdateNovaMutation,
   useGetAllNovasQuery,
   useGetNovaTasksQuery,
   useLazyCheckOnboardingAllowlistQuery

@@ -274,7 +274,7 @@ const NovaDetails = () => {
   const marketTemplate = useMemo(() => {
     const marketName = nova?.properties?.market;
     return MarketTemplates.find(
-      (v) => v.title === marketName || v.market === marketName
+      (v) => v.title === marketName || v.market === +marketName
     );
   }, [nova]);
 
@@ -284,9 +284,9 @@ const NovaDetails = () => {
 
   const handleDialogClose = () => {};
 
-  const archetype = useMemo(() => {
-    return archetypeChartValues(nova?.properties.archetype);
-  }, [nova]);
+  // const archetype = useMemo(() => {
+  //   return archetypeChartValues(nova?.properties.archetype);
+  // }, [nova]);
 
   const openEditNovaModal = () => {
     dispatch(setOpenEditNova(true));

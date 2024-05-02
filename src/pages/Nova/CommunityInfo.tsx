@@ -60,7 +60,8 @@ const CommunityInfo = () => {
       selectFromResult: ({ data }) => ({
         data: (data?.daos || []).find(
           (d) =>
-            d.daoAddress === searchParams.get(RequiredQueryParams.DaoAddress)
+            d.properties.address ===
+            searchParams.get(RequiredQueryParams.DaoAddress)
         )
       })
     }
@@ -91,7 +92,7 @@ const CommunityInfo = () => {
           <Typography color="white" variant="subtitle1">
             <Stack direction="row" alignItems="center">
               {data?.name}
-              <Tooltip title={data?.properties.description}>
+              <Tooltip title={data?.description}>
                 <DescriptionIcon
                   sx={{
                     color: "offWhite.main",
@@ -206,9 +207,11 @@ const CommunityInfo = () => {
           }}
           variant="body"
           target="_blank"
-          href={`${urls.myAut}${data?.admin}`}
+          href={`${urls.myAut}`}
         >
-          {data?.admin === account ? "View profile" : "View operator profile"}
+          {data?.properties?.userData?.isAdmin
+            ? "View profile"
+            : "View operator profile"}
         </Link>
       </Box>
     </Box>

@@ -31,14 +31,12 @@ import {
   NovaArchetypeParameters
 } from "@aut-labs/sdk/dist/models/nova";
 import { calculateAV } from "@utils/av-calculator";
-import {
-  useGetArchetypeAndStatsQuery,
-  useSetArchetypeMutation
-} from "@api/archetype.api";
 import { AutOsButton } from "@components/AutButton";
-import { useParams, useSearchParams } from "react-router-dom";
-import { useGetAllNovasQuery } from "@api/community.api";
-import { RequiredQueryParams } from "@api/RequiredQueryParams";
+import { useParams } from "react-router-dom";
+import {
+  useGetAllNovasQuery,
+  useSetArchetypeMutation
+} from "@api/community.api";
 import { useAutConnector, useWalletConnector } from "@aut-labs/connector";
 import { ArchetypeDialog } from "./ArchetypeDialog";
 
