@@ -39,7 +39,7 @@ interface Filters {
   novaName?: string;
 }
 const getAllNovas = async (body: any, api: BaseQueryApi) => {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  // await new Promise((resolve) => setTimeout(resolve, 1000));
   try {
     const sdk = AutSDK.getInstance();
     let fetchNovas;
@@ -97,10 +97,10 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
         environment.ipfsGatewayUrl
       );
       //TODO: Fix archetypes and find AV
-      const nova: Nova = sdk.initService<Nova>(Nova, novaDAO.address);
       let isAdmin = false;
 
       if (body?.connectedAddress) {
+        const nova: Nova = sdk.initService<Nova>(Nova, novaDAO.address);
         isAdmin = await nova.contract.functions.isAdmin(
           body?.connectedAddress.toLowerCase()
         );
@@ -160,6 +160,7 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
       data: { daos: filteredNovae }
     };
   } catch (e) {
+    debugger;
     return {
       error: e
     };

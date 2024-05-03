@@ -19,7 +19,6 @@ import {
   updateWalletProviderState
 } from "@store/WalletProvider/WalletProvider";
 import { useAppDispatch } from "@store/store.model";
-import { useGetAllNovasQuery } from "@api/community.api";
 
 const btnConfig = {
   metaMask: true,
@@ -47,8 +46,6 @@ const AutWallet = () => {
 
   const novaAddress = useSelector(NovaAddress);
   const selectedRoleId = useSelector(SelectedRoleId);
-
-  console.log("selectedRoleId", selectedRoleId);
 
   const initialiseSDK = async (
     network: NetworkConfig,
