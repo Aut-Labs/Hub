@@ -41,7 +41,6 @@ interface Filters {
 const getAllNovas = async (body: any, api: BaseQueryApi) => {
   // await new Promise((resolve) => setTimeout(resolve, 1000));
   try {
-    const sdk = AutSDK.getInstance();
     let fetchNovas;
 
     if (body?.marketFilter) {
@@ -100,6 +99,7 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
       let isAdmin = false;
 
       if (body?.connectedAddress) {
+        const sdk = AutSDK.getInstance();
         const nova: Nova = sdk.initService<Nova>(Nova, novaDAO.address);
         isAdmin = await nova.contract.functions.isAdmin(
           body?.connectedAddress.toLowerCase()
