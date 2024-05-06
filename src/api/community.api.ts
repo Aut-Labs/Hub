@@ -9,6 +9,50 @@ import { apolloClient } from "@store/graphql";
 import { RootState } from "@store/store.model";
 import { NetworkConfig } from "./ProviderFactory/network.config";
 import { NovaArchetypeParameters } from "@aut-labs/sdk/dist/models/nova";
+import { NovaArchetype } from "@aut-labs/sdk/dist/models/nova";
+import { ReactComponent as Size } from "@assets/icons/size.svg";
+import { ReactComponent as Growth } from "@assets/icons/growth.svg";
+import { ReactComponent as Performance } from "@assets/icons/performance.svg";
+import { ReactComponent as Reputation } from "@assets/icons/reputation.svg";
+import { ReactComponent as Conviction } from "@assets/icons/conviction.svg";
+
+export const ArchetypeTypes = {
+  [NovaArchetype.SIZE]: {
+    type: NovaArchetype.SIZE,
+    title: "Size",
+    description:
+      "A relative value that represents how “big” a Nova compared to others in the ecosystem. This Archetype encourages the largest projects to verify & maintain a positive influence in the overall ecosystem.",
+    logo: Size
+  },
+  [NovaArchetype.REPUTATION]: {
+    type: NovaArchetype.REPUTATION,
+    title: "Reputation",
+    description:
+      "The average Participation Score of a Nova’s Contributors. This Archetype gives more insights about the shared trust between members, and their constant effort towards a common goal.",
+    logo: Reputation
+  },
+  [NovaArchetype.CONVICTION]: {
+    type: NovaArchetype.CONVICTION,
+    title: "Conviction",
+    description:
+      "The avg. Commitment of the contributors of your Nova. This archetype is for the true believers – reflecting Members’ level of trust and belief in your project’s vision.",
+    logo: Conviction
+  },
+  [NovaArchetype.PERFORMANCE]: {
+    type: NovaArchetype.PERFORMANCE,
+    title: "Performance",
+    description:
+      "The ratio between tasks created and tasks completed during a given period. This Archetype is for ambitious, coordinated communities set to create real impact and thrive.",
+    logo: Performance
+  },
+  [NovaArchetype.GROWTH]: {
+    type: NovaArchetype.GROWTH,
+    title: "Growth",
+    description:
+      "Everything starts with something. This Archetype is not for the largest Novae, it’s for the ones with a continuous, organic, slow and steady growth determined by their scale.",
+    logo: Growth
+  }
+};
 
 // export enum NovaArchetype {
 //   "Size" = 1,
@@ -33,43 +77,22 @@ export enum Markets {
 // };
 
 interface Filters {
-  marketFilter?: string;
-  archetypeFilter?: string;
   connectedAddress?: string;
-  novaName?: string;
 }
 const getAllNovas = async (body: any, api: BaseQueryApi) => {
-  // await new Promise((resolve) => setTimeout(resolve, 1000));
   try {
-    let fetchNovas;
-
-    if (body?.marketFilter) {
-      fetchNovas = gql`
-        query GetNovas {
-          novaDAOs(skip: 0, first: 100, where: { market: ${body.marketFilter} }) {
-            id
-            deployer
-            address
-            market
-            metadataUri
-            minCommitment
-          }
+    const fetchNovas = gql`
+      query GetNovas {
+        novaDAOs(skip: 0, first: 100) {
+          id
+          deployer
+          address
+          market
+          metadataUri
+          minCommitment
         }
-      `;
-    } else {
-      fetchNovas = gql`
-        query GetNovas {
-          novaDAOs(skip: 0, first: 100) {
-            id
-            deployer
-            address
-            market
-            metadataUri
-            minCommitment
-          }
-        }
-      `;
-    }
+      }
+    `;
 
     const fetchAutIds = gql`
       query GetAutIds {
@@ -99,7 +122,7 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
       let isAdmin = false;
 
       if (body?.connectedAddress) {
-        const sdk = AutSDK.getInstance();
+        const sdk = await AutSDK.getInstance();
         const nova: Nova = sdk.initService<Nova>(Nova, novaDAO.address);
         isAdmin = await nova.contract.functions.isAdmin(
           body?.connectedAddress.toLowerCase()
@@ -124,43 +147,42 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
       } as unknown as Community);
       enrichedNovae.push(enrichedNova);
     }
-    enrichedNovae.sort((a, b) => {
-      if (a.name === body?.novaName) {
-        return -1;
-      } else if (b.name === body?.novaName) {
-        return 1;
-      } else {
-        return 0;
-      }
-    });
-    enrichedNovae.sort((a, b) => {
-      if (a.properties.deployer === body?.connectedAddress) {
-        return -1;
-      } else if (b.properties.deployer === body?.connectedAddress) {
-        return 1;
-      } else {
-        return 0;
-      }
-    });
+    // enrichedNovae.sort((a, b) => {
+    //   if (a.name === body?.novaName) {
+    //     return -1;
+    //   } else if (b.name === body?.novaName) {
+    //     return 1;
+    //   } else {
+    //     return 0;
+    //   }
+    // });
+    // enrichedNovae.sort((a, b) => {
+    //   if (a.properties.deployer === body?.connectedAddress) {
+    //     return -1;
+    //   } else if (b.properties.deployer === body?.connectedAddress) {
+    //     return 1;
+    //   } else {
+    //     return 0;
+    //   }
+    // });
 
-    let filteredNovae = enrichedNovae.filter((nova) => {
-      return (
-        nova.properties.members >= 1 ||
-        nova.properties.deployer?.toLowerCase() ===
-          body?.connectedAddress?.toLowerCase()
-      );
-    });
-    if (body.archetypeFilter) {
-      filteredNovae = filteredNovae.filter(
-        (nova) =>
-          nova?.properties?.archetype?.default === Number(body?.archetypeFilter)
-      );
-    }
+    // let filteredNovae = enrichedNovae.filter((nova) => {
+    //   return (
+    //     nova.properties.members >= 1 ||
+    //     nova.properties.deployer?.toLowerCase() ===
+    //       body?.connectedAddress?.toLowerCase()
+    //   );
+    // });
+    // if (body.archetypeFilter) {
+    //   filteredNovae = filteredNovae.filter(
+    //     (nova) =>
+    //       nova?.properties?.archetype?.default === Number(body?.archetypeFilter)
+    //   );
+    // }
     return {
-      data: { daos: filteredNovae }
+      data: { daos: enrichedNovae }
     };
   } catch (e) {
-    debugger;
     return {
       error: e
     };
@@ -263,7 +285,7 @@ const getNovaTasks = async (address: any, api: BaseQueryApi) => {
 };
 
 const checkOnboardingAllowlist = async (address: string, api: BaseQueryApi) => {
-  const sdk = AutSDK.getInstance();
+  const sdk = await AutSDK.getInstance();
   const state: RootState = api.getState() as RootState;
   const network: NetworkConfig = state.walletProvider.selectedNetwork;
   const allowlistContract = sdk.initService<Allowlist>(
@@ -278,7 +300,6 @@ const checkOnboardingAllowlist = async (address: string, api: BaseQueryApi) => {
 };
 
 const checkHasMinted = async (address: string, api: BaseQueryApi) => {
-  const sdk = AutSDK.getInstance();
   const state: RootState = api.getState() as RootState;
   const network: NetworkConfig = state.walletProvider.selectedNetwork;
 
@@ -317,7 +338,7 @@ export const setArchetype = async (
   api: BaseQueryApi
 ) => {
   try {
-    const sdk = AutSDK.getInstance();
+    const sdk = await AutSDK.getInstance();
     const newNova = {
       ...body.nova,
       properties: {
@@ -331,8 +352,13 @@ export const setArchetype = async (
       Nova,
       body.nova.properties.address
     );
-    await nova.contract.metadata.setMetadataUri(uri);
-    // api.dispatch(communityApi.util.invalidateTags(["AllNovas"]));
+    const result = await nova.contract.metadata.setMetadataUri(uri);
+
+    if (!result?.isSuccess) {
+      return {
+        error: result?.errorMessage
+      };
+    }
     return {
       data: newNova
     };
@@ -345,12 +371,17 @@ export const setArchetype = async (
 
 export const updateNova = async (body: Community, api: BaseQueryApi) => {
   try {
-    const sdk = AutSDK.getInstance();
+    const sdk = await AutSDK.getInstance();
     const updatedCommunity = Community.updateCommunity(body);
     const uri = await sdk.client.sendJSONToIPFS(updatedCommunity as any);
     const nova: Nova = sdk.initService<Nova>(Nova, body.properties.address);
-    await nova.contract.metadata.setMetadataUri(uri);
-    // api.dispatch(communityApi.util.invalidateTags(["AllNovas"]));
+    const result = await nova.contract.metadata.setMetadataUri(uri);
+
+    if (!result?.isSuccess) {
+      return {
+        error: result?.errorMessage
+      };
+    }
     return {
       data: body
     };
@@ -495,7 +526,6 @@ export const communityApi = createApi({
                   "getAllNovas",
                   queryValue.originalArgs,
                   (draft) => {
-                    debugger;
                     const index = draft.daos.findIndex(
                       (dao) => dao.id === arg.id
                     );
@@ -531,6 +561,7 @@ export const communityApi = createApi({
       onQueryStarted: async (arg, { dispatch, queryFulfilled, getState }) => {
         try {
           const result = await queryFulfilled;
+          debugger;
           const updatedNova: Community = result.data;
           const allQueries = getState().communityApi.queries;
           Object.entries(allQueries).forEach(([queryKey, queryValue]) => {
@@ -549,8 +580,6 @@ export const communityApi = createApi({
                         ...updatedNova
                       };
                     }
-
-                    debugger;
                   }
                 )
               );

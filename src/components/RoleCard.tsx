@@ -51,6 +51,7 @@ const RoleCard = ({ role }) => {
   const { isLoading: checkLoading, data: checkResult } = useCheckHasMintedQuery(
     address,
     {
+      refetchOnMountOrArgChange: true,
       skip: !address
     }
   );

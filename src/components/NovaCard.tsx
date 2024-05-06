@@ -13,10 +13,9 @@ import Flipcard from "@components/Flipcard";
 import FlipIcon from "@assets/flip.svg";
 import { useNavigate } from "react-router-dom";
 import AutIconLabel from "./AutIconLabel";
-import { Markets } from "@api/community.api";
 import { ReactComponent as Check } from "@assets/autos/check.svg";
-import { ArchetypeTypes } from "@api/archetype.api";
 import { MarketTemplates } from "@api/community.model";
+import { ArchetypeTypes } from "@api/community.api";
 
 const getRoleName = (daoData, quest) => {
   const role = daoData.properties.rolesSets[0].roles.find(

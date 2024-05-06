@@ -8,12 +8,11 @@ import {
   useTheme,
   styled,
   MenuItem,
-  InputAdornment,
-  CircularProgress
+  InputAdornment
 } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import NovaCard from "@components/NovaCard";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import { useGetAllNovasQuery } from "@api/community.api";
@@ -24,7 +23,7 @@ import { ReactComponent as Markets } from "@assets/icons/markets.svg";
 import { ReactComponent as Archetypes } from "@assets/icons/archetype.svg";
 import { useParams } from "react-router-dom";
 import { useAccount } from "wagmi";
-import { MarketTemplates } from "@api/community.model";
+import { Community, MarketTemplates } from "@api/community.model";
 
 const AutContainer = styled("div")(() => ({
   display: "flex",
@@ -64,18 +63,74 @@ export const NovaList = () => {
   const { novaName } = useParams();
   const { address } = useAccount();
 
-  const { data, isLoading, isFetching } = useGetAllNovasQuery(
+  const { data, isLoading, isFetching, refetch } = useGetAllNovasQuery(
     {
-      marketFilter,
-      archetypeFilter,
-      connectedAddress: address,
-      novaName: novaName
+      connectedAddress: address
     },
     {
       refetchOnMountOrArgChange: true,
       skip: false
     }
   );
+
+  const filteredNovas: Community[] = useMemo(() => {
+    let novas: Community[] = data?.daos || [];
+    const userAddress = address?.toLowerCase();
+
+    if (!novas) {
+      return [];
+    }
+    novas = [...novas];
+
+    if (novaName) {
+      novas = novas.sort((a, b) => {
+        if (a.name?.toLowerCase() === novaName?.toLowerCase()) {
+          return -1;
+        } else if (b.name?.toLowerCase() === novaName?.toLowerCase()) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+    }
+
+    if (userAddress) {
+      novas = novas.sort((a, b) => {
+        if (a.properties.deployer?.toLowerCase() === userAddress) {
+          return -1;
+        } else if (b.properties.deployer?.toLowerCase() === userAddress) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+    }
+
+    novas = novas.filter((nova) => {
+      return (
+        nova.properties.members >= 1 ||
+        nova.properties.deployer?.toLowerCase() === userAddress
+      );
+    });
+
+    if (archetypeFilter) {
+      novas = novas.filter(
+        (nova) =>
+          nova?.properties?.archetype?.default === Number(archetypeFilter)
+      );
+    }
+
+    if (marketFilter) {
+      const marketNum = MarketTemplates.find(
+        (v) => v.title === marketFilter || v.market === +marketFilter
+      );
+      novas = novas.filter(
+        (nova) => nova?.properties?.market === marketNum?.title
+      );
+    }
+    return novas;
+  }, [data, novaName, address, archetypeFilter, marketFilter]);
+
   return (
     <PerfectScrollbar
       style={{
@@ -192,7 +247,7 @@ export const NovaList = () => {
           </AutSelectField>
         </Box>
 
-        {!isLoading && !(data?.daos || [])?.length && (
+        {!isLoading && !filteredNovas?.length && (
           <Box
             sx={{
               display: "flex",
@@ -215,7 +270,7 @@ export const NovaList = () => {
                 ml: 1
               }}
               disabled={isLoading || isFetching}
-              // onClick={refetch}
+              onClick={() => refetch()}
             >
               Refresh
             </Button>
@@ -227,7 +282,7 @@ export const NovaList = () => {
         ) : (
           <>
             <GridBox sx={{ flexGrow: 1, mt: 4 }}>
-              {(data?.daos || []).map((dao, index) => (
+              {filteredNovas.map((dao, index) => (
                 <NovaCard
                   key={`nova-card-${index}`}
                   daoData={dao}

@@ -9,7 +9,7 @@ import { MultiSigner } from "@aut-labs/sdk/dist/models/models";
 import { communityUpdateState } from "@store/Community/community.reducer";
 import AutLoading from "@components/AutLoading";
 import AppTitle from "@components/AppTitle";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { environment, EnvMode } from "@api/environment";
 import AutSDK from "@aut-labs/sdk";
 import {
@@ -51,7 +51,7 @@ const AutWallet = () => {
     network: NetworkConfig,
     multiSigner: MultiSigner
   ) => {
-    const sdk = AutSDK.getInstance();
+    const sdk = await AutSDK.getInstance(false);
     return sdk.init(multiSigner, {
       novaAddress: novaAddress,
       daoTypesAddress: network.contracts.daoTypesAddress,

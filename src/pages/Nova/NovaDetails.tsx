@@ -1,8 +1,7 @@
-import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef } from "react";
 import {
   Avatar,
   Box,
-  CircularProgress,
   Link,
   Stack,
   SvgIcon,
@@ -14,19 +13,17 @@ import {
   useMediaQuery,
   useTheme
 } from "@mui/material";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { TOOLBAR_HEIGHT } from "./ToolbarConnector";
 import CopyAddress from "@components/CopyAddress";
 import CalendarIcon from "@assets/icons/calendar.png";
 
 import {
-  Markets,
-  useCheckHasMintedQuery,
+  ArchetypeTypes,
   useGetAllNovasQuery,
   useGetNovaTasksQuery
 } from "@api/community.api";
-import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import { ReactComponent as DiscordIcon } from "@assets/SocialIcons/DiscordIcon.svg";
 import { ReactComponent as GitHubIcon } from "@assets/SocialIcons/GitHubIcon.svg";
@@ -37,15 +34,13 @@ import { socialUrls } from "@api/aut.model";
 import AutTaskTabs from "./AutNovaTabs/AutTaskTabs";
 import AutIconLabel from "@components/AutIconLabel";
 import TaskCard from "@components/TaskCard";
-import { parseNovaTimestamp, parseTimestamp } from "@utils/date-format";
+import { parseNovaTimestamp } from "@utils/date-format";
 import RoleCard from "@components/RoleCard";
-import { archetypeChartValues } from "./AutNovaTabs/Archetype/ArchetypePieChart";
 import { AutOsButton } from "@components/AutButton";
 import { useAppDispatch } from "@store/store.model";
 import { IsEditingNova, setOpenEditNova } from "@store/ui-reducer";
 import { useSelector } from "react-redux";
 import { AutEditNovaDialog } from "@components/AutEditNovaDialog";
-import { ArchetypeTypes } from "@api/archetype.api";
 import { useAccount } from "wagmi";
 import { setNovaAddress } from "@store/WalletProvider/WalletProvider";
 import { MarketTemplates } from "@api/community.model";
@@ -238,19 +233,21 @@ const NovaDetails = () => {
   const { novaName } = useParams();
   const { address } = useAccount();
 
-  const {
-    data: result,
-    isLoading,
-    isUninitialized
-  } = useCheckHasMintedQuery(address, {
-    skip: !address
-  });
+  // const {
+  //   data: result,
+  //   isLoading,
+  //   isUninitialized
+  // } = useCheckHasMintedQuery(address, {
+  //   skip: !address,
+  //   refetchOnMountOrArgChange: true
+  // });
 
   const { data: nova } = useGetAllNovasQuery(
     {
       connectedAddress: address
     },
     {
+      refetchOnMountOrArgChange: true,
       selectFromResult: ({ data }) => ({
         data: (data?.daos || []).find((d) => {
           return d.name === novaName;
@@ -287,7 +284,8 @@ const NovaDetails = () => {
   }, [nova]);
 
   const { data: tasks } = useGetNovaTasksQuery(nova?.properties.address, {
-    skip: !nova?.properties.address
+    skip: !nova?.properties.address,
+    refetchOnMountOrArgChange: true
   });
 
   const handleDialogClose = () => {};

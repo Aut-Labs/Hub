@@ -4,7 +4,6 @@ import { reducers } from "./reducers";
 // import { pluginRegistryApi } from "@api/plugin-registry.api";
 // import { onboardingApi } from "@api/onboarding.api";
 import { communityApi } from "@api/community.api";
-import { archetypeApi } from "@api/archetype.api";
 // import storage from "redux-persist/lib/storage";
 // import {
 //   FLUSH,
@@ -32,7 +31,6 @@ const rootReducer = (state: RootState, action: Action) => {
   if (action.type === "RESET_ALL") {
     state = {
       communityApi: state.communityApi,
-      archetypeApi: state.archetypeApi,
       walletProvider: state.walletProvider,
       auth: state.auth
     } as RootState;
@@ -54,8 +52,7 @@ export const store = configureStore({
       logger,
       // pluginRegistryApi.middleware,
       // onboardingApi.middleware,
-      communityApi.middleware,
-      archetypeApi.middleware
+      communityApi.middleware
     ),
   reducer: rootReducer
 });

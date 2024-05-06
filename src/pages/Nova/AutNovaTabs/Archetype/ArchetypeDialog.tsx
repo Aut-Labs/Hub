@@ -10,7 +10,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  Grid,
   Stack,
   SvgIcon,
   Typography,
@@ -36,7 +35,7 @@ export interface InteractionsDialogProps {
 const AutStyledDialog = styled(Dialog)(({ theme }) => ({
   ".MuiPaper-root": {
     margin: "0",
-    width: "80%",
+    width: "90%",
     height: "80%",
     border: "none",
     backgroundColor: "#1E2430",
@@ -78,18 +77,11 @@ const ArchetypeCard = ({
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        // width: "100%",
-        // minWidth: "170px",
         minHeight: "190px",
         boxShadow: 3,
         borderRadius: "8.5px",
-        padding: theme.spacing(3),
-        width: {
-          xs: "100%",
-          md: "280px",
-          lg: "320px",
-          xxl: "350px"
-        }
+        padding: theme.spacing(2),
+        flex: 1
       }}
     >
       <Stack
@@ -134,14 +126,13 @@ const ArchetypeCard = ({
             flex: "2",
             display: "flex",
             alignItems: "center"
-            // justifyContent: "center"
           }}
         >
           <Typography
             color="offWhite.main"
             textAlign="center"
             lineHeight={1}
-            variant="subtitle1"
+            variant="subtitle2"
             marginLeft={1}
           >
             {title}
@@ -162,24 +153,24 @@ const ArchetypeCard = ({
           sx={{
             background: "#000000",
             borderRadius: "6px",
-            p: 3,
+            p: 2,
             mt: 2,
             flex: 1
           }}
         >
           <Typography
-            marginTop={3}
+            marginTop={1}
             color="offWhite.main"
             textAlign="center"
             lineHeight={1}
-            variant="body"
+            variant="body1"
           >
             {description}
           </Typography>
         </Box>
         <AutOsButton
           sx={{
-            mt: "24px",
+            mt: 2,
             bgcolor: "transparent",
             "&.MuiButton-root": {
               background: "linear-gradient(#244AFF, #1BB8FF)",
@@ -259,11 +250,11 @@ export function ArchetypeDialog(props: InteractionsDialogProps) {
       open={props.open}
     >
       <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
-      <LoadingDialog open={isLoading} message="Updating Archertype..." />
+      <LoadingDialog open={isLoading} message="Updating Archetype..." />
       <DialogContent
         sx={{
           border: 0,
-          padding: "0px 30px",
+          px: 3,
           mb: theme.spacing(2),
           height: "100%"
         }}
@@ -293,86 +284,74 @@ export function ArchetypeDialog(props: InteractionsDialogProps) {
           .
         </Typography>
 
-        <Grid container spacing={3} sx={{ flexGrow: 1, margin: "0 auto" }}>
-          {/* Row 1 */}
-          <Grid item xs={12} sm={6} md={4}>
-            <ArchetypeCard
-              isLoading={isLoading}
-              activeArchetype={
-                props?.nova?.properties?.archetype?.default ===
-                NovaArchetype.SIZE
-              }
-              onSelect={updateArchetype}
-              {...state[NovaArchetype.SIZE]}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <ArchetypeCard
-              activeArchetype={
-                props?.nova?.properties?.archetype?.default ===
-                NovaArchetype.REPUTATION
-              }
-              isLoading={isLoading}
-              onSelect={updateArchetype}
-              {...state[NovaArchetype.REPUTATION]}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <ArchetypeCard
-              isLoading={isLoading}
-              activeArchetype={
-                props?.nova?.properties?.archetype?.default ===
-                NovaArchetype.CONVICTION
-              }
-              onSelect={updateArchetype}
-              {...state[NovaArchetype.CONVICTION]}
-            />
-          </Grid>
+        <Box
+          sx={{
+            marginTop: theme.spacing(3),
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "1fr",
+              sm: "1fr 1fr",
+              md: "1fr 1fr",
+              lg: "1fr 1fr 1fr 1fr 1fr",
+              xl: "1fr 1fr 1fr 1fr 1fr",
+              xxl: "1fr 1fr 1fr 1fr 1fr"
+            },
+            gap: {
+              xs: theme.spacing(1),
+              md: theme.spacing(2),
+              xl: theme.spacing(2),
+              xxl: theme.spacing(4)
+            }
+          }}
+        >
+          <ArchetypeCard
+            isLoading={isLoading}
+            activeArchetype={
+              props?.nova?.properties?.archetype?.default === NovaArchetype.SIZE
+            }
+            onSelect={updateArchetype}
+            {...state[NovaArchetype.SIZE]}
+          />
+          <ArchetypeCard
+            activeArchetype={
+              props?.nova?.properties?.archetype?.default ===
+              NovaArchetype.REPUTATION
+            }
+            isLoading={isLoading}
+            onSelect={updateArchetype}
+            {...state[NovaArchetype.REPUTATION]}
+          />
 
-          {/* Row 2 */}
-          <Grid
-            display={{
-              xs: "none",
-              md: "inherit"
-            }}
-            item
-            xs={false}
-            sm={false}
-            md={2}
+          <ArchetypeCard
+            isLoading={isLoading}
+            activeArchetype={
+              props?.nova?.properties?.archetype?.default ===
+              NovaArchetype.CONVICTION
+            }
+            onSelect={updateArchetype}
+            {...state[NovaArchetype.CONVICTION]}
           />
-          <Grid item xs={12} sm={6} md={4}>
-            <ArchetypeCard
-              isLoading={isLoading}
-              activeArchetype={
-                props?.nova?.properties?.archetype?.default ===
-                NovaArchetype.PERFORMANCE
-              }
-              onSelect={updateArchetype}
-              {...state[NovaArchetype.PERFORMANCE]}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <ArchetypeCard
-              isLoading={isLoading}
-              activeArchetype={
-                props?.nova?.properties?.archetype?.default ===
-                NovaArchetype.GROWTH
-              }
-              onSelect={updateArchetype}
-              {...state[NovaArchetype.GROWTH]}
-            />
-          </Grid>
-          <Grid
-            display={{
-              xs: "none",
-              md: "inherit"
-            }}
-            item
-            xs={false}
-            sm={false}
-            md={2}
+
+          <ArchetypeCard
+            isLoading={isLoading}
+            activeArchetype={
+              props?.nova?.properties?.archetype?.default ===
+              NovaArchetype.PERFORMANCE
+            }
+            onSelect={updateArchetype}
+            {...state[NovaArchetype.PERFORMANCE]}
           />
-        </Grid>
+
+          <ArchetypeCard
+            isLoading={isLoading}
+            activeArchetype={
+              props?.nova?.properties?.archetype?.default ===
+              NovaArchetype.GROWTH
+            }
+            onSelect={updateArchetype}
+            {...state[NovaArchetype.GROWTH]}
+          />
+        </Box>
       </DialogContent>
       <DialogActions
         sx={{

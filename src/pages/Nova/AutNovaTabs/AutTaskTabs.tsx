@@ -2,7 +2,6 @@ import AutOsTabs from "@components/AutOsTabs";
 import { EmptyNovaOnboardingCards, NovaTasksGrid } from "../NovaDetails";
 import { useMemo } from "react";
 import Archetypes from "./Archetype/Archetype";
-import { useAccount } from "wagmi";
 
 interface AutTaskTabsProps {
   nova: any;
@@ -10,27 +9,15 @@ interface AutTaskTabsProps {
 }
 
 const AutTaskTabs = ({ nova, tasks }: AutTaskTabsProps) => {
-  const { address } = useAccount();
-  const canSetArchetype = useMemo(() => {
-    if (
-      nova?.properties?.userData?.isAdmin ||
-      address === nova?.properties?.deployer
-    ) {
-      return true;
-    }
-  }, [nova, address]);
-
   const tabs = useMemo(() => {
     const _tabs: any[] = [];
-    if (canSetArchetype) {
-      _tabs.push({
-        label: "Archetypes",
-        props: {
-          nova
-        },
-        component: Archetypes
-      });
-    }
+    _tabs.push({
+      label: "Archetypes",
+      props: {
+        nova
+      },
+      component: Archetypes
+    });
     if (tasks) {
       _tabs.push({
         label: "Tasks",
@@ -50,7 +37,7 @@ const AutTaskTabs = ({ nova, tasks }: AutTaskTabsProps) => {
       });
     }
     return _tabs;
-  }, [nova, tasks, canSetArchetype]);
+  }, [nova, tasks]);
 
   // useEffect(() => {
   //   console.log("novaDetails", novaDetails);
