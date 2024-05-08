@@ -116,7 +116,7 @@ export const DialogWrapper = ({
         {actions && (
           <DialogActions
             sx={{
-              backgroundColor: "background.default",
+              backgroundColor: "transparent",
               py: pxToRem(30),
               justifyContent: "center",
               height: pxToRem(120)

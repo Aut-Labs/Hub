@@ -60,7 +60,9 @@ const RoleCard = ({ role }) => {
         data: (data?.daos || []).find((d) => {
           return d.name === novaName;
         })
-      })
+      }),
+      refetchOnMountOrArgChange: true,
+      skip: !address
     }
   );
 

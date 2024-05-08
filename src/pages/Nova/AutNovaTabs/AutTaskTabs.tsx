@@ -29,15 +29,13 @@ const AutTaskTabs = ({ nova, tasks, selectedTab }: AutTaskTabsProps) => {
 
   const tabs = useMemo(() => {
     const _tabs: any[] = [];
-    if (canSetArchetype) {
-      _tabs.push({
-        label: "Archetypes",
-        props: {
-          nova
-        },
-        component: Archetypes
-      });
-    }
+    _tabs.push({
+      label: "Archetypes",
+      props: {
+        nova
+      },
+      component: Archetypes
+    });
     if (tasks) {
       _tabs.push({
         label: "Tasks",
@@ -57,7 +55,7 @@ const AutTaskTabs = ({ nova, tasks, selectedTab }: AutTaskTabsProps) => {
       });
     }
     return _tabs;
-  }, [nova, tasks, canSetArchetype]);
+  }, [nova, tasks]);
 
   return (
     <>

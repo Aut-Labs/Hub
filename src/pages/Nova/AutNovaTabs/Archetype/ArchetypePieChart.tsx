@@ -7,24 +7,12 @@ import {
   ResponsiveContainer,
   Sector
 } from "recharts";
-// import Size from "@assets/archetypes/people.png";
-// import Growth from "@assets/archetypes/seed.png";
-// import Performance from "@assets/archetypes/growth.png";
-// import Reputation from "@assets/archetypes/reputation-management.png";
-// import Conviction from "@assets/archetypes/deal.png";
 import {
   NovaArchetype,
   NovaArchetypeParameters
 } from "@aut-labs/sdk/dist/models/nova";
-import { ArchetypeTypes } from "@api/archetype.api";
-
-const nameShortcut = {
-  Size: "S",
-  Growth: "G",
-  Performance: "P",
-  Reputation: "R",
-  Conviction: "C"
-};
+import { ArchetypeTypes } from "@api/community.api";
+import { Box, Typography } from "@mui/material";
 
 const COLORS = ["#9BA1ED", "#272D76", "#4A3398", "#5C0E8D", "#2360EA"];
 const RADIAN = Math.PI / 180;
@@ -53,7 +41,7 @@ const renderCustomizedLabel = ({
       textAnchor="middle" // Change 'centre' to 'middle'
       dominantBaseline="middle" // Add this line
     >
-      {nameShortcut[name]}
+      {`${(percent * 100).toFixed(0)}%`}
     </text>
   );
 };
@@ -137,6 +125,38 @@ export const archetypeChartValues = (archetype: NovaArchetypeParameters) => {
   };
 };
 
+const CustomTooltip = ({ active, payload }) => {
+  console.log("CustomTooltip", active, payload);
+
+  const template = useMemo(() => {
+    if (!active || !payload || !payload.length) return null;
+
+    const {
+      name,
+      payload: { description }
+    } = payload[0];
+    return (
+      <Box
+        sx={{
+          borderRadius: "8px",
+          maxWidth: "220px",
+          boxShadow: 2,
+          background: "rgba(240, 245, 255, 0.4)",
+          backdropFilter: "blur(12px)",
+          padding: 2
+        }}
+      >
+        <Typography mb={1} variant="subtitle1">
+          {name}
+        </Typography>
+        <Typography variant="body">{description}</Typography>
+      </Box>
+    );
+  }, [active, payload]);
+
+  return template;
+};
+
 const ArchetypePieChart = ({
   archetype
 }: {
@@ -177,7 +197,7 @@ const ArchetypePieChart = ({
       <PieChart>
         <Pie
           activeIndex={activeIndex}
-          activeShape={renderActiveShape}
+          // activeShape={renderActiveShape}
           data={mappedData}
           cx="50%"
           cy="50%"
@@ -192,11 +212,102 @@ const ArchetypePieChart = ({
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
           ))}
         </Pie>
-        <Tooltip />
+        <Tooltip content={CustomTooltip} />
       </PieChart>
     </ResponsiveContainer>
   );
 };
+
+// const renderActiveShape = (props) => {
+//   const RADIAN = Math.PI / 180;
+//   const {
+//     cx,
+//     cy,
+//     midAngle,
+//     outerRadius,
+//     startAngle,
+//     endAngle,
+//     fill,
+//     payload,
+//     percent,
+//     value
+//   } = props;
+//   const sin = Math.sin(-RADIAN * midAngle);
+//   const cos = Math.cos(-RADIAN * midAngle);
+//   const sx = cx + (outerRadius + 10) * cos;
+//   const sy = cy + (outerRadius + 10) * sin;
+//   const mx = cx + (outerRadius + 30) * cos;
+//   const my = cy + (outerRadius + 30) * sin;
+//   const ex = mx + (cos >= 0 ? 1 : -1) * 22;
+//   const ey = my;
+//   const textAnchor = cos >= 0 ? "start" : "end";
+
+//   // Split description into lines
+//   const maxCharPerLine = 25; // Adjust as needed
+//   const words = payload?.description.split(" ");
+//   const lines = [];
+//   let currentLine = words[0];
+
+//   words.slice(1).forEach((word) => {
+//     if ((currentLine + " " + word).length > maxCharPerLine) {
+//       lines.push(currentLine);
+//       currentLine = word;
+//     } else {
+//       currentLine += " " + word;
+//     }
+//   });
+//   lines.push(currentLine); // Push the last line
+
+//   const lineHeight = 16; // Line height for text elements
+//   const backgroundPadding = 20; // Padding around text for background
+
+//   return (
+//     <g>
+//       <Sector
+//         cx={cx}
+//         cy={cy}
+//         outerRadius={outerRadius}
+//         startAngle={startAngle}
+//         endAngle={endAngle}
+//         fill={fill}
+//       />
+//       <Sector
+//         cx={cx}
+//         cy={cy}
+//         startAngle={startAngle}
+//         endAngle={endAngle}
+//         outerRadius={outerRadius + 6}
+//         fill={fill}
+//       />
+//       <path
+//         d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`}
+//         stroke={fill}
+//         fill="none"
+//       />
+//       <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
+//       {/* Background rectangle for text */}
+//       <rect
+//         x={ex + (cos >= 0 ? 1 : -1) * 12 - backgroundPadding}
+//         y={ey - lineHeight / 2 - backgroundPadding}
+//         width={maxCharPerLine * 6 + 2 * backgroundPadding} // Approximate width calculation
+//         height={lines.length * lineHeight + 2 * backgroundPadding}
+//         fill="rgba(255, 255, 255, 0.8)" // Semi-transparent white
+//       />
+//       {lines.map((line, index) => (
+//         <text
+//           key={index}
+//           x={ex + (cos >= 0 ? 1 : -1) * 12}
+//           y={ey + index * lineHeight}
+//           dy={18}
+//           textAnchor={textAnchor}
+//           fill="#333"
+//         >
+//           {line}
+//         </text>
+//       ))}
+//     </g>
+//   );
+// };
 
 const renderActiveShape = (props) => {
   const RADIAN = Math.PI / 180;
@@ -259,7 +370,7 @@ const renderActiveShape = (props) => {
         textAnchor={textAnchor}
         fill="#999"
       >
-        {`(Rate ${(percent * 100).toFixed(0)}%)`}
+        {payload?.description}
       </text>
     </g>
   );
