@@ -71,7 +71,7 @@ function App() {
                 <Routes>
                   <Route path="/:novaName?" element={<NovaList />} />
                   <Route path="callback" element={<Callback />} />
-                  <Route path="project/:novaName?" element={<NovaDetails />} />
+                  <Route path="project/:novaName" element={<NovaDetails />} />
                 </Routes>
               </Box>
             </>

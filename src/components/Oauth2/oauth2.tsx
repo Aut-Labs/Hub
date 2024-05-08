@@ -111,7 +111,7 @@ export const useOAuthSocials = () => {
 
     const callbackUrl = encodeURI(`${window.location.origin}/callback`);
     popupRef.current = openPopup(
-      `https://discord.com/oauth2/authorize?response_type=code&client_id=1080508975780474900&scope=identify%20guilds&state=15773059ghq9183habn&redirect_uri=${callbackUrl}&prompt=consent`
+      `https://discord.com/oauth2/authorize?client_id=1080508975780474900&response_type=code&redirect_uri=${callbackUrl}&scope=identify`
     ) as any;
 
     async function handleMessageListener(message) {
@@ -171,7 +171,7 @@ export const useOAuthSocials = () => {
 
     const callbackUrl = encodeURI(`${window.location.origin}/callback`);
     popupRef.current = openPopup(
-      `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=YWRmaEY4LU9aSkRXd2NoZlpiLVU6MTpjaQ&state=state&scope=tweet.read%20offline.access&redirect_uri=${callbackUrl}&code_challenge=challenge&code_challenge_method=plain`
+      `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=YTFySXpsSVZMblIxbGFSVzhGN1I6MTpjaQ&state=state&scope=tweet.read%20users.read%20offline.access&redirect_uri=${callbackUrl}&code_challenge=challenge&code_challenge_method=plain`
     ) as any;
 
     async function handleMessageListener(message) {
@@ -231,7 +231,7 @@ export const useOAuthSocials = () => {
 
     const callbackUrl = encodeURI(`${window.location.origin}/callback`);
     popupRef.current = openPopup(
-      `https://github.com/login/oauth/authorize?response_type=code&client_id=796be80cc5997ad5b9e6&state=state&scope=read:user&redirect_uri=${callbackUrl}`
+      `https://github.com/login/oauth/authorize?response_type=code&client_id=Ov23lipBiWk2FRfWdqla&state=state&scope=read:user&redirect_uri=${callbackUrl}`
     ) as any;
 
     async function handleMessageListener(message) {

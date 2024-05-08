@@ -3,6 +3,8 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import { SxProps, useTheme } from "@mui/material";
+import { useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
 
 interface AutOsTabParams {
   label: string | any;
@@ -52,6 +54,17 @@ function TabPanel(props: any) {
 function AutOsTabs(props: AutOsTabsParams) {
   const [value, setSelectedIndex] = React.useState(props.selectedTabIndex || 0);
   const theme = useTheme();
+
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    const tabValue = searchParams.get("tab");
+    if (tabValue === "archetype" && value == 1) {
+      setSelectedIndex(0);
+    } else if (tabValue === "roles" && value == 0) {
+      setSelectedIndex(0);
+    }
+  }, [searchParams]);
 
   const handleChange = (event: React.SyntheticEvent, index: number) => {
     setSelectedIndex(index);

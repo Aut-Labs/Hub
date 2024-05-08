@@ -10,8 +10,9 @@ import {
 import React, { useEffect, useState } from "react";
 import { AutOsButton } from "./AutButton";
 import {
-  useCheckHasMintedQuery,
-  useLazyCheckHasMintedQuery,
+  useCheckHasMintedForNovaQuery,
+  useGetAllNovasQuery,
+  useLazyCheckHasMintedForNovaQuery,
   useLazyCheckOnboardingAllowlistQuery
 } from "@api/community.api";
 import LoadingDialog from "./Dialog/LoadingPopup";
@@ -26,6 +27,7 @@ import { pulsate } from "./NovaCard";
 import { setSelectedRoleId } from "@store/WalletProvider/WalletProvider";
 import { useAppDispatch } from "@store/store.model";
 import { add } from "date-fns";
+import { useParams } from "react-router-dom";
 
 const roleIcons = {
   Creative: Creative,
@@ -39,6 +41,7 @@ const RoleCard = ({ role }) => {
   const { address, isConnected } = useAccount();
   const { open } = useWalletConnector();
   const dispatch = useAppDispatch();
+  const { novaName } = useParams();
 
   // const [
   //   checkOnboardingAllowlist,
@@ -46,14 +49,29 @@ const RoleCard = ({ role }) => {
   // ] = useLazyCheckOnboardingAllowlistQuery();
 
   const [checkHasMinted, { data: result, isLoading, isUninitialized }] =
-    useLazyCheckHasMintedQuery();
+    useLazyCheckHasMintedForNovaQuery();
 
-  const { isLoading: checkLoading, data: checkResult } = useCheckHasMintedQuery(
-    address,
+  const { data: nova } = useGetAllNovasQuery(
     {
-      skip: !address
+      connectedAddress: address
+    },
+    {
+      selectFromResult: ({ data }) => ({
+        data: (data?.daos || []).find((d) => {
+          return d.name === novaName;
+        })
+      })
     }
   );
+
+  const { isLoading: checkLoading, data: checkResult } =
+    useCheckHasMintedForNovaQuery(
+      { address, novaAddress: nova?.properties?.address },
+      {
+        skip: !address || !nova
+      }
+    );
+
   const handleClick = async () => {
     await dispatch(setSelectedRoleId(role?.id));
     if (result && !result?.hasMinted && isConnected) {
@@ -65,19 +83,19 @@ const RoleCard = ({ role }) => {
         addressToVerify = state?.address;
       }
 
-      await checkHasMinted(addressToVerify);
+      await checkHasMinted({ address, novaAddress: nova?.properties?.address });
     }
   };
 
-  const handleDialogClose = () => {
-    console.log("Verify task close");
-  };
+  // const handleDialogClose = () => {
+  //   console.log("Verify task close");
+  // };
 
-  useEffect(() => {
-    // if (isUninitialized && address) {
-    //   checkOnboardingAllowlist(address);
-    // }
-  }, [isUninitialized, address]);
+  // useEffect(() => {
+  //   // if (isUninitialized && address) {
+  //   //   checkOnboardingAllowlist(address);
+  //   // }
+  // }, [isUninitialized, address]);
 
   useEffect(() => {
     if (result && result?.hasMinted) {
@@ -137,7 +155,7 @@ const RoleCard = ({ role }) => {
           },
           display: "flex",
           flexDirection: "column",
-          animation: `${pulsate} 2s infinite`
+          animation: checkResult?.hasMinted ? "none" : `${pulsate} 2s infinite`
         }}
       >
         <Stack direction="row" justifyContent="center" display="flex">
@@ -197,44 +215,47 @@ const RoleCard = ({ role }) => {
               Join
             </Typography>
           </AutOsButton> */}
-          <Tooltip title={"Already claimed another role."}>
-            <>
-              <AutOsButton
-                sx={{
-                  mt: "24px",
-                  bgcolor: "transparent",
-                  "&.MuiButton-root": {
-                    background: "linear-gradient(#244AFF, #1BB8FF)",
-                    transition: theme.transitions.create([
-                      "border-color",
-                      "background",
-                      "color"
-                    ]),
-                    "&:hover": {
-                      background: "linear-gradient(#2037e0, #17a1e0)"
-                    },
-                    ...(checkResult?.hasMinted &&
-                      checkResult?.role == role?.id && {
-                        background: (theme) => theme.palette.success.main,
-                        "&:hover": {
-                          background: (theme) => theme.palette.success.main
-                        }
-                      })
-                  }
-                }}
-                onClick={() => handleClick()}
-                disabled={checkResult?.hasMinted || checkLoading}
-              >
-                <Typography variant="body" fontWeight="normal" color="white">
-                  {checkResult?.role == role?.id
-                    ? "Current Role"
-                    : checkResult?.hasMinted
-                      ? "Unavailable"
-                      : "Join"}
-                </Typography>
-              </AutOsButton>
-            </>
-          </Tooltip>
+          <>
+            <AutOsButton
+              sx={{
+                mt: "24px",
+                bgcolor: "transparent",
+                "&.MuiButton-root": {
+                  background: "linear-gradient(#244AFF, #1BB8FF)",
+                  transition: theme.transitions.create([
+                    "border-color",
+                    "background",
+                    "color"
+                  ]),
+                  "&:hover": {
+                    background: "linear-gradient(#2037e0, #17a1e0)"
+                  },
+                  ...(checkResult?.hasMinted &&
+                    checkResult?.hasMintedForNova &&
+                    checkResult?.role == role?.id && {
+                      background: (theme) => theme.palette.success.main,
+                      "&:hover": {
+                        background: (theme) => theme.palette.success.main
+                      }
+                    })
+                }
+              }}
+              onClick={() => handleClick()}
+              disabled={
+                checkResult?.hasMinted ||
+                checkLoading ||
+                !checkResult?.hasMintedForNova
+              }
+            >
+              <Typography variant="body" fontWeight="normal" color="white">
+                {checkResult?.role == role?.id && checkResult?.hasMintedForNova
+                  ? "Current Role"
+                  : checkResult?.hasMinted
+                    ? "Unavailable"
+                    : "Join"}
+              </Typography>
+            </AutOsButton>
+          </>
         </Stack>
       </Box>
     </>

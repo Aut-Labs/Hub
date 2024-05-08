@@ -103,7 +103,7 @@ export const NovaList = () => {
             flexDirection: isMobile ? "column" : "row"
           }}
         >
-          <AutSelectField
+          {/* <AutSelectField
             value={activeOnboardingFilter}
             color="offWhite"
             defaultValue={""}
@@ -129,7 +129,7 @@ export const NovaList = () => {
             <MenuItem value="Inactive">
               <em>Inactive</em>
             </MenuItem>
-          </AutSelectField>
+          </AutSelectField> */}
           <AutSelectField
             value={marketFilter}
             color="offWhite"

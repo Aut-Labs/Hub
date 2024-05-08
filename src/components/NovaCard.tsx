@@ -17,6 +17,7 @@ import { Markets } from "@api/community.api";
 import { ReactComponent as Check } from "@assets/autos/check.svg";
 import { ArchetypeTypes } from "@api/archetype.api";
 import { MarketTemplates } from "@api/community.model";
+import { useAccount } from "wagmi";
 
 const getRoleName = (daoData, quest) => {
   const role = daoData.properties.rolesSets[0].roles.find(
@@ -146,6 +147,7 @@ export const NovaCard = ({
   const navigate = useNavigate();
   const [isFlipped, setFlipped] = useState(false);
   const [hasTimePassed, setHasTimePassed] = useState(false);
+  const { address } = useAccount();
 
   const selectedArchetype = useMemo(() => {
     if (!daoData?.properties?.archetype?.default) {
@@ -289,7 +291,7 @@ export const NovaCard = ({
               sx={{
                 display: "flex",
                 gap: "12px",
-                justifyContent: "flex-end",
+                justifyContent: "center",
                 alignItems: "center"
               }}
               marginTop="auto"
@@ -538,6 +540,10 @@ export const NovaCard = ({
             borderRadius: "9px",
             width: "100%",
             mt: "24px",
+            animation:
+              daoData.properties.members == 0
+                ? `${pulsate} 2s infinite`
+                : "none",
             boxShadow:
               "0px 4px 5px -2px rgba(0,0,0,0.2), 0px 7px 10px 1px rgba(0,0,0,0.14), 0px 2px 16px 1px rgba(0,0,0,0.12)"
           }}
@@ -545,10 +551,16 @@ export const NovaCard = ({
           size="normal"
           color="offWhite"
           onClick={() => {
-            navigate(`/project/${daoData.name}`);
+            navigate(`/project/${daoData.name}?tab=archetype`);
           }}
         >
-          Join
+          {daoData?.properties?.members === 0
+            ? daoData?.properties?.deployer === address.toLowerCase()
+              ? "Verify"
+              : "Join"
+            : daoData?.properties?.deployer === address.toLowerCase()
+              ? "Verified"
+              : "Join"}
         </SeeQuestButton>
       </div>
     </div>

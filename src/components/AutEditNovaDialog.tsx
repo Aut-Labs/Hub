@@ -457,7 +457,7 @@ export function AutEditNovaDialog(props: EditDialogProps) {
                                     async (data) => {
                                       const { access_token } = data;
                                       const response = await fetch(
-                                        "https://api.twitter.com/1.1/account/verify_credentials.json",
+                                        "https://api.twitter.com/2/users/me",
                                         {
                                           headers: {
                                             Authorization: `Bearer ${access_token}`

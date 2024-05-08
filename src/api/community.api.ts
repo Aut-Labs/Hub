@@ -124,6 +124,7 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
       } as unknown as Community);
       enrichedNovae.push(enrichedNova);
     }
+    // url name novae first
     enrichedNovae.sort((a, b) => {
       if (a.name === body?.novaName) {
         return -1;
@@ -133,6 +134,7 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
         return 0;
       }
     });
+    // connected address novae first
     enrichedNovae.sort((a, b) => {
       if (a.properties.deployer === body?.connectedAddress) {
         return -1;
@@ -156,6 +158,17 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
           nova?.properties?.archetype?.default === Number(body?.archetypeFilter)
       );
     }
+    // 0 members first
+    filteredNovae.sort((a, b) => {
+      if (a.properties.members === 0 && b.properties.members !== 0) {
+        return -1;
+      } else if (a.properties.members !== 0 && b.properties.members === 0) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+
     return {
       data: { daos: filteredNovae }
     };
@@ -277,14 +290,22 @@ const checkOnboardingAllowlist = async (address: string, api: BaseQueryApi) => {
   };
 };
 
-const checkHasMinted = async (address: string, api: BaseQueryApi) => {
+interface CheckMintedParams {
+  address: string;
+  novaAddress: string;
+}
+
+const checkHasMintedForNova = async (
+  body: CheckMintedParams,
+  api: BaseQueryApi
+) => {
   const sdk = AutSDK.getInstance();
   const state: RootState = api.getState() as RootState;
   const network: NetworkConfig = state.walletProvider.selectedNetwork;
 
   const query = gql`
   query GetAutID {
-    autID(id: "${address.toLowerCase()}") {
+    autID(id: "${body.address.toLowerCase()}" novaAddress: "${body.novaAddress.toLowerCase()}") {
       id
       username
       tokenID
@@ -302,7 +323,13 @@ const checkHasMinted = async (address: string, api: BaseQueryApi) => {
   const autID = response?.data?.autID;
 
   return {
-    data: { hasMinted: !!autID, role: autID?.role }
+    data: {
+      hasMinted: !!autID,
+      hasMintedForNova:
+        autID?.novaAddress?.toLowerCase() === body?.novaAddress?.toLowerCase(),
+
+      role: autID?.role
+    }
   };
 };
 
@@ -380,7 +407,7 @@ export const communityApi = createApi({
       return checkOnboardingAllowlist(body, api);
     }
     if (url === "checkHasMinted") {
-      return checkHasMinted(body, api);
+      return checkHasMintedForNova(body, api);
     }
 
     if (url === "updateNova") {
@@ -449,12 +476,13 @@ export const communityApi = createApi({
         };
       }
     }),
-    checkHasMinted: builder.query<
+    checkHasMintedForNova: builder.query<
       {
         hasMinted: boolean;
         role: string;
+        hasMintedForNova: boolean;
       },
-      string
+      CheckMintedParams
     >({
       query: (body) => {
         return {
@@ -565,8 +593,8 @@ export const communityApi = createApi({
 });
 
 export const {
-  useLazyCheckHasMintedQuery,
-  useCheckHasMintedQuery,
+  useLazyCheckHasMintedForNovaQuery,
+  useCheckHasMintedForNovaQuery,
   useGetAllMembersQuery,
   useGetCommunityQuery,
   useSetArchetypeMutation,

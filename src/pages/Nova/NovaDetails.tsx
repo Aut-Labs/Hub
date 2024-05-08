@@ -22,7 +22,7 @@ import CalendarIcon from "@assets/icons/calendar.png";
 
 import {
   Markets,
-  useCheckHasMintedQuery,
+  useCheckHasMintedForNovaQuery,
   useGetAllNovasQuery,
   useGetNovaTasksQuery
 } from "@api/community.api";
@@ -238,14 +238,6 @@ const NovaDetails = () => {
   const { novaName } = useParams();
   const { address } = useAccount();
 
-  const {
-    data: result,
-    isLoading,
-    isUninitialized
-  } = useCheckHasMintedQuery(address, {
-    skip: !address
-  });
-
   const { data: nova } = useGetAllNovasQuery(
     {
       connectedAddress: address
@@ -256,6 +248,17 @@ const NovaDetails = () => {
           return d.name === novaName;
         })
       })
+    }
+  );
+
+  const {
+    data: result,
+    isLoading,
+    isUninitialized
+  } = useCheckHasMintedForNovaQuery(
+    { address, novaAddress: nova?.properties?.address },
+    {
+      skip: !address || !nova
     }
   );
 
@@ -289,6 +292,9 @@ const NovaDetails = () => {
   const { data: tasks } = useGetNovaTasksQuery(nova?.properties.address, {
     skip: !nova?.properties.address
   });
+
+  const [searchParams] = useSearchParams();
+  const selectedTab = searchParams.get("tab") === "archetype" ? 0 : 1;
 
   const handleDialogClose = () => {};
 
@@ -696,7 +702,7 @@ const NovaDetails = () => {
                     lineHeight={1}
                     variant="caption"
                   >
-                    {`Joined ${parsedTimeStamp}`}
+                    {`Created on ${parsedTimeStamp}`}
                   </Typography>
                 </Box>
 
@@ -727,7 +733,11 @@ const NovaDetails = () => {
             </LeftWrapper>
             <RightWrapper>
               {!!tasks && !!nova && (
-                <AutTaskTabs nova={nova} tasks={tasks.tasks} />
+                <AutTaskTabs
+                  nova={nova}
+                  tasks={tasks.tasks}
+                  selectedTab={selectedTab}
+                />
               )}
             </RightWrapper>
           </AutContainer>
