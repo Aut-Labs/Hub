@@ -153,7 +153,7 @@ export function AutEditNovaDialog(props: EditDialogProps) {
   //TODO: watch out!! the index of each icon should match the socials in the nova.properties!
   const socialIcons = {
     discord: DiscordIcon,
-    // eth: null,
+    eth: null,
     twitter: TwitterIcon,
     github: GitHubIcon
     // telegram: TelegramIcon,
