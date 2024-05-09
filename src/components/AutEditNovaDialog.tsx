@@ -162,10 +162,7 @@ export function AutEditNovaDialog(props: EditDialogProps) {
 
   const filteredSocials =
     (props.nova as Community)?.properties?.socials?.filter(
-      (social) =>
-        social.type !== "telegram" &&
-        social.type !== "lensfrens" &&
-        social.type !== "ens"
+      (social) => social.type !== "telegram" && social.type !== "lensfrens"
     ) || [];
 
   function displaySocialUsername(value, field) {
