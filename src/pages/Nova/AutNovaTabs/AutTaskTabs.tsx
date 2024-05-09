@@ -15,7 +15,7 @@ const AutTaskTabs = ({ nova, tasks, selectedTab }: AutTaskTabsProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const handleTabChange = (index: number) => {
     const tabRoute = index === 0 ? "archetype" : "roles";
-    setSearchParams({ tab: tabRoute });
+    setSearchParams({ tab: tabRoute }, { replace: true });
   };
   const { address } = useAccount();
   const canSetArchetype = useMemo(() => {

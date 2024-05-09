@@ -150,19 +150,22 @@ export function AutEditNovaDialog(props: EditDialogProps) {
   const navigate = useNavigate();
   const isAuthenticated = useSelector(IsAuthenticated);
   const [editInitiated, setEditInitiated] = useState(false);
-
+  //TODO: watch out!! the index of each icon should match the socials in the nova.properties!
   const socialIcons = {
-    // eth: EthIcon,
     discord: DiscordIcon,
-    github: GitHubIcon,
-    twitter: TwitterIcon
+    // eth: null,
+    twitter: TwitterIcon,
+    github: GitHubIcon
     // telegram: TelegramIcon,
     // lensfrens: LensfrensIcon
   };
 
   const filteredSocials =
     (props.nova as Community)?.properties?.socials?.filter(
-      (social) => social.type !== "telegram" && social.type !== "lensfrens"
+      (social) =>
+        social.type !== "telegram" &&
+        social.type !== "lensfrens" &&
+        social.type !== "ens"
     ) || [];
 
   function displaySocialUsername(value, field) {
@@ -479,7 +482,10 @@ export function AutEditNovaDialog(props: EditDialogProps) {
                                     }
                                   );
                                 }
+
+                                debugger;
                                 if (field.type === "github") {
+                                  debugger;
                                   getAuthGithub(
                                     async (data) => {
                                       const { access_token } = data;

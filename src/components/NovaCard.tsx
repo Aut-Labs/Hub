@@ -550,7 +550,6 @@ export const NovaCard = ({
           size="normal"
           color="offWhite"
           onClick={() => {
-            debugger;
             if (daoData?.properties?.deployer === address.toLowerCase()) {
               navigate(`/project/${daoData.name}?tab=roles`);
             } else {

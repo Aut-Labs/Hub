@@ -622,7 +622,6 @@ export const communityApi = createApi({
       onQueryStarted: async (arg, { dispatch, queryFulfilled, getState }) => {
         try {
           const result = await queryFulfilled;
-          debugger;
           const updatedNova: Community = result.data;
           const allQueries = getState().communityApi.queries;
           Object.entries(allQueries).forEach(([queryKey, queryValue]) => {

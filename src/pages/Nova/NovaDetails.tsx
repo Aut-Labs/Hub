@@ -20,7 +20,6 @@ import CopyAddress from "@components/CopyAddress";
 import CalendarIcon from "@assets/icons/calendar.png";
 
 import {
-  Markets,
   useCheckHasMintedForNovaQuery,
   ArchetypeTypes,
   useGetAllNovasQuery,
@@ -260,7 +259,7 @@ const NovaDetails = () => {
 
   const {
     data: result,
-    isLoading,
+    isLoading: checkingIfMinted,
     isUninitialized
   } = useCheckHasMintedForNovaQuery(
     { address, novaAddress: nova?.properties?.address },
@@ -385,7 +384,7 @@ const NovaDetails = () => {
           flexDirection: "column"
         }}
       >
-        {nova ? (
+        {!!nova && !checkingIfMinted ? (
           <AutContainer>
             <LeftWrapper>
               <Stack

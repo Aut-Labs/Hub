@@ -227,7 +227,7 @@ export const NovaList = () => {
             }
           >
             <MenuItem value="">
-              <em>Archetype</em>
+              <em>All Archetypes</em>
             </MenuItem>
             <MenuItem value="1">
               <em>Size</em>

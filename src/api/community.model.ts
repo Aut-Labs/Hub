@@ -9,10 +9,10 @@ import {
 import { AutSocial } from "./api.model";
 import { Quest } from "@aut-labs/sdk";
 import { ReactComponent as OpenSource } from "@assets/icons/opensource.svg";
-import { ReactComponent as ArtEvents } from "@assets/icons/artevents.svg";
+import { ReactComponent as Defi } from "@assets/icons/defi.svg";
 import { ReactComponent as Social } from "@assets/icons/social.svg";
 import { ReactComponent as Refi } from "@assets/icons/refi.svg";
-import { ReactComponent as Check } from "@assets/autos/check.svg";
+import { ReactComponent as Identity } from "@assets/icons/identity.svg";
 
 export const MarketTemplates = [
   {
@@ -23,22 +23,22 @@ export const MarketTemplates = [
   {
     title: "DeFi & Payments",
     market: 2,
-    icon: ArtEvents
+    icon: Defi
   },
   {
     title: "ReFi & Governance",
     market: 3,
-    icon: Social
+    icon: Refi
   },
   {
     title: "Social, Art & Gaming",
     market: 4,
-    icon: Refi
+    icon: Social
   },
   {
     title: "Identity & Reputation",
     market: 5,
-    icon: Check
+    icon: Identity
   }
 ];
 
