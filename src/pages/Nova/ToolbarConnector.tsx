@@ -17,7 +17,7 @@ export const ToolbarConnector = () => {
   const connectDisconnectToggle = async () => {
     if (isConnected) {
       disconnect();
-      dispatch(communityApi.util.invalidateTags(["hasMinted"]));
+      await dispatch(communityApi.util.invalidateTags(["hasMinted"]));
     } else {
       open();
     }

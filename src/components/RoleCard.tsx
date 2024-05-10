@@ -10,6 +10,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { AutOsButton } from "./AutButton";
 import {
+  communityApi,
   useCheckHasMintedForNovaQuery,
   useGetAllNovasQuery,
   useLazyCheckHasMintedForNovaQuery,
@@ -43,14 +44,6 @@ const RoleCard = ({ role }) => {
   const dispatch = useAppDispatch();
   const { novaName } = useParams();
 
-  // const [
-  //   checkOnboardingAllowlist,
-  //   { data: result, isLoading, isUninitialized }
-  // ] = useLazyCheckOnboardingAllowlistQuery();
-
-  const [checkHasMinted, { data: result, isLoading, isUninitialized }] =
-    useLazyCheckHasMintedForNovaQuery();
-
   const { data: nova } = useGetAllNovasQuery(
     {
       connectedAddress: address
@@ -61,10 +54,13 @@ const RoleCard = ({ role }) => {
           return d.name === novaName;
         })
       }),
-      refetchOnMountOrArgChange: true,
-      skip: !address
+      refetchOnMountOrArgChange: true
+      // skip: !address
     }
   );
+
+  const [checkHasMinted, { data: lazyCheckResult, isLoading }] =
+    useLazyCheckHasMintedForNovaQuery();
 
   const { isLoading: checkLoading, data: checkResult } =
     useCheckHasMintedForNovaQuery(
@@ -76,7 +72,7 @@ const RoleCard = ({ role }) => {
 
   const handleClick = async () => {
     await dispatch(setSelectedRoleId(role?.id));
-    if (result && !result?.hasMinted && isConnected) {
+    if (lazyCheckResult && !lazyCheckResult?.hasMinted && isConnected) {
       handleMint();
     } else {
       let addressToVerify = address as string;
@@ -85,7 +81,12 @@ const RoleCard = ({ role }) => {
         addressToVerify = state?.address;
       }
 
-      await checkHasMinted({ address, novaAddress: nova?.properties?.address });
+      debugger;
+      await checkHasMinted({
+        address: addressToVerify,
+        novaAddress: nova?.properties?.address
+      });
+      dispatch(communityApi.util.invalidateTags(["hasMinted"]));
     }
   };
 
@@ -100,12 +101,15 @@ const RoleCard = ({ role }) => {
   // }, [isUninitialized, address]);
 
   useEffect(() => {
-    if (result && result?.hasMinted) {
-      // setOpenSuccess(true);
-    } else if (result && !result?.hasMinted) {
+    debugger;
+    if (lazyCheckResult && lazyCheckResult?.hasMinted) {
+      debugger;
+      // already minted
+    } else if (lazyCheckResult && !lazyCheckResult?.hasMinted) {
+      debugger;
       handleMint();
     }
-  }, [isLoading, result]);
+  }, [lazyCheckResult]);
 
   const handleMint = async () => {
     setOpenSuccess(false);
@@ -115,6 +119,7 @@ const RoleCard = ({ role }) => {
       bubbles: true
       // detail: payload
     });
+    debugger;
     window.dispatchEvent(event);
   };
 
@@ -244,9 +249,8 @@ const RoleCard = ({ role }) => {
               }}
               onClick={() => handleClick()}
               disabled={
-                checkResult?.hasMinted ||
-                checkLoading ||
-                !checkResult?.hasMintedForNova
+                (checkLoading || !!checkResult) &&
+                (checkResult?.hasMinted || checkResult?.hasMintedForNova)
               }
             >
               <Typography variant="body" fontWeight="normal" color="white">
@@ -255,6 +259,11 @@ const RoleCard = ({ role }) => {
                   : checkResult?.hasMinted
                     ? "Unavailable"
                     : "Join"}
+                {/* {checkResult?.role == role?.id && checkResult?.hasMintedForNova
+                  ? "Current Role"
+                  : checkResult?.hasMinted
+                    ? "Unavailable"
+                    : "Join"} */}
               </Typography>
             </AutOsButton>
           </>

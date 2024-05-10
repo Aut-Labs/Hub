@@ -373,7 +373,6 @@ const checkHasMintedForNova = async (
   const response = await apolloClient.query<any>({
     query
   });
-
   const autID = response?.data?.autID;
 
   return {
