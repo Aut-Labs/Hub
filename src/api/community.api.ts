@@ -359,7 +359,7 @@ const checkHasMintedForNova = async (
 
   const query = gql`
   query GetAutID {
-    autID(id: "${body.address.toLowerCase()}" novaAddress: "${body.novaAddress.toLowerCase()}") {
+    autID(id: "${body?.address?.toLowerCase()}" novaAddress: "${body?.novaAddress?.toLowerCase()}") {
       id
       username
       tokenID

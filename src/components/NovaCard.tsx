@@ -550,7 +550,7 @@ export const NovaCard = ({
           size="normal"
           color="offWhite"
           onClick={() => {
-            if (daoData?.properties?.deployer === address.toLowerCase()) {
+            if (daoData?.properties?.deployer === address?.toLowerCase()) {
               navigate(`/project/${daoData.name}?tab=roles`);
             } else {
               navigate(`/project/${daoData.name}?tab=archetype`);
@@ -558,10 +558,10 @@ export const NovaCard = ({
           }}
         >
           {daoData?.properties?.members === 0
-            ? daoData?.properties?.deployer === address.toLowerCase()
+            ? daoData?.properties?.deployer === address?.toLowerCase()
               ? "Verify"
               : "Join"
-            : daoData?.properties?.deployer === address.toLowerCase()
+            : daoData?.properties?.deployer === address?.toLowerCase()
               ? "Verified"
               : "Join"}
         </SeeQuestButton>
