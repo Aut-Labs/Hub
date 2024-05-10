@@ -30,12 +30,6 @@ import { useAppDispatch } from "@store/store.model";
 import { add } from "date-fns";
 import { useParams } from "react-router-dom";
 
-const roleIcons = {
-  Creative: Creative,
-  Tech: Tech,
-  Community: Community
-};
-
 const RoleCard = ({ role }) => {
   const [openSuccess, setOpenSuccess] = useState(false);
   const [openError, setOpenError] = useState(false);
@@ -66,7 +60,8 @@ const RoleCard = ({ role }) => {
     useCheckHasMintedForNovaQuery(
       { address, novaAddress: nova?.properties?.address },
       {
-        skip: !address || !nova
+        skip: !nova,
+        refetchOnMountOrArgChange: true
       }
     );
 
@@ -80,13 +75,15 @@ const RoleCard = ({ role }) => {
         const state = await open();
         addressToVerify = state?.address;
       }
-
-      debugger;
-      await checkHasMinted({
+      const result = await checkHasMinted({
         address: addressToVerify,
         novaAddress: nova?.properties?.address
       });
-      dispatch(communityApi.util.invalidateTags(["hasMinted"]));
+      if (result?.data && result?.data?.hasMinted) {
+        setOpenError(true);
+      } else if (result?.data && !result?.data?.hasMinted) {
+        handleMint();
+      }
     }
   };
 
@@ -100,16 +97,13 @@ const RoleCard = ({ role }) => {
   //   // }
   // }, [isUninitialized, address]);
 
-  useEffect(() => {
-    debugger;
-    if (lazyCheckResult && lazyCheckResult?.hasMinted) {
-      debugger;
-      // already minted
-    } else if (lazyCheckResult && !lazyCheckResult?.hasMinted) {
-      debugger;
-      handleMint();
-    }
-  }, [lazyCheckResult]);
+  // useEffect(() => {
+  //   if (lazyCheckResult && lazyCheckResult?.hasMinted) {
+  //     setOpenError(true);
+  //   } else if (lazyCheckResult && !lazyCheckResult?.hasMinted) {
+  //     handleMint();
+  //   }
+  // }, [lazyCheckResult]);
 
   const handleMint = async () => {
     setOpenSuccess(false);
@@ -119,7 +113,6 @@ const RoleCard = ({ role }) => {
       bubbles: true
       // detail: payload
     });
-    debugger;
     window.dispatchEvent(event);
   };
 

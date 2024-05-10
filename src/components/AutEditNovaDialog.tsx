@@ -483,7 +483,6 @@ export function AutEditNovaDialog(props: EditDialogProps) {
                                   );
                                 }
                                 if (field.type === "github") {
-                                  debugger;
                                   getAuthGithub(
                                     async (data) => {
                                       const { access_token } = data;
