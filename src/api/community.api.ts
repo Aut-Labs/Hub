@@ -83,7 +83,7 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
   try {
     const fetchNovas = gql`
       query GetNovas {
-        novaDAOs(skip: 0, first: 100) {
+        novaDAOs(skip: 0, first: 10000) {
           id
           deployer
           address
@@ -96,7 +96,7 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
 
     const fetchAutIds = gql`
       query GetAutIds {
-        autIDs(skip: 0, first: 100) {
+        autIDs(skip: 0, first: 10000) {
           novaAddress
         }
       }
