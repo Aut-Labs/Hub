@@ -51,7 +51,7 @@ const AutWallet = () => {
     network: NetworkConfig,
     multiSigner: MultiSigner
   ) => {
-    const sdk = await AutSDK.getInstance();
+    const sdk = await AutSDK.getInstance(false);
     return sdk.init(multiSigner, {
       novaAddress: novaAddress,
       daoTypesAddress: network.contracts.daoTypesAddress,

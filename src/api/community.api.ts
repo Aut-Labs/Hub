@@ -81,9 +81,9 @@ interface Filters {
 }
 const getAllNovas = async (body: any, api: BaseQueryApi) => {
   try {
-    const fetchNovas = gql`
-      query GetNovas {
-        novaDAOs(skip: 0, first: 100) {
+    const fetch = gql`
+      query GetNovasAndAutIds {
+        novaDAOs(skip: 0, first: 10000) {
           id
           deployer
           address
@@ -91,143 +91,72 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
           metadataUri
           minCommitment
         }
-      }
-    `;
-
-    const fetchAutIds = gql`
-      query GetAutIds {
-        autIDs(skip: 0, first: 100) {
+        autIDs(skip: 0, first: 10000) {
+          id
           novaAddress
         }
       }
     `;
 
-    const novaeResponse = await apolloClient.query<any>({ query: fetchNovas });
-    const autIdsResponse = await apolloClient.query<any>({
-      query: fetchAutIds,
-      variables: {}
-    });
+    const response = await apolloClient.query<any>({ query: fetch });
+    const { novaDAOs, autIDs } = response.data;
 
-    const { novaDAOs } = novaeResponse.data;
+    let isAdminForNovaAddress = null;
+    if (body?.connectedAddress) {
+      const sdk = await AutSDK.getInstance();
 
-    const enrichedNovae = [];
+      const foundAutID = autIDs.find(
+        (a) => a.id?.toLowerCase() === body?.connectedAddress?.toLowerCase()
+      );
 
-    for (let i = 0; i < novaDAOs.length; i++) {
-      const novaDAO = novaDAOs[i];
+      if (foundAutID) {
+        const nova = sdk.initService<Nova>(Nova, foundAutID.novaAddress);
+        const isAdmin = await nova.contract.functions.isAdmin(
+          body?.connectedAddress.toLowerCase()
+        );
+
+        if (isAdmin) {
+          isAdminForNovaAddress = foundAutID.novaAddress;
+        }
+      }
+    }
+
+    const fetchAndConstructCommunity = async (novaDAO) => {
       const novaMetadata = await fetchMetadata<any>(
         novaDAO.metadataUri,
         environment.ipfsGatewayUrl
       );
-      //TODO: Fix archetypes and find AV
-      let isAdmin = false;
 
-      if (body?.connectedAddress) {
-        const sdk = await AutSDK.getInstance();
-        const nova: Nova = sdk.initService<Nova>(Nova, novaDAO.address);
-        isAdmin = await nova.contract.functions.isAdmin(
-          body?.connectedAddress.toLowerCase()
-        );
-      }
-      const enrichedNova = new Community({
+      const communityProperties = {
+        ...novaMetadata.properties,
+        market: +novaDAO.market - 1,
+        roles: novaMetadata.properties.rolesSets[0].roles,
+        absoluteValue: Math.floor(Math.random() * 100) + 1,
+        prestige: 100,
+        isAdmin: novaDAO.address === isAdminForNovaAddress,
+        members: autIDs.filter((a) => a.novaAddress === novaDAO.address).length,
+        address: novaDAO.address,
+        deployer: novaDAO.deployer
+      };
+
+      return new Community({
         ...novaDAO,
         ...novaMetadata,
-        properties: {
-          ...novaMetadata.properties,
-          market: +novaDAO.market - 1,
-          roles: novaMetadata.properties.rolesSets[0].roles,
-          absoluteValue: Math.floor(Math.random() * 100) + 1,
-          prestige: 100,
-          isAdmin,
-          members: autIdsResponse.data.autIDs.filter(
-            (a) => a.novaAddress === novaDAO.address
-          ).length,
-          address: novaDAO.address,
-          deployer: novaDAO.deployer
-        }
+        properties: communityProperties
       } as unknown as Community);
-      enrichedNovae.push(enrichedNova);
-    }
-    // enrichedNovae.sort((a, b) => {
-    //   if (a.name === body?.novaName) {
-    //     return -1;
-    //   } else if (b.name === body?.novaName) {
-    //     return 1;
-    //   } else {
-    //     return 0;
-    //   }
-    // });
-    // enrichedNovae.sort((a, b) => {
-    //   if (a.properties.deployer === body?.connectedAddress) {
-    //     return -1;
-    //   } else if (b.properties.deployer === body?.connectedAddress) {
-    //     return 1;
-    //   } else {
-    //     return 0;
-    //   }
-    // });
+    };
 
-    // let filteredNovae = enrichedNovae.filter((nova) => {
-    //   return (
-    //     nova.properties.members >= 1 ||
-    //     nova.properties.deployer?.toLowerCase() ===
-    //       body?.connectedAddress?.toLowerCase()
-    //   );
-    // });
-    // if (body.archetypeFilter) {
-    //   filteredNovae = filteredNovae.filter(
-    //     (nova) =>
-    //       nova?.properties?.archetype?.default === Number(body?.archetypeFilter)
-    //   );
-    // }
+    const promises = novaDAOs.map((novaDAO) =>
+      fetchAndConstructCommunity(novaDAO)
+    );
 
-    // old sorting
-    // enrichedNovae.sort((a, b) => {
-    //   if (a.name === body?.novaName) {
-    //     return -1;
-    //   } else if (b.name === body?.novaName) {
-    //     return 1;
-    //   } else {
-    //     return 0;
-    //   }
-    // });
-    // // connected address novae first
-    // enrichedNovae.sort((a, b) => {
-    //   if (a.properties.deployer === body?.connectedAddress) {
-    //     return -1;
-    //   } else if (b.properties.deployer === body?.connectedAddress) {
-    //     return 1;
-    //   } else {
-    //     return 0;
-    //   }
-    // });
+    const enrichedNovae = await Promise.all(promises);
 
-    // let filteredNovae = enrichedNovae.filter((nova) => {
-    //   return (
-    //     nova.properties.members >= 1 ||
-    //     nova.properties.deployer?.toLowerCase() ===
-    //       body?.connectedAddress?.toLowerCase()
-    //   );
-    // });
-    // if (body.archetypeFilter) {
-    //   filteredNovae = filteredNovae.filter(
-    //     (nova) =>
-    //       nova?.properties?.archetype?.default === Number(body?.archetypeFilter)
-    //   );
-    // }
-    // // 0 members first
-    // filteredNovae.sort((a, b) => {
-    //   if (a.properties.members === 0 && b.properties.members !== 0) {
-    //     return -1;
-    //   } else if (a.properties.members !== 0 && b.properties.members === 0) {
-    //     return 1;
-    //   } else {
-    //     return 0;
-    //   }
-    // });
     return {
       data: { daos: enrichedNovae }
     };
   } catch (e) {
+    debugger;
     return {
       error: e
     };
@@ -353,9 +282,7 @@ const checkHasMintedForNova = async (
   body: CheckMintedParams,
   api: BaseQueryApi
 ) => {
-  const sdk = AutSDK.getInstance();
   const state: RootState = api.getState() as RootState;
-  const network: NetworkConfig = state.walletProvider.selectedNetwork;
 
   const query = gql`
   query GetAutID {

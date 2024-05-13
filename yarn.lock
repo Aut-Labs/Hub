@@ -88,10 +88,10 @@
   dependencies:
     "@tanstack/react-query" "^5.18.1"
 
-"@aut-labs/sdk@^0.0.159-dev":
-  version "0.0.159-dev"
-  resolved "https://registry.yarnpkg.com/@aut-labs/sdk/-/sdk-0.0.159-dev.tgz#ddfc97e1f242402b7be57df4806205bddfe9115f"
-  integrity sha512-Gzqp4SKkSzr36LAPa8FKCmdnz3gdpAp4evbKZ4s48SGZCXzlnHaWaKiKUPZYNYKaS+RkVaP+I0zVHak7IPtgZg==
+"@aut-labs/sdk@^0.0.160-dev":
+  version "0.0.160-dev"
+  resolved "https://registry.yarnpkg.com/@aut-labs/sdk/-/sdk-0.0.160-dev.tgz#8c866a0068adb25e50515a9745ad3450188b2635"
+  integrity sha512-EBp4vcfRg35iAL8Uy8GKFOMUQh9uRsuLIKS26tQrgN0vAf5T8YVsuouBaoL1LXGg3fvPuKyJOE7UluUcNoJa4g==
   dependencies:
     "@aut-labs/abi-types" "^0.0.74-dev"
     date-fns "^2.29.3"

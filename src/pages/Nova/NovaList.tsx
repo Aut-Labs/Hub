@@ -18,12 +18,12 @@ import ErrorDialog from "@components/Dialog/ErrorPopup";
 import { useGetAllNovasQuery } from "@api/community.api";
 import { TOOLBAR_HEIGHT } from "./ToolbarConnector";
 import { AutSelectField } from "@theme/field-select-styles";
-import { ReactComponent as Filters } from "@assets/icons/filters.svg";
 import { ReactComponent as Markets } from "@assets/icons/markets.svg";
 import { ReactComponent as Archetypes } from "@assets/icons/archetype.svg";
 import { useParams } from "react-router-dom";
 import { useAccount } from "wagmi";
 import { Community, MarketTemplates } from "@api/community.model";
+import { filterActiveNovas } from "./utils";
 
 const AutContainer = styled("div")(() => ({
   display: "flex",
@@ -53,11 +53,8 @@ export const GridBox = styled(Box)(({ theme }) => ({
 }));
 
 export const NovaList = () => {
-  // should only see novas with more than 0 members
-  // if connected can see their nova that has 0 members so they can join it
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const [activeOnboardingFilter, setActiveOnboardingFilter] = useState("");
   const [marketFilter, setMarketFilter] = useState("");
   const [archetypeFilter, setArchetypeFilter] = useState("");
   const { novaName } = useParams();
@@ -106,12 +103,7 @@ export const NovaList = () => {
       });
     }
 
-    novas = novas.filter((nova) => {
-      return (
-        nova.properties.members >= 1 ||
-        nova.properties.deployer?.toLowerCase() === userAddress
-      );
-    });
+    novas = filterActiveNovas(novas, userAddress);
 
     if (archetypeFilter) {
       novas = novas.filter(
@@ -261,6 +253,7 @@ export const NovaList = () => {
             <Typography color="rgb(107, 114, 128)" variant="subtitle2">
               No Novas were found...
             </Typography>
+            {/* @ts-ignore */}
             <Button
               size="medium"
               component="span"

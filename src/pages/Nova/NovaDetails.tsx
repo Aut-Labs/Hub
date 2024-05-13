@@ -13,7 +13,7 @@ import {
   useMediaQuery,
   useTheme
 } from "@mui/material";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { TOOLBAR_HEIGHT } from "./ToolbarConnector";
 import CopyAddress from "@components/CopyAddress";
@@ -46,6 +46,7 @@ import { useAccount } from "wagmi";
 import { setNovaAddress } from "@store/WalletProvider/WalletProvider";
 import { MarketTemplates } from "@api/community.model";
 import AutLoading from "@components/AutLoading";
+import { filterActiveNovas } from "./utils";
 
 const socialIcons = {
   discord: DiscordIcon,
@@ -233,29 +234,26 @@ const NovaDetails = () => {
   const isEditingNova = useSelector(IsEditingNova);
   const { novaName } = useParams();
   const { address } = useAccount();
+  const navigate = useNavigate();
 
-  // const {
-  //   data: result,
-  //   isLoading,
-  //   isUninitialized
-  // } = useCheckHasMintedQuery(address, {
-  //   skip: !address,
-  //   refetchOnMountOrArgChange: true
-  // });
-
-  const { data: nova } = useGetAllNovasQuery(
+  const { data, isSuccess } = useGetAllNovasQuery(
     {
       connectedAddress: address
     },
     {
       refetchOnMountOrArgChange: true,
-      selectFromResult: ({ data }) => ({
-        data: (data?.daos || []).find((d) => {
-          return d.name === novaName;
-        })
+      selectFromResult: ({ data, isSuccess }) => ({
+        isSuccess,
+        data
       })
     }
   );
+
+  const nova = useMemo(() => {
+    return filterActiveNovas(data?.daos || [], address).find((d) => {
+      return d.name?.toLowerCase() === novaName?.toLowerCase();
+    });
+  }, [data, novaName, address]);
 
   const {
     data: result,
@@ -268,6 +266,14 @@ const NovaDetails = () => {
     }
   );
 
+  useEffect(() => {
+    if (nova) {
+      dispatch(setNovaAddress(nova?.properties?.address));
+    } else if (!nova && isSuccess) {
+      navigate("/");
+    }
+  }, [nova, isSuccess]);
+
   const canSetArchetype = useMemo(() => {
     if (
       nova?.properties?.userData?.isAdmin ||
@@ -276,10 +282,6 @@ const NovaDetails = () => {
       return true;
     }
   }, [nova, address]);
-
-  useEffect(() => {
-    dispatch(setNovaAddress(nova?.properties.address));
-  }, [nova]);
 
   const selectedArchetype = useMemo(() => {
     if (!nova?.properties?.archetype?.default) {

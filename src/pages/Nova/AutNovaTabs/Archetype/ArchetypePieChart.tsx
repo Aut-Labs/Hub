@@ -139,7 +139,12 @@ const CustomTooltip = ({ active, payload }) => {
       <Box
         sx={{
           borderRadius: "8px",
-          maxWidth: "220px",
+          maxWidth: {
+            xs: "200px",
+            sm: "220px",
+            xl: "240px",
+            xxl: "280px"
+          },
           boxShadow: 2,
           background: "rgba(240, 245, 255, 0.4)",
           backdropFilter: "blur(12px)",
