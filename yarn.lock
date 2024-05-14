@@ -69,10 +69,10 @@
   resolved "https://registry.yarnpkg.com/@aut-labs/abi-types/-/abi-types-0.0.75-dev.tgz#6d91f8025fced39c4fff3834a0e143f5d71599f1"
   integrity sha512-aQd6qNQKJZ5Cb/8hFOm1U+8B7JDLWVhG+m5H5ZFijCgJoknfUxN1SUNMucZCbXe3DVmJRVLpuqJxaX4CGyWkoA==
 
-"@aut-labs/connector@^0.0.77":
-  version "0.0.77"
-  resolved "https://registry.yarnpkg.com/@aut-labs/connector/-/connector-0.0.77.tgz#b596a35c86801e1fe7620dcb8ac87dacb9a48a77"
-  integrity sha512-Dp+OYAb9nfDOG4Ju9ZyenqgPTg9gHcMizJnH3HE7cHYaNJsnDFAvyM3EI0esNravBNlheG5DuTZcZK+SqbRDkQ==
+"@aut-labs/connector@^0.0.82":
+  version "0.0.82"
+  resolved "https://registry.yarnpkg.com/@aut-labs/connector/-/connector-0.0.82.tgz#1b459c0ed36e26a073663d967a3b0b05fc92d046"
+  integrity sha512-f6jCIR9BAs69F9pcIm3pjUWeNOb6r0LPe3Xb+CBtrSSoNcsFSUlBRn1dYdB7w4jhh60REjg9Yccx2r4r8vIe2A==
   dependencies:
     "@web3auth/base" "^8.0.0"
     "@web3auth/ethereum-provider" "^8.0.1"
@@ -81,10 +81,10 @@
     "@web3auth/wallet-services-plugin" "^8.0.1"
     "@web3auth/web3auth-wagmi-connector" "^6.0.0"
 
-"@aut-labs/d-aut@^1.0.142-dev":
-  version "1.0.142-dev"
-  resolved "https://registry.yarnpkg.com/@aut-labs/d-aut/-/d-aut-1.0.142-dev.tgz#4cc133ac23893e3f13d25c84e9c12fdaf8820b8c"
-  integrity sha512-ZdghEf9Y36nPph3FsokA84UkdJ0GJimZ6ZW8IlQ0upq8+W3UWfxfe6oj9rGSCAgwNEpcpoLyrathOMPxO5XR3w==
+"@aut-labs/d-aut@^1.0.145-dev":
+  version "1.0.145-dev"
+  resolved "https://registry.yarnpkg.com/@aut-labs/d-aut/-/d-aut-1.0.145-dev.tgz#2011859e2fddc998ed3e3062a3e7101d736ffc88"
+  integrity sha512-BPP27UcXC32lGNkxUzR8NcP1tCd7/iXa4zlkaRqnVGddfPJ36tkQNI7JBhUv3XBQlXN1FHo1e+CfeSbnxvAAVQ==
   dependencies:
     "@tanstack/react-query" "^5.18.1"
 
