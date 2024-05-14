@@ -26,3 +26,25 @@ export const dateToUnix = (date: Date | string | number) => {
   }
   return getUnixTime(date);
 };
+
+export const parseTimestamp = (ts) => {
+  const [time, date] = ts.split(" | ");
+  const [hours, minutes, seconds] = time.split(":");
+  const [day, month, year] = date.split("/").map((num) => parseInt(num, 10));
+
+  // Note: month is 0-indexed in JavaScript Date, subtract 1 from the month
+  const fullYear = year + 2000; // Adjust century
+  return new Date(fullYear, month - 1, day, hours, minutes, seconds);
+};
+
+export const parseNovaTimestamp = (ts) => {
+  const dateObj = new Date(parseInt(ts));
+  const hours = dateObj.getHours();
+  const minutes = dateObj.getMinutes();
+  const seconds = dateObj.getSeconds();
+  const day = dateObj.getDate();
+  const month = dateObj.getMonth() + 1; // Month is 0-indexed in JavaScript Date
+  const year = dateObj.getFullYear();
+
+  return new Date(year, month - 1, day, hours, minutes, seconds);
+};

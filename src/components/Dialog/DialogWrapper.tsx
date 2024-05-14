@@ -23,7 +23,7 @@ export const DialogWrapper = ({
   const isXXL = useMediaQuery(theme.breakpoints.up("xxl"));
   return (
     <Dialog
-      open={open}
+      open={!!open}
       fullScreen={isMobile || fullScreen}
       {...(onClose && {
         onClose
@@ -116,7 +116,7 @@ export const DialogWrapper = ({
         {actions && (
           <DialogActions
             sx={{
-              backgroundColor: "background.default",
+              backgroundColor: "transparent",
               py: pxToRem(30),
               justifyContent: "center",
               height: pxToRem(120)

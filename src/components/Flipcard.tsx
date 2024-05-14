@@ -105,7 +105,10 @@ const Flipcard = (props) => {
   return (
     <div
       className={getContainerClassName}
-      style={{ ...styles.container, ...containerStyle }}
+      style={{
+        ...styles.container,
+        ...containerStyle
+      }}
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}

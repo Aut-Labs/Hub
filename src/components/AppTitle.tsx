@@ -1,25 +1,53 @@
-import { Stack, Typography, TypographyProps } from "@mui/material";
-
+import { Stack, SvgIcon, Typography, TypographyProps } from "@mui/material";
+import { ReactComponent as AutIcon } from "@assets/aut_logo_offwhite.svg";
 const AppTitle = (props: TypographyProps) => {
   return (
-    <Typography
-      fontWeight="300"
-      fontFamily="FractulAltLight"
-      component="h1"
-      variant="h1"
-      color="white"
-      whiteSpace="nowrap"
+    <Stack
+      alignItems="center"
+      justifyContent="center"
+      sx={{
+        flexDirection: {
+          xs: "column",
+          md: "row"
+        }
+      }}
       {...(props as any)}
     >
-      <strong
-        style={{
-          fontFamily: "FractulAltBold"
+      <SvgIcon
+        sx={{
+          height: {
+            xs: "40px",
+            md: "64px"
+          },
+          width: {
+            xs: "40px",
+            md: "64px"
+          }
+        }}
+        inheritViewBox
+        component={AutIcon}
+      ></SvgIcon>
+      <Typography
+        fontFamily="FractulAltLight"
+        fontWeight={700}
+        variant="h3"
+        color="white"
+        whiteSpace="nowrap"
+        sx={{
+          marginLeft: {
+            xs: "8px",
+            md: "14px"
+          },
+          fontSize: {
+            xs: "24px",
+            md: "32px"
+          }
         }}
       >
-        Nova
-      </strong>{" "}
-      Showcase <Typography variant="body">(beta)</Typography>
-    </Typography>
+        Showcase
+        {/* <Typography variant="body">(beta)</Typography> */}
+      </Typography>
+    </Stack>
   );
 };
 

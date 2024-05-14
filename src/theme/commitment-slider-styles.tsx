@@ -142,8 +142,8 @@ export default (theme: Theme) =>
         }
       }
     } as ComponentsOverrides<Theme>["MuiSlider"]
-  } as {
+  }) as {
     defaultProps?: ComponentsProps["MuiSlider"];
     styleOverrides?: ComponentsOverrides<Theme>["MuiSlider"];
     variants?: ComponentsVariants["MuiSlider"];
-  });
+  };

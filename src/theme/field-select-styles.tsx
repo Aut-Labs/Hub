@@ -3,15 +3,21 @@ import {
   ComponentsOverrides,
   ComponentsProps,
   ComponentsVariants,
+  FormControl,
+  Input,
+  InputAdornment,
+  InputLabel,
   PaletteColor,
   Select,
   SelectProps,
+  SvgIcon,
   Theme,
   darken,
   styled,
   useTheme
 } from "@mui/material";
 import clsx from "clsx";
+import { ReactComponent as FlipIcon } from "@assets/flip.svg";
 
 const isNullEmptyOrUndefined = (v: any) =>
   v === null || v === "" || v === undefined;
@@ -25,7 +31,7 @@ const SelectWrapper = styled("div")({
   }
 });
 
-interface AutSelectProps extends Partial<SelectProps> {
+interface AutSelectProps extends Partial<SelectProps & any> {
   helperText?: JSX.Element;
 }
 
@@ -41,12 +47,32 @@ export const AutSelectField = ({
   helperText,
   sx,
   className,
+  startAdornment,
   ...props
 }: AutSelectProps) => {
   const theme = useTheme();
   return (
-    <SelectWrapper sx={sx}>
+    <SelectWrapper
+      sx={{
+        ".MuiInputBase-root": {
+          maxHeight: "48px",
+          minWidth: "270px"
+        },
+        ...sx
+      }}
+    >
       <Select
+        displayEmpty
+        startAdornment={startAdornment}
+        sx={{
+          "& .MuiOutlinedInput-notchedOutline": {
+            border: "none"
+          },
+          borderRadius: "10px",
+          border: "3px solid #000000",
+          backgroundColor: "white"
+        }}
+        labelId="select-label"
         className={clsx(className, {
           ["aut-selected"]: !isNullEmptyOrUndefined(props.value)
         })}
@@ -85,14 +111,18 @@ const generateColors = (color: PaletteColor) => ({
     }
   },
   ".MuiSvgIcon-root": {
-    color: color.light
+    color: color.dark
   },
   "&.MuiInputBase-root:before": {
     borderColor: color.dark
   },
   "&.MuiInputBase-root:hover:not(.Mui-disabled):before": {
     borderColor: color.dark
-  }
+  },
+  ".MuiInputBase-root.Mui-focused:before, .MuiInputBase-root.Mui-focused fieldset":
+    {
+      color: "white"
+    }
 });
 
 export default (theme: Theme) =>
@@ -100,6 +130,7 @@ export default (theme: Theme) =>
     ...theme.components.MuiSelect,
     styleOverrides: {
       root: {
+        borderRadius: "4px",
         color: theme.palette.offWhite.dark,
         ".MuiInput-input": {
           textAlign: "left"
@@ -117,8 +148,8 @@ export default (theme: Theme) =>
         }, {})
       }
     } as ComponentsOverrides<Theme>["MuiSelect"]
-  } as {
+  }) as {
     defaultProps?: ComponentsProps["MuiSelect"];
     styleOverrides?: ComponentsOverrides<Theme>["MuiSelect"];
     variants?: ComponentsVariants["MuiSelect"];
-  });
+  };

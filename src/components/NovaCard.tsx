@@ -1,11 +1,22 @@
-import { Box, Button, Link, Typography, styled } from "@mui/material";
-import { memo, useEffect, useMemo, useState } from "react";
+import {
+  Avatar,
+  Box,
+  Button,
+  Typography,
+  styled,
+  keyframes,
+  SvgIcon
+} from "@mui/material";
+import { memo, useMemo, useState } from "react";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import Flipcard from "@components/Flipcard";
 import FlipIcon from "@assets/flip.svg";
-import FlipClockCountdown from "@leenguyen/react-flip-clock-countdown";
-import { ApplyOrWithdrawFromQuest } from "./ApplyOrWithdrawFromQuest";
-import { NovaDAO } from "@api/community.model";
+import { useNavigate } from "react-router-dom";
+import AutIconLabel from "./AutIconLabel";
+import { ReactComponent as Check } from "@assets/autos/check.svg";
+import { MarketTemplates } from "@api/community.model";
+import { useAccount } from "wagmi";
+import { ArchetypeTypes } from "@api/community.api";
 
 const getRoleName = (daoData, quest) => {
   const role = daoData.properties.rolesSets[0].roles.find(
@@ -16,6 +27,17 @@ const getRoleName = (daoData, quest) => {
   }
   return "N/A";
 };
+export const pulsate = keyframes`
+  0% {
+    box-shadow: 0 0 0 0 rgba(27, 95, 168, 0.9);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(27, 95, 168, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(27, 95, 168, 0);
+  }
+`;
 
 const AutCardFront = styled("div")({
   width: "100%",
@@ -24,70 +46,75 @@ const AutCardFront = styled("div")({
 });
 
 const SeeQuestButton = styled(Button)(({ theme }) => ({
+  height: "70px",
+  borderRadius: "9px !important",
   [theme.breakpoints.up("xs")]: {
-    width: "300px"
-  },
-  [theme.breakpoints.up("sm")]: {
-    width: "300px"
-  },
-  [theme.breakpoints.up("md")]: {
-    width: "300px"
-  },
-  [theme.breakpoints.up("xl")]: {
     width: "330px"
   },
+  [theme.breakpoints.up("sm")]: {
+    width: "330px"
+  },
+  [theme.breakpoints.up("md")]: {
+    width: "330px"
+  },
+  [theme.breakpoints.up("xl")]: {
+    width: "350px"
+  },
   [theme.breakpoints.up("xxl")]: {
-    width: "380px"
+    width: "350px"
   }
 }));
 
-const AutCardContainer = styled("div")(({ theme }) => ({
-  [theme.breakpoints.up("xs")]: {
-    width: "300px",
-    height: "350px"
-  },
-  [theme.breakpoints.up("sm")]: {
-    width: "300px",
-    height: "350px"
-  },
-  [theme.breakpoints.up("md")]: {
-    width: "300px",
-    height: "350px"
-  },
-  [theme.breakpoints.up("xl")]: {
-    width: "330px",
-    height: "380px"
-  },
-  [theme.breakpoints.up("xxl")]: {
-    width: "380px",
-    height: "430px"
-  },
-  boxShadow:
-    "0px 4px 5px -2px rgba(0,0,0,0.2), 0px 7px 10px 1px rgba(0,0,0,0.14), 0px 2px 16px 1px rgba(0,0,0,0.12)",
-  // boxShadow: "10px 10px 10px black",
-  backgroundColor: "#262626",
-  borderColor: "#3f3f40",
-  borderStyle: "solid",
-  borderWidth: "3px",
-  padding: "0px 5px",
-  overflow: "hidden",
-  borderRadius: "16px",
-  // borderTopLeftRadius: "16px",
-  // borderTopRightRadius: "16px",
-  // borderBottomLeftRadius: "0",
-  // borderBottomRightRadius: "0",
-  display: "flex",
-  justifyContent: "flex-start",
-  alignItems: "center",
-  flexDirection: "column",
-  "&.highlighted": {
-    boxShadow: "20px 20px 20px #0063a2"
-  },
-  transition: theme.transitions.create(["transform"]),
-  "&:hover": {
-    transform: "scale(1.019)"
-  }
-}));
+const AutCardContainer = styled("div")<{ isHighlighted?: boolean }>(
+  ({ theme, isHighlighted }) => ({
+    [theme.breakpoints.up("xs")]: {
+      width: "330px",
+      height: "350px"
+    },
+    [theme.breakpoints.up("sm")]: {
+      width: "330px",
+      height: "350px"
+    },
+    [theme.breakpoints.up("md")]: {
+      width: "330px",
+      height: "350px"
+    },
+    [theme.breakpoints.up("xl")]: {
+      width: "350px",
+      height: "380px"
+    },
+    [theme.breakpoints.up("xxl")]: {
+      width: "350px",
+      height: "430px"
+    },
+    boxShadow:
+      "0px 4px 5px -2px rgba(0,0,0,0.2), 0px 7px 10px 1px rgba(0,0,0,0.14), 0px 2px 16px 1px rgba(0,0,0,0.12)",
+    // boxShadow: "10px 10px 10px black",
+    backgroundColor: "#FFF",
+    borderColor: "#3f3f40",
+    borderStyle: "solid",
+    borderWidth: "3px",
+    padding: "0px 5px",
+    overflow: "hidden",
+    borderRadius: "16px",
+    // borderTopLeftRadius: "16px",
+    // borderTopRightRadius: "16px",
+    // borderBottomLeftRadius: "0",
+    // borderBottomRightRadius: "0",
+    display: "flex",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    flexDirection: "column",
+    "&.highlighted": {
+      boxShadow: "20px 20px 20px #0063a2"
+    },
+    transition: theme.transitions.create(["transform"]),
+    "&:hover": {
+      transform: "scale(1.019)"
+    },
+    animation: isHighlighted ? `${pulsate} 2s infinite` : "none"
+  })
+);
 
 const AutCardBack = styled("div")({
   height: "100%",
@@ -111,52 +138,29 @@ const Countdown = styled("div")({
 
 export const NovaCard = ({
   daoData,
-  highlightData,
-  onQuestSelected,
-  onApplyForQuest,
-  questToApplyFor,
-  isApplying
+  isHighlighted
 }: {
-  daoData: NovaDAO;
-  highlightData: any;
-  onQuestSelected: any;
-  onApplyForQuest: any;
-  questToApplyFor: any;
-  isApplying: boolean;
+  daoData: any;
+  isHighlighted?: boolean;
 }) => {
+  const navigate = useNavigate();
   const [isFlipped, setFlipped] = useState(false);
   const [hasTimePassed, setHasTimePassed] = useState(false);
+  const { address } = useAccount();
 
-  const questStartTime = useMemo(() => {
-    return new Date(
-      daoData?.properties?.quests.find(
-        (q) => q.questId === highlightData?.questId
-      )?.startDate
-    );
-  }, [highlightData, daoData, hasTimePassed]);
-
-  useEffect(() => {
-    if (highlightData.highlighted && questStartTime > new Date()) {
-      const timeDifference = questStartTime.getTime() - new Date().getTime();
-
-      const buttonTimeout = setTimeout(() => {
-        setHasTimePassed(true);
-      }, timeDifference);
-
-      return () => {
-        clearTimeout(buttonTimeout);
-      };
+  const selectedArchetype = useMemo(() => {
+    if (!daoData?.properties?.archetype?.default) {
+      return null;
     }
-  }, []);
+    return ArchetypeTypes[daoData?.properties?.archetype?.default];
+  }, [daoData]);
 
-  const questDetails = async (e, quest) => {
-    e.stopPropagation();
-    onQuestSelected({
-      ...quest,
-      onboardingQuestAddress: daoData.onboardingQuestAddress,
-      daoAddress: daoData.daoAddress
-    });
-  };
+  const marketTemplate = useMemo(() => {
+    const marketName = daoData?.properties?.market;
+    return MarketTemplates.find(
+      (v) => v.title === marketName || v.market === marketName
+    );
+  }, [daoData]);
 
   const flipCard = () => {
     if (isFlipped) {
@@ -166,23 +170,11 @@ export const NovaCard = ({
     }
   };
 
-  const goToQuest = (e) => {
-    e.stopPropagation();
-    const quest = daoData.properties.quests.find(
-      (q) => q.questId === highlightData.questId
-    );
-    onQuestSelected({
-      ...quest,
-      onboardingQuestAddress: daoData.onboardingQuestAddress,
-      daoAddress: daoData.daoAddress
-    });
-  };
-
   return (
     <div
-      style={{
-        marginBottom: "65px"
-      }}
+    // style={{
+    //   marginBottom: "65px"
+    // }}
     >
       <Flipcard
         isFlipped={isFlipped}
@@ -193,22 +185,9 @@ export const NovaCard = ({
           className={`aut-card-front ${isFlipped ? "flipped" : ""}`}
         >
           <AutCardContainer
-            className={`aut-card-container front ${
-              highlightData.highlighted && "highlighted"
-            }`}
+            isHighlighted={isHighlighted}
+            className={`aut-card-container front`}
           >
-            <Typography
-              fontWeight="bold"
-              fontFamily="FractulAltBold"
-              variant="subtitle1"
-              sx={{
-                mt: "25px",
-                mb: "0px",
-                color: "white"
-              }}
-            >
-              {daoData.name}
-            </Typography>
             <img
               src={ipfsCIDToHttpUrl(daoData?.image)}
               alt="Dao image"
@@ -219,25 +198,184 @@ export const NovaCard = ({
               }}
             />
             <Typography
-              fontWeight="normal"
-              textAlign="center"
-              fontFamily="FractulRegular"
-              variant="body"
+              fontWeight="bold"
+              fontFamily="FractulAltBold"
+              variant="subtitle1"
               sx={{
                 mt: "25px",
                 mb: "0px",
-                color: "white"
+                color: "#000"
               }}
             >
-              {daoData.description}
+              {daoData.name}
             </Typography>
+            <Box
+              sx={{
+                maxWidth: "600px",
+                width: "60%",
+                display: "flex",
+                alignItems: "space-between",
+                justifyContent: "space-between"
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              >
+                <Typography
+                  fontWeight="bold"
+                  fontFamily="FractulAltBold"
+                  variant="subtitle1"
+                  sx={{
+                    mt: "20px",
+                    mb: "0px",
+                    color: "#000"
+                  }}
+                >
+                  {daoData.properties.prestige}
+                </Typography>
+                <Typography
+                  fontWeight="bold"
+                  fontFamily="FractulRegular"
+                  variant="body"
+                  sx={{
+                    mt: "4px",
+                    mb: "0px",
+                    color: "#000"
+                  }}
+                >
+                  Prestige
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  marginRight: "16px",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              >
+                <Typography
+                  fontWeight="bold"
+                  fontFamily="FractulAltBold"
+                  variant="subtitle1"
+                  sx={{
+                    mt: "20px",
+                    mb: "0px",
+                    color: "#000"
+                  }}
+                >
+                  {daoData.properties.members}
+                </Typography>
+                <Typography
+                  fontWeight="bold"
+                  fontFamily="FractulRegular"
+                  variant="body"
+                  sx={{
+                    mt: "4px",
+                    mb: "0px",
+                    color: "#000"
+                  }}
+                >
+                  Members
+                </Typography>
+              </Box>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                gap: "12px",
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+              marginTop="auto"
+              width="90%"
+              marginBottom="10px"
+            >
+              {daoData.properties.roles.map((role: any) => (
+                <Box
+                  key={role.roleName}
+                  sx={{
+                    minHeight: "33px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    padding: "0px 10px",
+                    alignItems: "center",
+                    flexDirection: "row",
+                    flex: "1",
+                    color: "#000",
+                    maxWidth: "85px",
+                    fontFamily: "FractulAltLight",
+                    fontSize: "10px",
+                    overflow: "hidden",
+                    border: "2px solid #000",
+                    borderRadius: "24px",
+                    borderColor: "#000"
+                  }}
+                >
+                  <Typography
+                    fontFamily="FractulRegular"
+                    variant="body"
+                    sx={{
+                      color: "#000",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis"
+                    }}
+                  >
+                    {role.roleName}
+                  </Typography>
+                  <Check
+                    style={{
+                      minHeight: "15px",
+                      minWidth: "15px"
+                    }}
+                  />
+                </Box>
+                // <Button
+                //   key={role.roleName}
+                //   sx={{
+                //     flex: "1",
+                //     color: "#000",
+                //     maxWidth: "85px",
+                //     fontFamily: "FractulAltLight",
+                //     fontSize: "10px",
+                //     overflow: "hidden",
+                //     border: "2px solid #000",
+                //     borderRadius: "24px",
+                //     borderColor: "#000",
+                //     "&:hover": {
+                //       backgroundColor: "#000",
+                //       color: "white"
+                //     }
+                //   }}
+                // >
+                //   {/* <Typography
+                //     fontFamily="FractulAltLight"
+                //     variant="caption"
+                //     sx={{
+                //       mt: "4px",
+                //       mb: "0px",
+                //       color: "#000"
+                //     }}
+                //   > */}
+                //   {role.roleName}
+                //   {/* </Typography> */}
+                // </Button>
+              ))}
+            </Box>
             <div
               style={{
                 marginTop: "auto",
                 marginBottom: "10px",
                 width: "100%",
                 display: "flex",
-                justifyContent: "flex-end"
+                justifyContent: "center"
               }}
             >
               <img
@@ -254,137 +392,131 @@ export const NovaCard = ({
         </AutCardFront>
         <AutCardBack className="aut-card-back">
           <AutCardContainer
-            className={`aut-card-container back ${
-              highlightData.highlighted && "highlighted"
-            }`}
+            className={`aut-card-container back`}
+            isHighlighted={isHighlighted}
           >
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                gap: "12px",
+                justifyContent: "space-between",
+                width: "100%",
+                alignItems: "center",
+                marginTop: "24px",
+                padding: "0px 34px"
+              }}
+            >
+              <Avatar
+                sx={{
+                  height: {
+                    xs: "60px",
+                    md: "70px",
+                    xxl: "70px"
+                  },
+                  borderRadius: "0",
+                  width: {
+                    xs: "60px",
+                    md: "70px",
+                    xxl: "70px"
+                  },
+                  bgcolor: "purple",
+                  background: "transparent"
+                }}
+                aria-label="avatar"
+                src={ipfsCIDToHttpUrl(daoData?.image as string)}
+              />
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center"
+                }}
+              >
+                <Typography
+                  color="#000"
+                  textAlign="left"
+                  lineHeight={1}
+                  variant="h3"
+                >
+                  {daoData?.name}
+                </Typography>
+              </div>
+            </Box>
             <Typography
-              fontWeight="bold"
-              textAlign="center"
-              fontFamily="FractulAltBold"
-              variant="subtitle1"
+              fontFamily="FractulRegular"
+              variant="body1"
               sx={{
                 mt: "25px",
-                mb: "0px",
-                color: "white"
+                padding: "0px 24px",
+                color: "#000"
               }}
             >
-              Pick your Role
-            </Typography>
-            <Typography
-              fontWeight="normal"
-              textAlign="center"
-              fontFamily="FractulRegular"
-              variant="subtitle2"
-              sx={{
-                mt: "5px",
-                mb: "0px",
-                color: "white"
-              }}
-            >
-              {daoData.name}
+              {daoData?.description}
             </Typography>
             <Box
-              marginTop={{ _: "20px", md: "10px", lg: "13px", xl: "20px" }}
-              width="100%"
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                gap: "12px",
+                justifyContent: "center",
+                alignItems: "center",
+                width: "100%",
+                padding: "0px 14px",
+                marginTop: "auto"
+              }}
             >
-              {daoData.properties.quests.map((quest, i) => {
-                return (
-                  <div
-                    key={i}
-                    style={{
-                      marginTop: "22px",
-                      padding: "0px 17px",
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-between"
+              <AutIconLabel
+                textColor="#FFF"
+                sx={{
+                  flex: "1",
+                  flexBasis: "50%",
+                  minHeight: "42px"
+                  // marginTop: theme.spacing(2)
+                }}
+                icon={
+                  <SvgIcon
+                    sx={{
+                      width: "16px"
                     }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "start"
-                      }}
-                    >
-                      <Typography
-                        fontWeight="normal"
-                        textAlign="center"
-                        fontFamily="FractulRegular"
-                        variant="body"
-                        sx={{
-                          textAlign: "start",
-                          mt: "5px",
-                          mb: "0px",
-                          color: "white"
-                        }}
-                      >
-                        {getRoleName(daoData, quest)}
-                      </Typography>
-                      {quest.active ? (
-                        <Link
-                          sx={{
-                            textAlign: "start"
-                          }}
-                          component="button"
-                          color="offWhite.main"
-                          variant="caption"
-                          onClick={(e) => questDetails(e, quest)}
-                        >
-                          Details
-                        </Link>
-                      ) : (
-                        <Typography color="offWhite.main" variant="caption">
-                          Inactive
-                        </Typography>
-                      )}
-                    </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "flex-end",
-                        alignItems: "center",
-                        width: "105px"
-                      }}
-                    >
-                      <ApplyOrWithdrawFromQuest
-                        daoData={daoData}
-                        quest={quest}
-                        onApplyForQuest={onApplyForQuest}
-                        questToApplyFor={questToApplyFor}
-                        isApplying={isApplying}
-                      ></ApplyOrWithdrawFromQuest>
-                    </div>
-
-                    {/* <Button
-                      onClick={(e) => applyForQuest(e, quest)}
-                      disabled={isApplying || isQuestDisabled(quest.questId)}
-                      sx={{
-                        color: "white",
-                        padding: "0px",
-                        fontSize: "12px",
-                        height: "38px",
-                        width: "94px",
-                        borderWidth: "2px",
-                        whiteSpace: "nowrap",
-                        textAlign: "center"
-                      }}
-                      color="offWhite"
-                      variant="square"
-                    >
-                      {isActiveQuest(quest.questId) ? "Withdraw" : "Apply"}
-                    </Button> */}
-                  </div>
-                );
-              })}
+                    inheritViewBox
+                    component={marketTemplate?.icon}
+                  ></SvgIcon>
+                }
+                label={marketTemplate?.title}
+              ></AutIconLabel>
+              <AutIconLabel
+                textColor="#FFF"
+                sx={{
+                  flex: "1",
+                  flexBasis: "50%",
+                  minHeight: "42px",
+                  ...(!selectedArchetype?.title && {
+                    ".MuiSvgIcon-root": {
+                      display: "none"
+                    }
+                  })
+                  // marginTop: theme.spacing(2)
+                }}
+                icon={
+                  <SvgIcon
+                    sx={{
+                      width: "16px"
+                    }}
+                    inheritViewBox
+                    component={selectedArchetype?.logo}
+                  ></SvgIcon>
+                }
+                label={selectedArchetype?.title ?? "N/A"}
+              ></AutIconLabel>
             </Box>
+
             <div
               style={{
-                marginTop: "auto",
+                marginTop: "14px",
                 marginBottom: "10px",
                 width: "100%",
                 display: "flex",
-                justifyContent: "flex-end"
+                justifyContent: "center"
               }}
             >
               <img
@@ -400,76 +532,40 @@ export const NovaCard = ({
           </AutCardContainer>
         </AutCardBack>
       </Flipcard>
-      {highlightData.highlighted && highlightData.questId ? (
-        questStartTime > new Date() ? (
-          <Countdown>
-            <Typography
-              width="100%"
-              textAlign="center"
-              variant="subtitle2"
-              mb={1}
-              className="text-secondary"
-            >
-              Quest starts in...
-            </Typography>
-            <FlipClockCountdown
-              digitBlockStyle={{
-                fontFamily: "FractulRegular",
-                width: "26px",
-                height: "40px",
-                fontSize: "38px"
-              }}
-              labelStyle={{
-                fontSize: "12px",
-                fontFamily: "FractulRegular"
-              }}
-              separatorStyle={{
-                size: "4px"
-              }}
-              // next line should have a date thats 10 minutes from now
-              to={questStartTime}
-            />
-          </Countdown>
-        ) : (
-          <div
-            style={{ width: "100%", display: "flex", justifyContent: "center" }}
-          >
-            <SeeQuestButton
-              sx={{
-                width: "100%",
-                mt: "24px",
-                boxShadow:
-                  "0px 4px 5px -2px rgba(0,0,0,0.2), 0px 7px 10px 1px rgba(0,0,0,0.14), 0px 2px 16px 1px rgba(0,0,0,0.12)"
-              }}
-              variant="outlined"
-              size="normal"
-              color="offWhite"
-              onClick={goToQuest}
-            >
-              GO TO QUEST
-            </SeeQuestButton>
-          </div>
-        )
-      ) : (
-        <div
-          style={{ width: "100%", display: "flex", justifyContent: "center" }}
+      <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+        <SeeQuestButton
+          sx={{
+            border: "2px solid #FFF",
+            borderRadius: "9px",
+            width: "100%",
+            mt: "24px",
+            animation:
+              daoData.properties.members == 0
+                ? `${pulsate} 2s infinite`
+                : "none",
+            boxShadow:
+              "0px 4px 5px -2px rgba(0,0,0,0.2), 0px 7px 10px 1px rgba(0,0,0,0.14), 0px 2px 16px 1px rgba(0,0,0,0.12)"
+          }}
+          variant="outlined"
+          size="normal"
+          color="offWhite"
+          onClick={() => {
+            if (daoData?.properties?.deployer === address?.toLowerCase()) {
+              navigate(`/project/${daoData.name}?tab=roles`);
+            } else {
+              navigate(`/project/${daoData.name}?tab=archetype`);
+            }
+          }}
         >
-          <SeeQuestButton
-            sx={{
-              width: "100%",
-              mt: "24px",
-              boxShadow:
-                "0px 4px 5px -2px rgba(0,0,0,0.2), 0px 7px 10px 1px rgba(0,0,0,0.14), 0px 2px 16px 1px rgba(0,0,0,0.12)"
-            }}
-            variant="outlined"
-            size="normal"
-            color="offWhite"
-            onClick={flipCard}
-          >
-            SEE QUESTS
-          </SeeQuestButton>
-        </div>
-      )}
+          {daoData?.properties?.members === 0
+            ? daoData?.properties?.deployer === address?.toLowerCase()
+              ? "Verify"
+              : "Join"
+            : daoData?.properties?.deployer === address?.toLowerCase()
+              ? "Verified"
+              : "Join"}
+        </SeeQuestButton>
+      </div>
     </div>
   );
 };

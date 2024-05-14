@@ -1,23 +1,44 @@
 import { CommitmentMessages } from "@utils/misc";
 import { httpUrlToIpfsCID } from "./storage.api";
 import { BaseNFTModel } from "@aut-labs/sdk/dist/models/baseNFTModel";
-import { DAOProperties, Role, RoleSet } from "@aut-labs/sdk/dist/models/dao";
+import {
+  NovaArchetypeParameters,
+  NovaProperties,
+  RoleSet
+} from "@aut-labs/sdk/dist/models/nova";
 import { AutSocial } from "./api.model";
-import { socialUrls } from "./aut.model";
 import { Quest } from "@aut-labs/sdk";
+import { ReactComponent as OpenSource } from "@assets/icons/opensource.svg";
+import { ReactComponent as Defi } from "@assets/icons/defi.svg";
+import { ReactComponent as Social } from "@assets/icons/social.svg";
+import { ReactComponent as Refi } from "@assets/icons/refi.svg";
+import { ReactComponent as Identity } from "@assets/icons/identity.svg";
 
 export const MarketTemplates = [
   {
-    title: "Open-Source & DeFi",
-    market: 1
+    title: "Open-Source & Infra",
+    market: 1,
+    icon: OpenSource
   },
   {
-    title: "Art, Events & NFTs",
-    market: 2
+    title: "DeFi & Payments",
+    market: 2,
+    icon: Defi
   },
   {
-    title: "Local Projects & DAOs",
-    market: 3
+    title: "ReFi & Governance",
+    market: 3,
+    icon: Refi
+  },
+  {
+    title: "Social, Art & Gaming",
+    market: 4,
+    icon: Social
+  },
+  {
+    title: "Identity & Reputation",
+    market: 5,
+    icon: Identity
   }
 ];
 
@@ -31,9 +52,24 @@ export const findRoleName = (roleId: string, rolesSets: RoleSet[]) => {
   }
 };
 
-export class CommunityProperties extends DAOProperties {
-  address?: string;
+interface Role {
+  id: number;
+  roleName: string;
+}
 
+export interface CommunityDomains {
+  note: string;
+  domain: string;
+}
+
+export class CommunityProperties extends NovaProperties {
+  address?: string;
+  deployer: string;
+  prestige?: number;
+  market: string;
+  members?: number;
+  absoluteValue?: number;
+  roles: Role[];
   socials: AutSocial[];
 
   userData?: {
@@ -47,17 +83,31 @@ export class CommunityProperties extends DAOProperties {
 
   additionalProps?: any;
 
+  domains: CommunityDomains[];
+
+  archetype: {
+    default: number;
+    parameters: NovaArchetypeParameters;
+  };
+
   constructor(data: CommunityProperties) {
     super(data);
     if (!data) {
       this.rolesSets = [];
     } else {
+      this.deployer = data.deployer;
       this.market = MarketTemplates[data.market]?.title;
       this.commitment = data.commitment;
       this.rolesSets = data.rolesSets;
+      this.roles = data.roles;
       this.address = data.address;
       this.socials = data.socials;
+      this.archetype = data.archetype;
+      this.prestige = data.prestige;
+      this.members = data.members;
+      this.absoluteValue = data.absoluteValue;
       this.additionalProps = data.additionalProps;
+      this.archetype = data.archetype;
       this.userData =
         JSON.parse(JSON.stringify(data?.userData || {})) ||
         ({} as typeof this.userData);
@@ -74,13 +124,13 @@ export class CommunityProperties extends DAOProperties {
           +this.userData.commitment
         );
       }
-      // @TODO - Tao to fix
       this.userData.isAdmin = (data as any).isAdmin;
     }
   }
 }
 
 export class Community extends BaseNFTModel<CommunityProperties> {
+  id: string;
   static updateCommunity(updatedCommunity: Community): Partial<Community> {
     const community = new Community(updatedCommunity);
     const market = MarketTemplates.find(
@@ -92,10 +142,12 @@ export class Community extends BaseNFTModel<CommunityProperties> {
       image: httpUrlToIpfsCID(community.image as string),
       properties: {
         market: market?.title || 0,
+        deployer: community.properties.deployer,
         commitment: community.properties.commitment,
+        archetype: community.properties.archetype,
         rolesSets: community.properties.rolesSets,
+        timestamp: community.properties.timestamp,
         socials: community.properties.socials.map((social) => {
-          social.link = `${socialUrls[social.type].prefix}${social.link}`;
           return social;
         })
       }
@@ -104,11 +156,12 @@ export class Community extends BaseNFTModel<CommunityProperties> {
 
   constructor(data: Community = {} as Community) {
     super(data);
+    this.id = data.id;
     this.properties = new CommunityProperties(data.properties);
   }
 }
 
-export class NovaDAOProperties extends DAOProperties {
+export class NovaDAOProperties extends NovaProperties {
   address?: string;
 
   socials: AutSocial[];

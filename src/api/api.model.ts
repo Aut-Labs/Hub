@@ -3,6 +3,30 @@ import { CommunityMembershipDetails } from "@aut-labs/sdk/dist/models/holder";
 import { Community } from "./community.model";
 import { httpUrlToIpfsCID } from "./storage.api";
 
+export const socialUrls = {
+  discord: {
+    hidePrefix: true,
+    placeholder: "name#1234",
+    prefix: "https://discord.com/users/"
+  },
+  github: {
+    prefix: "https://github.com/",
+    placeholder: ""
+  },
+  twitter: {
+    prefix: "https://twitter.com/",
+    placeholder: ""
+  },
+  telegram: {
+    prefix: "https://t.me/",
+    placeholder: ""
+  },
+  lensfrens: {
+    prefix: "https://www.lensfrens.xyz/",
+    placeholder: ""
+  }
+};
+
 /* eslint-disable no-shadow */
 export enum ActivityTypes {
   Polls = 1,

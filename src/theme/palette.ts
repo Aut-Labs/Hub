@@ -19,19 +19,13 @@ export default {
   },
   divider: "rgba(241,245,249,.12)",
   offWhite: {
-    main: "#EBEBF2",
+    main: "#F0F5FF",
     light: "#ffffff",
-    dark: "#b9b9bf",
+    dark: "#A7B1C4",
     contrastText: "#000000"
   },
-  autGrey: {
-    main: "rgb(107, 114, 128)",
-    light: "rgb(136, 142, 153)",
-    dark: "rgb(74, 79, 89)",
-    contrastText: "#fff"
-  },
   nightBlack: {
-    main: "#262626",
+    main: "#27292B",
     light: "#4e4e4e",
     dark: "#000000",
     contrastText: "#ffffff"

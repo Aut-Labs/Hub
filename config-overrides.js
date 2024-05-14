@@ -4,24 +4,33 @@ const webpack = require("webpack");
 
 module.exports = {
   webpack: (config) => {
-    config.ignoreWarnings = [/Failed to parse source map/];
-
     const fallback = config.resolve.fallback || {};
     Object.assign(fallback, {
+      crypto: false,
       stream: false,
       assert: false,
+      http: false,
       https: false,
-      util: path.resolve(__dirname, "node_modules/util"),
       os: false,
       url: false,
-      http: false
+      zlib: false
     });
+    config.resolve.fallback = fallback;
     config.plugins = (config.plugins || []).concat([
       new webpack.ProvidePlugin({
+        process: "process/browser",
         Buffer: ["buffer", "Buffer"]
       })
     ]);
-    config.resolve.fallback = fallback;
+    config.ignoreWarnings = [/Failed to parse source map/];
+    config.module.rules.push({
+      test: /\.(js|mjs|jsx)$/,
+      enforce: "pre",
+      loader: require.resolve("source-map-loader"),
+      resolve: {
+        fullySpecified: false
+      }
+    });
 
     const modifiedConfig = alias({
       "@assets": path.resolve(__dirname, "./src/assets"),
