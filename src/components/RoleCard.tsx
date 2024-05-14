@@ -1,33 +1,18 @@
 /* eslint-disable max-len */
-import {
-  Box,
-  Avatar,
-  Typography,
-  Stack,
-  useTheme,
-  Tooltip
-} from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { Box, Typography, Stack, useTheme } from "@mui/material";
+import React, { useState } from "react";
 import { AutOsButton } from "./AutButton";
 import {
-  communityApi,
   useCheckHasMintedForNovaQuery,
-  useGetAllNovasQuery,
-  useLazyCheckHasMintedForNovaQuery,
-  useLazyCheckOnboardingAllowlistQuery
+  useGetAllNovasQuery
 } from "@api/community.api";
-import LoadingDialog from "./Dialog/LoadingPopup";
 import SuccessDialog from "./Dialog/SuccessPopup";
-import Community from "@assets/community.png";
-import Creative from "@assets/creative.png";
-import Tech from "@assets/tech.png";
 import ErrorDialog from "./Dialog/ErrorPopup";
 import { useWalletConnector } from "@aut-labs/connector";
 import { useAccount } from "wagmi";
 import { pulsate } from "./NovaCard";
 import { setSelectedRoleId } from "@store/WalletProvider/WalletProvider";
 import { useAppDispatch } from "@store/store.model";
-import { add } from "date-fns";
 import { useParams } from "react-router-dom";
 
 const RoleCard = ({ role }) => {
@@ -53,8 +38,8 @@ const RoleCard = ({ role }) => {
     }
   );
 
-  const [checkHasMinted, { data: lazyCheckResult, isLoading }] =
-    useLazyCheckHasMintedForNovaQuery();
+  // const [checkHasMinted, { data: lazyCheckResult, isLoading }] =
+  //   useLazyCheckHasMintedForNovaQuery();
 
   const { isLoading: checkLoading, data: checkResult } =
     useCheckHasMintedForNovaQuery(
@@ -67,24 +52,25 @@ const RoleCard = ({ role }) => {
 
   const handleClick = async () => {
     await dispatch(setSelectedRoleId(role?.id));
-    if (lazyCheckResult && !lazyCheckResult?.hasMinted && isConnected) {
-      handleMint();
-    } else {
-      let addressToVerify = address as string;
-      if (!addressToVerify) {
-        const state = await open();
-        addressToVerify = state?.address;
-      }
-      const result = await checkHasMinted({
-        address: addressToVerify,
-        novaAddress: nova?.properties?.address
-      });
-      if (result?.data && result?.data?.hasMinted) {
-        setOpenError(true);
-      } else if (result?.data && !result?.data?.hasMinted) {
-        handleMint();
-      }
-    }
+    handleMint();
+    // if (lazyCheckResult && !lazyCheckResult?.hasMinted && isConnected) {
+    //   handleMint();
+    // } else {
+    //   let addressToVerify = address as string;
+    //   if (!addressToVerify) {
+    //     const state = await open();
+    //     addressToVerify = state?.address;
+    //   }
+    //   const result = await checkHasMinted({
+    //     address: addressToVerify,
+    //     novaAddress: nova?.properties?.address
+    //   });
+    //   if (result?.data && result?.data?.hasMinted) {
+    //     setOpenError(true);
+    //   } else if (result?.data && !result?.data?.hasMinted) {
+    //     handleMint();
+    //   }
+    // }
   };
 
   // const handleDialogClose = () => {
@@ -120,11 +106,11 @@ const RoleCard = ({ role }) => {
 
   return (
     <>
-      <LoadingDialog
+      {/* <LoadingDialog
         handleClose={openSuccess}
         open={isLoading}
         message="Checking requirements..."
-      />
+      /> */}
       <SuccessDialog
         titleVariant="h3"
         message="Congrats!"

@@ -4,6 +4,7 @@ import { reducers } from "./reducers";
 // import { pluginRegistryApi } from "@api/plugin-registry.api";
 // import { onboardingApi } from "@api/onboarding.api";
 import { communityApi } from "@api/community.api";
+import { environment, EnvMode } from "@api/environment";
 // import storage from "redux-persist/lib/storage";
 // import {
 //   FLUSH,
@@ -49,7 +50,7 @@ export const store = configureStore({
       serializableCheck: false,
       immutableCheck: false
     }).concat(
-      logger,
+      environment.env === EnvMode.Development ? logger : [],
       // pluginRegistryApi.middleware,
       // onboardingApi.middleware,
       communityApi.middleware
