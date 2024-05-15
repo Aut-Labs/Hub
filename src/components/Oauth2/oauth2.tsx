@@ -231,7 +231,7 @@ export const useOAuthSocials = () => {
 
     const callbackUrl = encodeURI(`${window.location.origin}/callback`);
     popupRef.current = openPopup(
-      `https://github.com/login/oauth/authorize?response_type=code&client_id=Ov23lipBiWk2FRfWdqla&state=state&scope=read:user&redirect_uri=${callbackUrl}`
+      `https://github.com/login/oauth/authorize?response_type=code&client_id=Ov23lilzR4TMABVhvR6W&state=state&scope=read:user&redirect_uri=${callbackUrl}`
     ) as any;
 
     async function handleMessageListener(message) {
