@@ -9,6 +9,6 @@ services:
 
   hub_main:
     container_name: hub_main
-    image: autlabs/hub:mainnet
+    image: autlabs/hub:main
     ports:
       - '4002:80'
