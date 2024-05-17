@@ -1,11 +1,14 @@
 version: '3.7'
 
 services:
+  hub_mainnet:
+    container_name: hub_mainnet
+    image: autlabs/hub:mainnet
+    ports:
+      - '4001:80'
 
-  nova_showcase_dev:
-    container_name: nova_showcase_dev
-    build:
-      context: .
-      dockerfile: Dockerfile
+  hub_main:
+    container_name: hub_main
+    image: autlabs/hub:mainnet
     ports:
       - '4002:80'

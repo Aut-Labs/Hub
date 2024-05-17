@@ -7,16 +7,9 @@ export enum EnvMode {
 
 export const swEnvVariables = {
   // app config
-  rpcUrls: "REACT_APP_MATIC_RPC_URLS",
   env: "REACT_APP_NODE_ENV",
-  hideDashboard: "REACT_APP_HIDE_DASHBOARD",
   graphApiUrl: "REACT_APP_GRAPH_API_URL",
-
-  // Aut
   apiUrl: "REACT_APP_API_URL",
-  registryAdress: "REACT_APP_COMMUNITY_REGISTRY_ADDRESS",
-  autIDAddress: "REACT_APP_AUT_ID_ADDRESS",
-  // Networks
   networkEnv: "REACT_APP_NETWORK_ENV",
 
   // discord
