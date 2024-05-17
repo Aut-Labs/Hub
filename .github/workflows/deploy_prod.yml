@@ -3,7 +3,7 @@ name: Deployment Prod
 on:
   push:
     branches:
-      - main
+      - mainnet
   workflow_dispatch:
     inputs:
       env_file:
