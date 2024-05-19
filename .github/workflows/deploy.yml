@@ -24,7 +24,7 @@ jobs:
           script: |
             #!/usr/bin/env bash
 
-            cd hub
+            cd Hub
             sudo git checkout main;
             sudo git pull origin main;
 
