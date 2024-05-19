@@ -28,15 +28,15 @@ jobs:
             sudo git checkout main;
             sudo git pull origin main;
 
-            sudo docker build -t autlabs/hub:main . --build-arg ENV_FILE=.env
-            # sudo docker push autlabs/hub:main
-
             echo "Stopping and removing specific service: hub_main"
             sudo docker-compose stop hub_main
             sudo docker-compose rm -f hub_main
 
             echo "Removing dangling images"
             sudo docker rmi $(sudo docker images -f "dangling=true" -q) || true
+
+            sudo docker build -t autlabs/hub:main . --build-arg ENV_FILE=.env
+            # sudo docker push autlabs/hub:main
 
             echo "Pulling the new image"
             # sudo docker-compose pull hub_main
