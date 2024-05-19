@@ -5,10 +5,10 @@ services:
     container_name: hub_mainnet
     image: autlabs/hub:mainnet
     ports:
-      - '4001:80'
+      - '5002:80'
 
   hub_main:
     container_name: hub_main
     image: autlabs/hub:main
     ports:
-      - '4002:80'
+      - '5002:80'

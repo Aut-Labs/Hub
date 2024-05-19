@@ -4,12 +4,6 @@ on:
   push:
     branches:
       - mainnet
-  workflow_dispatch:
-    inputs:
-      env_file:
-        description: 'Environment file to use (e.g., .env, .env_prod)'
-        required: true
-        default: '.env_prod'
 
 jobs:
   build-and-deploy:
@@ -24,13 +18,13 @@ jobs:
       - name: SSH & Deploy
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.SSH_SERVER_IP }}
-          username: ${{ secrets.SSH_SERVER_USER }}
+          host: ${{ secrets.MAINNET_FRONTEND_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.FRONTEND_SSH_KEY }}
           script: |
             #!/usr/bin/env bash
 
-            cd nova-showcase
+            cd hub
             sudo git checkout mainnet;
             sudo git pull origin mainnet;
 
@@ -46,6 +40,6 @@ jobs:
 
             echo "Pulling the new image"
             # sudo docker-compose pull hub_mainnet
-            docker-compose up -d --build hub_mainnet
+            docker-compose up -d --build hub_mainnet --remove-orphans
 
             exit 0;
