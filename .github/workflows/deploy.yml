@@ -40,6 +40,6 @@ jobs:
 
             echo "Pulling the new image"
             # sudo docker-compose pull hub_main
-            docker-compose up -d --build hub_main --remove-orphans
+            docker-compose up -d --build hub_main
 
             exit 0;
