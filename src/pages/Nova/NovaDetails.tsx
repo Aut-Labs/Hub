@@ -664,7 +664,8 @@ const NovaDetails = () => {
                                 color: theme.palette.divider
                               }
                             },
-                            component: "button",
+                            component: "a",
+                            pointerEvents: "none",
                             disabled: true
                           })}
                         >
@@ -722,21 +723,23 @@ const NovaDetails = () => {
                     marginTop: theme.spacing(2)
                   }}
                 >
-                  <AutOsButton
-                    onClick={openEditNovaModal}
-                    type="button"
-                    color="primary"
-                    disabled={!canSetArchetype}
-                    variant="outlined"
-                  >
-                    <Typography
-                      fontWeight="700"
-                      fontSize="16px"
-                      lineHeight="26px"
+                  {canSetArchetype && (
+                    <AutOsButton
+                      onClick={openEditNovaModal}
+                      type="button"
+                      color="primary"
+                      disabled={!canSetArchetype}
+                      variant="outlined"
                     >
-                      Edit Nova
-                    </Typography>
-                  </AutOsButton>
+                      <Typography
+                        fontWeight="700"
+                        fontSize="16px"
+                        lineHeight="26px"
+                      >
+                        Edit Nova
+                      </Typography>
+                    </AutOsButton>
+                  )}
                 </Box>
               </Stack>
             </LeftWrapper>
