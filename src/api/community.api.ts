@@ -126,7 +126,9 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
         novaDAO.metadataUri,
         environment.ipfsGatewayUrl
       );
-
+      const memberAutIDs = autIDs.filter(
+        (a) => a.novaAddress === novaDAO.address
+      );
       const communityProperties = {
         ...novaMetadata.properties,
         market: +novaDAO.market - 1,
@@ -134,7 +136,8 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
         absoluteValue: Math.floor(Math.random() * 100) + 1,
         prestige: 100,
         isAdmin: novaDAO.address === isAdminForNovaAddress,
-        members: autIDs.filter((a) => a.novaAddress === novaDAO.address).length,
+        members: memberAutIDs.length,
+        membersList: memberAutIDs,
         address: novaDAO.address,
         deployer: novaDAO.deployer
       };

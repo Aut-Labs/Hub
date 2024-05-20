@@ -103,9 +103,15 @@ export const NovaList = () => {
           return 0;
         }
       });
-      if (novaFilter === "My Hubs") {
+      if (novaFilter === "My Hub") {
+        debugger;
         novas = novas.filter(
-          (nova) => nova.properties.deployer?.toLowerCase() === userAddress
+          (nova) =>
+            nova.properties.deployer?.toLowerCase() ===
+              userAddress.toLowerCase() ||
+            nova.properties.membersList.some(
+              (autId) => autId.id.toLowerCase() === userAddress.toLowerCase()
+            )
         );
       }
     }
@@ -200,8 +206,8 @@ export const NovaList = () => {
               <MenuItem value="">
                 <em>All Hubs</em>
               </MenuItem>
-              <MenuItem value="My Hubs">
-                <em>My Hubs</em>
+              <MenuItem value="My Hub">
+                <em>My Hub</em>
               </MenuItem>
             </AutSelectField>
           )}

@@ -68,6 +68,7 @@ export class CommunityProperties extends NovaProperties {
   prestige?: number;
   market: string;
   members?: number;
+  membersList?: any[];
   absoluteValue?: number;
   roles: Role[];
   socials: AutSocial[];
@@ -105,6 +106,7 @@ export class CommunityProperties extends NovaProperties {
       this.archetype = data.archetype;
       this.prestige = data.prestige;
       this.members = data.members;
+      this.membersList = data.membersList;
       this.absoluteValue = data.absoluteValue;
       this.additionalProps = data.additionalProps;
       this.archetype = data.archetype;
