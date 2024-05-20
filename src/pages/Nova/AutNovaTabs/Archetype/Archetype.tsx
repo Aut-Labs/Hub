@@ -8,6 +8,7 @@ import { ArchetypeDialog } from "./ArchetypeDialog";
 import AutSDK, { Nova } from "@aut-labs/sdk";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import { ResponsiveContainer } from "recharts";
+import { environment } from "@api/environment";
 
 const Archetypes = ({ nova }) => {
   const [isArchetypeOpen, setIsArchetypeOpen] = React.useState(false);
@@ -16,7 +17,9 @@ const Archetypes = ({ nova }) => {
     setIsArchetypeOpen(false);
   };
 
-  const { address } = useAutConnector();
+  const { address } = useAutConnector({
+    defaultChainId: +environment.defaultChainId
+  });
   const { open } = useWalletConnector();
 
   const isArchetypeSet = React.useMemo(() => {

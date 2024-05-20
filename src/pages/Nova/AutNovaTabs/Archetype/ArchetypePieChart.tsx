@@ -126,15 +126,16 @@ export const archetypeChartValues = (archetype: NovaArchetypeParameters) => {
 };
 
 const CustomTooltip = ({ active, payload }) => {
-  console.log("CustomTooltip", active, payload);
-
   const template = useMemo(() => {
     if (!active || !payload || !payload.length) return null;
 
     const {
       name,
-      payload: { description }
+      payload: { description, value }
     } = payload[0];
+
+    if (value < 40) return null;
+
     return (
       <Box
         sx={{

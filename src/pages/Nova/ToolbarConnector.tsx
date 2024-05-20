@@ -4,11 +4,14 @@ import { useAutConnector, useWalletConnector } from "@aut-labs/connector";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "@store/store.model";
 import { communityApi } from "@api/community.api";
+import { environment } from "@api/environment";
 
 export const TOOLBAR_HEIGHT = 84;
 
 export const ToolbarConnector = () => {
-  const { isConnected, disconnect } = useAutConnector();
+  const { isConnected, disconnect } = useAutConnector({
+    defaultChainId: +environment.defaultChainId
+  });
   const { open } = useWalletConnector();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
