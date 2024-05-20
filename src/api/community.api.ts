@@ -159,7 +159,6 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
       data: { daos: enrichedNovae }
     };
   } catch (e) {
-    debugger;
     return {
       error: e
     };

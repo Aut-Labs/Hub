@@ -104,7 +104,6 @@ export const NovaList = () => {
         }
       });
       if (novaFilter === "My Hub") {
-        debugger;
         novas = novas.filter(
           (nova) =>
             nova.properties.deployer?.toLowerCase() ===
