@@ -630,7 +630,7 @@ export function AutEditNovaDialog(props: EditDialogProps) {
             color="offWhite.main"
             fontWeight="bold"
           >
-            Edit Nova
+            Edit Hub
           </Typography>
         </Box>
         <Box

@@ -136,6 +136,28 @@ const Countdown = styled("div")({
   }
 });
 
+const calculateFontSize = (name: string) => {
+  const words = name.split(" ");
+  const longestWordLength = Math.max(...words.map((word) => word.length));
+  if (longestWordLength >= 22) {
+    return "0.85rem !important";
+  } else if (longestWordLength >= 20) {
+    return "0.95rem !important";
+  } else if (longestWordLength >= 18) {
+    return "1.05rem !important";
+  } else if (longestWordLength >= 16) {
+    return "1.15rem !important";
+  } else if (longestWordLength >= 14) {
+    return "1.25rem !important";
+  } else if (longestWordLength >= 12) {
+    return "1.35rem !important";
+  } else if (longestWordLength >= 10) {
+    return "1.45rem !important";
+  } else {
+    return "";
+  }
+};
+
 export const NovaCard = ({
   daoData,
   isHighlighted
@@ -147,7 +169,6 @@ export const NovaCard = ({
   const [isFlipped, setFlipped] = useState(false);
   const [hasTimePassed, setHasTimePassed] = useState(false);
   const { address } = useAccount();
-
   const selectedArchetype = useMemo(() => {
     if (!daoData?.properties?.archetype?.default) {
       return null;
@@ -428,7 +449,9 @@ export const NovaCard = ({
               />
               <div
                 style={{
+                  width: "100%",
                   display: "flex",
+                  justifyContent: "center",
                   alignItems: "center"
                 }}
               >
@@ -437,6 +460,7 @@ export const NovaCard = ({
                   textAlign="left"
                   lineHeight={1}
                   variant="h3"
+                  fontSize={calculateFontSize(daoData?.name as string)}
                 >
                   {daoData?.name}
                 </Typography>

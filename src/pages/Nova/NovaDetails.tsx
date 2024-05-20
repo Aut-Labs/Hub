@@ -366,7 +366,7 @@ const NovaDetails = () => {
         <AutEditNovaDialog
           open={isEditingNova}
           hideCloseBtn={false}
-          title="Edit Nova"
+          title="Edit Hub"
           nova={nova}
           onClose={handleClose}
         />
@@ -736,7 +736,7 @@ const NovaDetails = () => {
                         fontSize="16px"
                         lineHeight="26px"
                       >
-                        Edit Nova
+                        Edit Hub
                       </Typography>
                     </AutOsButton>
                   )}
