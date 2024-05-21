@@ -56,7 +56,10 @@ const Archetypes = ({ nova }) => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: "20px", height: "100%" }}>
+    <Container
+      maxWidth="lg"
+      sx={{ py: "20px", height: "100%", minHeight: "300px" }}
+    >
       <>
         <ErrorDialog
           handleClose={() => setNotAdminOpen(false)}
@@ -79,11 +82,32 @@ const Archetypes = ({ nova }) => {
               justifyContent: "center",
               gridGap: "12px",
               textAlign: "center",
-              position: "absolute",
-              top: "60px",
-              left: "60px",
-              right: "60px",
-              bottom: "60px",
+              padding: {
+                xs: "30px 20px"
+              },
+              position: {
+                xs: "relative",
+                sm: "absolute"
+              },
+              width: {
+                xs: "100%"
+              },
+              top: {
+                xs: "0",
+                sm: "60px"
+              },
+              left: {
+                xs: "0",
+                sm: "60px"
+              },
+              right: {
+                xs: "0",
+                sm: "60px"
+              },
+              bottom: {
+                xs: "0",
+                sm: "60px"
+              },
               zIndex: 99,
               backdropFilter: "blur(12px)",
               background: "rgba(128, 128, 128, 0.06)",

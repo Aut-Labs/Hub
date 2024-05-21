@@ -55,11 +55,11 @@ export const ToolbarConnector = () => {
             flexDirection: {
               xs: "row",
               sm: "row"
-            },
-            py: {
-              xs: "8px",
-              sm: 0
             }
+            // py: {
+            //   xs: "8px",
+            //   sm: 0
+            // }
           }
         }}
       >
