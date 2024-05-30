@@ -27,6 +27,12 @@ const cleanup = (intervalRef, popupRef, handleMessageListener) => {
   window.removeEventListener("message", handleMessageListener);
 };
 
+const xCleanUp = (xIntervalRef) => {
+  if (xIntervalRef.current) {
+    clearInterval(xIntervalRef.current);
+  }
+};
+
 export const useOAuth = () => {
   const [authenticating, setAuthenticating] = useState(false);
   const [finsihedFlow, setFinishedFlow] = useState(false);
@@ -102,6 +108,7 @@ export const useOAuthSocials = () => {
   const [finsihedFlow, setFinishedFlow] = useState(false);
   const popupRef = useRef<Window>();
   const intervalRef = useRef<ReturnType<typeof setInterval>>();
+  const xIntervalRef = useRef<ReturnType<typeof setInterval>>();
 
   const getAuthDiscord = useCallback(async (onSuccess, onFailure) => {
     setAuthenticating(true);
@@ -182,6 +189,7 @@ export const useOAuthSocials = () => {
           if (error) {
             onFailure(error);
           } else {
+            xCleanUp(xIntervalRef);
             const response = await axios.post(
               `${environment.apiUrl}/autID/config/oauth2AccessTokenX`,
               {
@@ -217,9 +225,38 @@ export const useOAuthSocials = () => {
       }
     }, 550);
 
+    xIntervalRef.current = setInterval(async () => {
+      const oauthResponse = JSON.parse(localStorage.getItem("OAUTH_RESPONSE"));
+      if (oauthResponse) {
+        cleanup(intervalRef, popupRef, handleMessageListener);
+        localStorage.removeItem("OAUTH_RESPONSE");
+        try {
+          if (oauthResponse.error) {
+            onFailure(oauthResponse.error);
+          } else {
+            const response = await axios.post(
+              `${environment.apiUrl}/autID/config/oauth2AccessTokenX`,
+              {
+                code: oauthResponse.payload.code,
+                callbackUrl
+              }
+            );
+            setAuthenticating(false);
+            popupRef.current.close();
+            onSuccess(response.data);
+            xCleanUp(xIntervalRef);
+          }
+        } catch (genericError) {
+          onFailure(genericError);
+          console.error(genericError);
+        }
+      }
+    }, 550);
+
     return () => {
       setAuthenticating(false);
       cleanup(intervalRef, popupRef, handleMessageListener);
+      xCleanUp(xIntervalRef);
     };
   }, []);
 

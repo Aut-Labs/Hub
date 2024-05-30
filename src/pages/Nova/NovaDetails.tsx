@@ -23,7 +23,8 @@ import {
   useCheckHasMintedForNovaQuery,
   ArchetypeTypes,
   useGetAllNovasQuery,
-  useGetNovaTasksQuery
+  useGetNovaTasksQuery,
+  communityApi
 } from "@api/community.api";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import { ReactComponent as DiscordIcon } from "@assets/SocialIcons/DiscordIcon.svg";
@@ -368,7 +369,12 @@ const NovaDetails = () => {
     // };
   }, []);
 
+  const onMinted = async (event: CustomEvent) => {
+    dispatch(communityApi.util.invalidateTags(["hasMinted"]));
+  };
+
   useEffect(() => {
+    window.addEventListener("aut-minted", onMinted);
     // window.addEventListener("aut_profile", onAutMenuProfile);
     // window.addEventListener("aut-Init", onAutInit);
     // window.addEventListener("aut-onConnected", onAutLogin);
@@ -382,6 +388,7 @@ const NovaDetails = () => {
       // if (abort.current) {
       //   abort.current.abort();
       // }
+      window.removeEventListener("aut-minted", onMinted);
     };
   }, []);
 
