@@ -6,7 +6,7 @@ import { useAppDispatch } from "@store/store.model";
 import { communityApi } from "@api/community.api";
 import { environment } from "@api/environment";
 
-export const TOOLBAR_HEIGHT = 84;
+export const TOOLBAR_HEIGHT = 70;
 
 export const ToolbarConnector = () => {
   const { isConnected, disconnect } = useAutConnector({
@@ -32,6 +32,7 @@ export const ToolbarConnector = () => {
         sx={{
           width: "100%",
           zIndex: 99,
+          opacity: 0.9,
           position: "fixed",
           top: 0,
           backgroundColor: "nightBlack.main",

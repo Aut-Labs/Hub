@@ -60,6 +60,7 @@
     "@testing-library/user-event": "~14.5.2",
     "axios": "^1.6.7",
     "buffer": "^6.0.3",
+    "canvas": "^2.11.2",
     "clsx": "^2.1.0",
     "d3-force": "^3.0.0",
     "date-fns": "^3.3.1",
@@ -90,7 +91,8 @@
     "swiper": "^11.0.5",
     "util": "^0.12.5",
     "viem": "^2.7.1",
-    "wagmi": "^2.5.5"
+    "wagmi": "^2.5.5",
+    "xmldom": "^0.6.0"
   },
   "devDependencies": {
     "@types/jest": "~29.5.11",

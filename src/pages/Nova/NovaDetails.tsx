@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useRef } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import {
   Avatar,
   Box,
@@ -23,7 +23,8 @@ import {
   useCheckHasMintedForNovaQuery,
   ArchetypeTypes,
   useGetAllNovasQuery,
-  useGetNovaTasksQuery
+  useGetNovaTasksQuery,
+  communityApi
 } from "@api/community.api";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import { ReactComponent as DiscordIcon } from "@assets/SocialIcons/DiscordIcon.svg";
@@ -47,6 +48,7 @@ import { setNovaAddress } from "@store/WalletProvider/WalletProvider";
 import { MarketTemplates } from "@api/community.model";
 import AutLoading from "@components/AutLoading";
 import { filterActiveNovas } from "./utils";
+import { generateAutIdDAOSigil } from "@utils/AutSIgilGenerator/SigilGenerator";
 
 const socialIcons = {
   discord: DiscordIcon,
@@ -54,6 +56,28 @@ const socialIcons = {
   twitter: TwitterIcon,
   telegram: TelegramIcon,
   lensfrens: LensfrensIcon
+};
+
+const calculateFontSize = (name: string) => {
+  const words = name.split(" ");
+  const longestWordLength = Math.max(...words.map((word) => word.length));
+  if (longestWordLength >= 22) {
+    return "0.85rem !important";
+  } else if (longestWordLength >= 20) {
+    return "0.95rem !important";
+  } else if (longestWordLength >= 18) {
+    return "1.05rem !important";
+  } else if (longestWordLength >= 16) {
+    return "1.15rem !important";
+  } else if (longestWordLength >= 14) {
+    return "1.25rem !important";
+  } else if (longestWordLength >= 12) {
+    return "1.35rem !important";
+  } else if (longestWordLength >= 10) {
+    return "1.45rem !important";
+  } else {
+    return "";
+  }
 };
 
 const AutContainer = styled("div")(({ theme }) => ({
@@ -255,6 +279,18 @@ const NovaDetails = () => {
     });
   }, [data, novaName, address]);
 
+  const [sigil, setSigil] = useState<string | null>(null);
+
+  useEffect(() => {
+    const generate = async () => {
+      const { toBase64 } = await generateAutIdDAOSigil(nova.properties.address);
+      setSigil(toBase64());
+    };
+    if (nova) {
+      generate();
+    }
+  }, []);
+
   const {
     data: result,
     isLoading: checkingIfMinted,
@@ -333,7 +369,12 @@ const NovaDetails = () => {
     // };
   }, []);
 
+  const onMinted = async (event: CustomEvent) => {
+    dispatch(communityApi.util.invalidateTags(["hasMinted"]));
+  };
+
   useEffect(() => {
+    window.addEventListener("aut-minted", onMinted);
     // window.addEventListener("aut_profile", onAutMenuProfile);
     // window.addEventListener("aut-Init", onAutInit);
     // window.addEventListener("aut-onConnected", onAutLogin);
@@ -347,6 +388,7 @@ const NovaDetails = () => {
       // if (abort.current) {
       //   abort.current.abort();
       // }
+      window.removeEventListener("aut-minted", onMinted);
     };
   }, []);
 
@@ -403,59 +445,143 @@ const NovaDetails = () => {
                     justifyContent: "center"
                   }}
                 >
-                  <Avatar
+                  <Box
                     sx={{
                       flex: "1",
                       height: {
                         xs: "120px",
+                        sm: "120px",
                         md: "120px",
                         xxl: "130px"
                       },
-                      borderRadius: "0",
                       width: {
                         xs: "120px",
+                        sm: "120px",
                         md: "120px",
                         xxl: "130px"
                       },
-                      background: "transparent"
+                      "@media (max-width: 370px)": {
+                        height: "100px",
+                        width: "100px"
+                      },
+                      minWidth: "120px",
+                      position: "relative"
                     }}
-                    aria-label="avatar"
                   >
-                    <img
-                      src={ipfsCIDToHttpUrl(nova?.image as string)}
-                      style={{
-                        objectFit: "contain",
+                    <Avatar
+                      sx={{
                         width: "100%",
-                        height: "100%"
-                      }}
-                    />
-                  </Avatar>
-                  {/* TODO: Implement when nova sigil is available  */}
-                  {/* {nova?.sigil && typeof nova?.sigil == "string" && (
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      cursor: "pointer",
-                      bottom: "-20px",
-                      left: "100px",
-                      transform: "rotate(7deg)",
-                      height: {
-                        xs: "130px",
-                        md: "140px",
-                        xxl: "140px"
-                      }
-                    }}
-                  >
-                    <img
-                      style={{
                         height: "100%",
-                        width: "100%"
+                        borderRadius: "0",
+                        background: "transparent"
                       }}
-                      aria-label="card"
-                      src={ipfsCIDToHttpUrl(nova?.sigil as string)}
-                    />
+                      aria-label="avatar"
+                    >
+                      <img
+                        src={ipfsCIDToHttpUrl(nova?.image as string)}
+                        style={{
+                          objectFit: "contain",
+                          width: "100%",
+                          height: "100%"
+                        }}
+                      />
+                    </Avatar>
+
+                    {sigil && (
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          bottom: {
+                            xs: "-15px",
+                            sm: "-15px",
+                            md: "-17.5px",
+                            xxl: "-10px"
+                          },
+                          right: {
+                            xs: "10px",
+                            sm: "10px",
+                            md: "-17.5px",
+                            xxl: "-17.5px"
+                          },
+                          "@media (max-width: 584px)": {
+                            right: "5px"
+                          },
+                          "@media (max-width: 520px)": {
+                            right: "-5px"
+                          },
+                          "@media (max-width: 480px)": {
+                            right: "-15px"
+                          },
+                          height: {
+                            xs: "35px",
+                            sm: "35px",
+                            md: "40px",
+                            xxl: "40px"
+                          },
+                          width: {
+                            xs: "35px",
+                            sm: "35px",
+                            md: "40px",
+                            xxl: "40px"
+                          },
+                          backgroundColor: "transparent",
+                          backdropFilter: "blur(8px)",
+                          borderRadius: "8px",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          padding: "8px",
+                          zIndex: 1
+                        }}
+                      >
+                        <img
+                          style={{
+                            transform: "scale(1.8)",
+                            height: "100%",
+                            width: "100%",
+                            objectFit: "contain"
+                          }}
+                          aria-label="card"
+                          src={sigil}
+                        />
+                      </Box>
+                    )}
                   </Box>
-                )} */}
+
+                  {/* {sigil && (
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        bottom: {
+                          xs: "-17.5px",
+                          md: "-20px",
+                          xxl: "-22.5px"
+                        },
+                        right: { xs: "-17.5px", md: "-20px", xxl: "-22.5px" },
+                        height: { xs: "35px", md: "40px", xxl: "45px" },
+                        width: { xs: "35px", md: "40px", xxl: "45px" },
+                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        backdropFilter: "blur(8px)",
+                        borderRadius: "8px",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        padding: "8px",
+                        boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)"
+                      }}
+                    >
+                      <img
+                        style={{
+                          transform: "scale(1.6)",
+                          height: "100%",
+                          width: "100%",
+                          objectFit: "contain"
+                        }}
+                        aria-label="card"
+                        src={sigil}
+                      />
+                    </Box>
+                  )} */}
                   <div
                     style={{
                       flex: "1",
@@ -471,6 +597,7 @@ const NovaDetails = () => {
                       lineHeight={1}
                       variant="h3"
                       marginBottom={2}
+                      fontSize={calculateFontSize(nova?.name as string)}
                     >
                       {nova?.name}
                     </Typography>

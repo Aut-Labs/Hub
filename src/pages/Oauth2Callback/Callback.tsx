@@ -10,9 +10,12 @@ const Callback = () => {
   useEffect(() => {
     const payload = queryToObject(window.location.search.split("?")[1]);
     const error = payload && payload.error;
-
-    if (!window.opener) {
-      throw new Error("No window opener");
+    if (!window.opener && !error) {
+      localStorage.setItem("OAUTH_RESPONSE", JSON.stringify({ payload }));
+      window.close();
+    } else if (!window.opener && error) {
+      localStorage.setItem("OAUTH_RESPONSE", JSON.stringify({ error }));
+      window.close();
     }
     if (error) {
       window.opener.postMessage({
@@ -26,7 +29,6 @@ const Callback = () => {
         payload
       });
     }
-    // window.close();
   }, []);
 
   return (
