@@ -11,6 +11,7 @@ export const swEnvVariables = {
   graphApiUrl: "REACT_APP_GRAPH_API_URL",
   apiUrl: "REACT_APP_API_URL",
   networkEnv: "REACT_APP_NETWORK_ENV",
+  defaultChainId: "REACT_APP_DEFAULT_CHAIN_ID",
 
   // discord
   discordClientId: "REACT_APP_DISCORD_CLIENT_ID",

@@ -35,7 +35,7 @@ jobs:
             echo "Removing dangling images"
             sudo docker rmi $(sudo docker images -f "dangling=true" -q) || true
 
-            sudo docker build -t autlabs/hub:mainnet . --build-arg ENV_FILE=.env
+            sudo docker build -t autlabs/hub:mainnet . --build-arg ENV_FILE=.env_prod
             # sudo docker push autlabs/hub:mainnet
 
             echo "Pulling the new image"

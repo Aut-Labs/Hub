@@ -42,7 +42,9 @@ const AutWallet = () => {
     status,
     address,
     chainId
-  } = useAutConnector();
+  } = useAutConnector({
+    defaultChainId: +environment.defaultChainId
+  });
 
   const novaAddress = useSelector(NovaAddress);
   const selectedRoleId = useSelector(SelectedRoleId);

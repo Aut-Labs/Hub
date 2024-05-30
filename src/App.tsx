@@ -60,7 +60,10 @@ function App() {
                   backgroundAttachment: "fixed",
                   backgroundSize: "cover",
                   backgroundPosition: "center",
-                  height: "100vh",
+                  height: {
+                    xs: window.innerHeight,
+                    sm: "100%"
+                  },
                   width: "100vw",
                   position: "fixed",
                   top: 0,
