@@ -94,7 +94,7 @@ export const ToolbarConnector = () => {
           <Link
             fontSize={24}
             color="#FFF"
-            href="https://aut.id/"
+            href={environment.landingPageUrl}
             target="_blank"
             rel="noopener noreferrer"
             sx={{
@@ -107,6 +107,27 @@ export const ToolbarConnector = () => {
             }}
           >
             Āut Labs
+          </Link>
+          <Link
+            fontSize={24}
+            color="#FFF"
+            href={environment.launchpadUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{
+              textDecoration: "none",
+              cursor: "pointer",
+              display: {
+                xs: "none",
+                md: "flex"
+              },
+              ml: {
+                xs: "12px",
+                md: "33px"
+              }
+            }}
+          >
+            Launchpad
           </Link>
           <Link
             fontSize={24}
