@@ -4,7 +4,7 @@ import { useAutConnector, useWalletConnector } from "@aut-labs/connector";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "@store/store.model";
 import { communityApi } from "@api/community.api";
-import { environment } from "@api/environment";
+import { autUrls, environment } from "@api/environment";
 
 export const TOOLBAR_HEIGHT = 70;
 
@@ -94,7 +94,7 @@ export const ToolbarConnector = () => {
           <Link
             fontSize={24}
             color="#FFF"
-            href="https://aut.id/"
+            href={autUrls().landingPage}
             target="_blank"
             rel="noopener noreferrer"
             sx={{
@@ -107,6 +107,27 @@ export const ToolbarConnector = () => {
             }}
           >
             Āut Labs
+          </Link>
+          <Link
+            fontSize={24}
+            color="#FFF"
+            href={autUrls().launchpad}
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{
+              textDecoration: "none",
+              cursor: "pointer",
+              display: {
+                xs: "none",
+                md: "flex"
+              },
+              ml: {
+                xs: "12px",
+                md: "33px"
+              }
+            }}
+          >
+            Launchpad
           </Link>
           <Link
             fontSize={24}
