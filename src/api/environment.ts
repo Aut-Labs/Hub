@@ -12,6 +12,8 @@ export const swEnvVariables = {
   apiUrl: "REACT_APP_API_URL",
   networkEnv: "REACT_APP_NETWORK_ENV",
   defaultChainId: "REACT_APP_DEFAULT_CHAIN_ID",
+  landingPageUrl: "REACT_APP_LANDING_PAGE_URL",
+  launchpadUrl: "REACT_APP_LAUNCHPAD_URL",
 
   // discord
   discordClientId: "REACT_APP_DISCORD_CLIENT_ID",
