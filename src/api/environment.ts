@@ -12,8 +12,6 @@ export const swEnvVariables = {
   apiUrl: "REACT_APP_API_URL",
   networkEnv: "REACT_APP_NETWORK_ENV",
   defaultChainId: "REACT_APP_DEFAULT_CHAIN_ID",
-  landingPageUrl: "REACT_APP_LANDING_PAGE_URL",
-  launchpadUrl: "REACT_APP_LAUNCHPAD_URL",
 
   // discord
   discordClientId: "REACT_APP_DISCORD_CLIENT_ID",
@@ -36,21 +34,17 @@ export const environment: typeof swEnvVariables =
 export const autUrls = () => {
   if (environment.env === EnvMode.Development) {
     return {
-      tryAut: "https://try-internal.aut.id/",
-      novaDashboard: "https://nova-internal.aut.id/",
-      myAut: "https://my-internal.aut.id/",
-      showcase: "https://showcase-internal.aut.id/",
-      leaderboard: "https://leaderboard-internal.aut.id/",
-      expander: "https://expander-internal.aut.id/"
+      myAut: "https://internal.os.aut.id/",
+      hub: "https://internal.hub.sbs/",
+      launchpad: "https://internal.launch.hub.sbs/",
+      landingPage: "https://aut.gg/"
     };
   }
 
   return {
-    tryAut: "https://try.aut.id/",
-    novaDashboard: "https://nova.aut.id/",
-    myAut: "https://my.aut.id/",
-    showcase: "https://showcase.aut.id/",
-    leaderboard: "https://leaderboard.aut.id/",
-    expander: "https://expander.aut.id/"
+    myAut: "https://os.aut.id/",
+    hub: "https://hub.sbs/",
+    launchpad: "https://launch.hub.sbs/",
+    landingPage: "https://aut.gg/"
   };
 };
