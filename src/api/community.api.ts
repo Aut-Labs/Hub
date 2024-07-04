@@ -79,17 +79,41 @@ export enum Markets {
 interface Filters {
   connectedAddress?: string;
 }
+
+// @TODO @antonio: Implement the registerDomain function
+// export const registerDomain = async (body: any, api: BaseQueryApi) => {
+//   try {
+//     const sdk = await AutSDK.getInstance();
+//     const domain_ = "";
+//     const novaAddress_ = "";
+//     const metadataUri_ = "";
+//     const result = await sdk.nova.contract.functions.registerDomain(
+//       domain_,
+//       novaAddress_,
+//       metadataUri_
+//     );
+//     return {
+//       data: result
+//     };
+//   } catch (error) {
+//     return {
+//       error: error?.message
+//     };
+//   }
+// };
+
 const getAllNovas = async (body: any, api: BaseQueryApi) => {
   try {
     const fetch = gql`
       query GetNovasAndAutIds {
-        novaDAOs(skip: 0, first: 10000) {
+        hubs(skip: 0, first: 10000) {
           id
           deployer
           address
           market
           metadataUri
           minCommitment
+          domain
         }
         autIDs(skip: 0, first: 10000) {
           id
@@ -99,7 +123,7 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
     `;
 
     const response = await apolloClient.query<any>({ query: fetch });
-    const { novaDAOs, autIDs } = response.data;
+    const { hubs, autIDs } = response.data;
 
     let isAdminForNovaAddress = null;
     if (body?.connectedAddress) {
@@ -121,37 +145,34 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
       }
     }
 
-    const fetchAndConstructCommunity = async (novaDAO) => {
+    const fetchAndConstructCommunity = async (hub) => {
       const novaMetadata = await fetchMetadata<any>(
-        novaDAO.metadataUri,
+        hub.metadataUri,
         environment.ipfsGatewayUrl
       );
-      const memberAutIDs = autIDs.filter(
-        (a) => a.novaAddress === novaDAO.address
-      );
+      const memberAutIDs = autIDs.filter((a) => a.novaAddress === hub.address);
       const communityProperties = {
         ...novaMetadata.properties,
-        market: +novaDAO.market - 1,
+        domain: hub.domain,
+        market: +hub.market - 1,
         roles: novaMetadata.properties.rolesSets[0].roles,
         absoluteValue: Math.floor(Math.random() * 100) + 1,
         prestige: 100,
-        isAdmin: novaDAO.address === isAdminForNovaAddress,
+        isAdmin: hub.address === isAdminForNovaAddress,
         members: memberAutIDs.length,
         membersList: memberAutIDs,
-        address: novaDAO.address,
-        deployer: novaDAO.deployer
+        address: hub.address,
+        deployer: hub.deployer
       };
 
       return new Community({
-        ...novaDAO,
+        ...hub,
         ...novaMetadata,
         properties: communityProperties
       } as unknown as Community);
     };
 
-    const promises = novaDAOs.map((novaDAO) =>
-      fetchAndConstructCommunity(novaDAO)
-    );
+    const promises = hubs.map((hub) => fetchAndConstructCommunity(hub));
 
     const enrichedNovae = await Promise.all(promises);
 
@@ -439,9 +460,6 @@ export const communityApi = createApi({
       }
     }),
     getAllNovas: builder.query<
-      // {
-      //   daos: NovaDAO[];
-      // },
       {
         daos: Community[];
       },

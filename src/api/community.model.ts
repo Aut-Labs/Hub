@@ -86,6 +86,8 @@ export class CommunityProperties extends NovaProperties {
 
   domains: CommunityDomains[];
 
+  domain: string;
+
   archetype: {
     default: number;
     parameters: NovaArchetypeParameters;
@@ -103,6 +105,7 @@ export class CommunityProperties extends NovaProperties {
       this.roles = data.roles;
       this.address = data.address;
       this.socials = data.socials;
+      this.domain = data.domain;
       this.archetype = data.archetype;
       this.prestige = data.prestige;
       this.members = data.members;
@@ -163,14 +166,14 @@ export class Community extends BaseNFTModel<CommunityProperties> {
   }
 }
 
-export class NovaDAOProperties extends NovaProperties {
+export class HubProperties extends NovaProperties {
   address?: string;
 
   socials: AutSocial[];
 
   quests: Quest[];
 
-  constructor(data: NovaDAOProperties) {
+  constructor(data: HubProperties) {
     super(data);
     if (!data) {
       this.rolesSets = [];
@@ -184,17 +187,17 @@ export class NovaDAOProperties extends NovaProperties {
     }
   }
 }
-export class NovaDAO extends BaseNFTModel<NovaDAOProperties> {
+export class Hub extends BaseNFTModel<HubProperties> {
   daoAddress: string;
   admin: string;
   onboardingQuestAddress: string;
   daoMetadataUri: string;
-  constructor(data: NovaDAO = {} as NovaDAO) {
+  constructor(data: Hub = {} as Hub) {
     super(data);
     this.daoAddress = data.daoAddress;
     this.admin = data.admin;
     this.onboardingQuestAddress = data.onboardingQuestAddress;
-    this.properties = new NovaDAOProperties(data.properties);
+    this.properties = new HubProperties(data.properties);
   }
 }
 
