@@ -25,6 +25,11 @@ import { useParams } from "react-router-dom";
 import { useAccount } from "wagmi";
 import { Community, MarketTemplates } from "@api/community.model";
 import { filterActiveNovas } from "./utils";
+import { AUTH_TOKEN_KEY, authorizeWithWeb3 } from "@api/auth.api";
+import { useAutConnector } from "@aut-labs/connector";
+import axios from "axios";
+import { environment } from "@api/environment";
+import { useOAuthSocials } from "@components/Oauth2/oauth2";
 
 const AutContainer = styled("div")(() => ({
   display: "flex",
@@ -61,6 +66,9 @@ export const NovaList = () => {
   const [archetypeFilter, setArchetypeFilter] = useState("");
   const { novaName } = useParams();
   const { address } = useAccount();
+  const { multiSigner } = useAutConnector();
+
+  const { getAuthX, authenticating } = useOAuthSocials();
 
   const { data, isLoading, isFetching, refetch } = useGetAllNovasQuery(
     {
@@ -135,6 +143,16 @@ export const NovaList = () => {
     return novas;
   }, [data, novaName, address, archetypeFilter, marketFilter, novaFilter]);
 
+  const authorize = async () => {
+    const isAuthorized = await authorizeWithWeb3(multiSigner, address);
+    const authToken = localStorage.getItem(AUTH_TOKEN_KEY);
+    const userData = await axios.get(`${environment.apiUrl}/autID/user/me`, {
+      headers: {
+        Authorization: authToken
+      }
+    });
+  };
+
   return (
     <PerfectScrollbar
       style={{
@@ -151,6 +169,37 @@ export const NovaList = () => {
       }}
     >
       <AutContainer>
+        {/* <Button
+          color="offWhite"
+          disabled={isLoading || isFetching}
+          onClick={() => authorize()}
+        >
+          Authorize
+        </Button>
+        <Button
+          color="offWhite"
+          onClick={() => {
+            getAuthX(
+              async (data) => {
+                const { access_token } = data;
+                // const response = await fetch(
+                //   "https://api.twitter.com/2/users/me",
+                //   {
+                //     headers: {
+                //       Authorization: `Bearer ${access_token}`
+                //     }
+                //   }
+                // );
+                debugger;
+              },
+              () => {
+                // setLoading(false);
+              }
+            );
+          }}
+        >
+          Verify Twitter Follow
+        </Button> */}
         <ErrorDialog handleClose={() => null} open={null} message={null} />
         <Box
           sx={{
