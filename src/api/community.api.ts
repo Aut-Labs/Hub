@@ -80,27 +80,26 @@ interface Filters {
   connectedAddress?: string;
 }
 
-// @TODO @antonio: Implement the registerDomain function
-// export const registerDomain = async (body: any, api: BaseQueryApi) => {
-//   try {
-//     const sdk = await AutSDK.getInstance();
-//     const domain_ = "";
-//     const novaAddress_ = "";
-//     const metadataUri_ = "";
-//     const result = await sdk.nova.contract.functions.registerDomain(
-//       domain_,
-//       novaAddress_,
-//       metadataUri_
-//     );
-//     return {
-//       data: result
-//     };
-//   } catch (error) {
-//     return {
-//       error: error?.message
-//     };
-//   }
-// };
+export const registerDomain = async (body: any, api: BaseQueryApi) => {
+  try {
+    const sdk = await AutSDK.getInstance();
+    debugger;
+    const { domain, novaAddress, metadataUri } = body;
+
+    const result = await sdk.nova.contract.functions.registerDomain(
+      domain,
+      novaAddress,
+      metadataUri
+    );
+    return {
+      data: result
+    };
+  } catch (error) {
+    return {
+      error: error?.message
+    };
+  }
+};
 
 const getAllNovas = async (body: any, api: BaseQueryApi) => {
   try {
@@ -162,9 +161,9 @@ const getAllNovas = async (body: any, api: BaseQueryApi) => {
         members: memberAutIDs.length,
         membersList: memberAutIDs,
         address: hub.address,
-        deployer: hub.deployer
+        deployer: hub.deployer,
+        metadataUri: hub.metadataUri
       };
-
       return new Community({
         ...hub,
         ...novaMetadata,
@@ -431,6 +430,10 @@ export const communityApi = createApi({
       return setArchetype(body, api);
     }
 
+    if (url === "registerDomain") {
+      return registerDomain(body, api);
+    }
+
     return {
       data: "Test"
     };
@@ -444,6 +447,17 @@ export const communityApi = createApi({
           url: "getAllMembers"
         };
       }
+    }),
+    registerDomain: builder.mutation<
+      void,
+      { domain: string; novaAddress: string; metadataUri: string }
+    >({
+      query: (body) => ({
+        body,
+        url: "registerDomain"
+      })
+      // Optionally, you can invalidate relevant queries here
+      // invalidatesTags: ["AllNovas"]
     }),
     getCommunity: builder.query<
       {
@@ -600,6 +614,7 @@ export const communityApi = createApi({
 });
 
 export const {
+  useRegisterDomainMutation,
   useLazyCheckHasMintedForNovaQuery,
   useCheckHasMintedForNovaQuery,
   useGetAllMembersQuery,
