@@ -37,10 +37,10 @@
   },
   "dependencies": {
     "@apollo/client": "^3.9.1",
-    "@aut-labs/abi-types": "^0.0.76-dev",
+    "@aut-labs/abi-types": "^0.0.77-dev",
     "@aut-labs/connector": "^0.0.93",
-    "@aut-labs/d-aut": "^1.0.165-dev",
-    "@aut-labs/sdk": "^0.0.161-dev",
+    "@aut-labs/d-aut": "^1.0.166-dev",
+    "@aut-labs/sdk": "^0.0.162-dev",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@leenguyen/react-flip-clock-countdown": "^1.5.0",
