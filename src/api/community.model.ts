@@ -72,6 +72,7 @@ export class CommunityProperties extends NovaProperties {
   absoluteValue?: number;
   roles: Role[];
   socials: AutSocial[];
+  metadataUri: string;
 
   userData?: {
     role: string;
@@ -103,6 +104,7 @@ export class CommunityProperties extends NovaProperties {
       this.commitment = data.commitment;
       this.rolesSets = data.rolesSets;
       this.roles = data.roles;
+      this.metadataUri = data.metadataUri;
       this.address = data.address;
       this.socials = data.socials;
       this.domain = data.domain;
@@ -152,6 +154,7 @@ export class Community extends BaseNFTModel<CommunityProperties> {
         archetype: community.properties.archetype,
         rolesSets: community.properties.rolesSets,
         timestamp: community.properties.timestamp,
+        metadataUri: community.properties.metadataUri,
         socials: community.properties.socials.map((social) => {
           return social;
         })

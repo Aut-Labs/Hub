@@ -17,6 +17,7 @@ import background1 from "@assets/autos/background1.png";
 import AutLoading from "@components/AutLoading";
 import AutWallet from "./AutWallet";
 import Callback from "./pages/Oauth2Callback/Callback";
+import SimulationChart from "./pages/Nova/Chart";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -75,6 +76,7 @@ function App() {
                   <Route path="/:novaName?" element={<NovaList />} />
                   <Route path="callback" element={<Callback />} />
                   <Route path="project/:novaName" element={<NovaDetails />} />
+                  <Route path="chart" element={<SimulationChart />} />
                 </Routes>
               </Box>
             </>
