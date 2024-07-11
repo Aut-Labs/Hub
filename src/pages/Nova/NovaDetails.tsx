@@ -18,6 +18,7 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import { TOOLBAR_HEIGHT } from "./ToolbarConnector";
 import CopyAddress from "@components/CopyAddress";
 import CalendarIcon from "@assets/icons/calendar.png";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 import {
   useCheckHasMintedForNovaQuery,
@@ -52,6 +53,9 @@ import { filterActiveNovas } from "./utils";
 import { generateAutIdDAOSigil } from "@utils/AutSIgilGenerator/SigilGenerator";
 import { register } from "module";
 import DomainRegistrationDialog from "./RegisterDomainDialog";
+import LoadingDialog from "@components/Dialog/LoadingPopup";
+import ErrorDialog from "@components/Dialog/ErrorPopup";
+import SuccessDialog from "@components/Dialog/SuccessPopup";
 
 const socialIcons = {
   discord: DiscordIcon,
@@ -263,9 +267,17 @@ const NovaDetails = () => {
   const { address } = useAccount();
   const navigate = useNavigate();
   const [openDomainDialog, setOpenDomainDialog] = useState(false);
+  const [domain, setDomain] = useState("");
 
-  const [registerDomain, { isLoading: isRegistering }] =
-    useRegisterDomainMutation();
+  const [
+    registerDomain,
+    {
+      isLoading: isRegisteringDomain,
+      isError: failedToRegisterDomain,
+      reset,
+      isSuccess: successfullyRegisteredDomain
+    }
+  ] = useRegisterDomainMutation();
 
   const { data, isSuccess } = useGetAllNovasQuery(
     {
@@ -281,10 +293,16 @@ const NovaDetails = () => {
   );
 
   const nova = useMemo(() => {
-    return filterActiveNovas(data?.daos || [], address).find((d) => {
-      return d.name?.toLowerCase() === novaName?.toLowerCase();
-    });
-  }, [data, novaName, address]);
+    const novaResult = filterActiveNovas(data?.daos || [], address).find(
+      (d) => {
+        return d.name?.toLowerCase() === novaName?.toLowerCase();
+      }
+    );
+    if (domain) {
+      novaResult.properties.domain = domain;
+    }
+    return novaResult;
+  }, [data, novaName, address, domain]);
 
   const [sigil, setSigil] = useState<string | null>(null);
 
@@ -376,6 +394,11 @@ const NovaDetails = () => {
     // };
   }, []);
 
+  // if (nova?.properties && address) {
+  //   const bool = address === nova.properties.deployer.toLowerCase();
+  //   debugger;
+  // }
+
   const onMinted = async (event: CustomEvent) => {
     dispatch(communityApi.util.invalidateTags(["hasMinted"]));
   };
@@ -420,15 +443,42 @@ const NovaDetails = () => {
           onClose={handleClose}
         />
       )}
+      <LoadingDialog
+        open={isRegisteringDomain}
+        message="Registering Hub Domain..."
+      />
+
+      <SuccessDialog
+        titleVariant="h3"
+        subtitleVariant="h4"
+        message="Congrats!"
+        subtitle="You have registered your hub's domain!"
+        handleClose={() => {
+          reset();
+          setOpenDomainDialog(false);
+        }}
+        open={successfullyRegisteredDomain}
+        // action={() => handleMint()}
+      ></SuccessDialog>
+
+      <ErrorDialog
+        handleClose={() => reset()}
+        open={failedToRegisterDomain}
+        message={"Failed to register domain."}
+      />
       <DomainRegistrationDialog
         open={openDomainDialog}
         onClose={() => setOpenDomainDialog(false)}
-        onRegister={(domain: string) => {
-          registerDomain({
+        onRegister={async (domain: string) => {
+          const result = await registerDomain({
             domain,
             novaAddress: nova.properties.address,
             metadataUri: nova.properties.metadataUri
           });
+          if ((result as any)?.data?.success) {
+            // hack cause query fails to refetch
+            setDomain(domain);
+          }
         }}
       ></DomainRegistrationDialog>
       <PerfectScrollbar
@@ -618,8 +668,30 @@ const NovaDetails = () => {
                       fontSize={calculateFontSize(nova?.name as string)}
                     >
                       {nova?.name}
+                      {nova.properties.domain && (
+                        <SvgIcon
+                          component={CheckCircleIcon}
+                          sx={{
+                            fontSize: "0.8em",
+                            marginLeft: "4px",
+                            verticalAlign: "middle",
+                            color: theme.palette.success.main
+                          }}
+                        />
+                      )}
                     </Typography>
                     <CopyAddress address={nova?.properties.address} />
+                    {/* Add domain information here */}
+                    <Typography
+                      color="offWhite.main"
+                      textAlign="center"
+                      variant="body2"
+                      marginTop={1}
+                    >
+                      {nova.properties.domain
+                        ? nova.properties.domain
+                        : "Domain not registered"}
+                    </Typography>
                   </div>
                 </Box>
                 <Stack
@@ -885,39 +957,28 @@ const NovaDetails = () => {
                       </Typography>
                     </AutOsButton>
                   )}
+                  {address.toLowerCase() ===
+                    nova.properties.deployer.toLowerCase() &&
+                    !nova.properties.domain && (
+                      <Box marginTop={theme.spacing(2)}>
+                        <AutOsButton
+                          onClick={() => setOpenDomainDialog(true)}
+                          type="button"
+                          color="primary"
+                          variant="outlined"
+                        >
+                          <Typography
+                            fontWeight="700"
+                            fontSize="16px"
+                            lineHeight="26px"
+                          >
+                            Register Domain
+                          </Typography>
+                        </AutOsButton>
+                      </Box>
+                    )}
                 </Box>
               </Stack>
-              <Box marginTop={theme.spacing(2)}>
-                <Typography
-                  color="offWhite.main"
-                  textAlign="center"
-                  variant="body2"
-                >
-                  Domain: {nova.properties.domain || "Not registered"}
-                </Typography>
-              </Box>
-
-              {
-                // address === nova.properties.deployer
-                true && !nova.properties.domain && (
-                  <Box marginTop={theme.spacing(2)}>
-                    <AutOsButton
-                      onClick={() => setOpenDomainDialog(true)}
-                      type="button"
-                      color="primary"
-                      variant="outlined"
-                    >
-                      <Typography
-                        fontWeight="700"
-                        fontSize="16px"
-                        lineHeight="26px"
-                      >
-                        Register Domain
-                      </Typography>
-                    </AutOsButton>
-                  </Box>
-                )
-              }
             </LeftWrapper>
             <RightWrapper>
               {!!tasks && !!nova && (

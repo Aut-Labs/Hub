@@ -52,14 +52,39 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
 const DomainRegistrationDialog = ({ open, onClose, onRegister }) => {
   const [domain, setDomain] = useState("");
   const [isValid, setIsValid] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    setIsValid(domain.trim() !== "" && domain.endsWith(".hub"));
+    validateDomain(domain);
   }, [domain]);
+
+  const validateDomain = (value) => {
+    const domainRegex =
+      /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z]{2,})+$/;
+    const hubEndingRegex = /\.hub$/i;
+    const trimmedValue = value.trim().toLowerCase();
+
+    if (trimmedValue === "") {
+      setIsValid(false);
+      setErrorMessage("Domain name is required");
+    } else if (!domainRegex.test(trimmedValue)) {
+      setIsValid(false);
+      setErrorMessage("Invalid domain format");
+    } else if (trimmedValue.length > 253) {
+      setIsValid(false);
+      setErrorMessage("Domain name is too long (max 253 characters)");
+    } else if (!hubEndingRegex.test(trimmedValue)) {
+      setIsValid(false);
+      setErrorMessage("Domain must end with '.hub'");
+    } else {
+      setIsValid(true);
+      setErrorMessage("");
+    }
+  };
 
   const handleRegister = () => {
     if (isValid) {
-      onRegister(domain);
+      onRegister(domain.trim().toLowerCase());
     }
   };
 
@@ -72,7 +97,7 @@ const DomainRegistrationDialog = ({ open, onClose, onRegister }) => {
       </DialogTitle>
       <DialogContent>
         <Typography variant="body2" color="offWhite.main" gutterBottom>
-          Enter a domain name for your Nova. The domain must end with .hub
+          Enter a domain name for your Nova.
         </Typography>
         <StyledTextField
           autoFocus
@@ -82,12 +107,8 @@ const DomainRegistrationDialog = ({ open, onClose, onRegister }) => {
           fullWidth
           value={domain}
           onChange={(e) => setDomain(e.target.value)}
-          helperText={
-            domain && !domain.endsWith(".hub")
-              ? "Domain must end with .hub"
-              : " "
-          }
-          error={Boolean(domain && !domain.endsWith(".hub"))}
+          helperText={errorMessage || " "}
+          error={Boolean(errorMessage)}
         />
       </DialogContent>
       <DialogActions>
@@ -100,7 +121,9 @@ const DomainRegistrationDialog = ({ open, onClose, onRegister }) => {
             width: "100px"
           }}
         >
-          Cancel
+          <Typography fontWeight="700" fontSize="16px" lineHeight="26px">
+            Cancel
+          </Typography>
         </AutOsButton>
         <AutOsButton
           onClick={handleRegister}

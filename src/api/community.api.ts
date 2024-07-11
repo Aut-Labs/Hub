@@ -15,6 +15,7 @@ import { ReactComponent as Growth } from "@assets/icons/growth.svg";
 import { ReactComponent as Performance } from "@assets/icons/performance.svg";
 import { ReactComponent as Reputation } from "@assets/icons/reputation.svg";
 import { ReactComponent as Conviction } from "@assets/icons/conviction.svg";
+import { ContractTransactionReceipt } from "ethers";
 
 export const ArchetypeTypes = {
   [NovaArchetype.SIZE]: {
@@ -80,23 +81,80 @@ interface Filters {
   connectedAddress?: string;
 }
 
+// export const registerDomain = async () => {
+//   try {
+//     const sdk = await AutSDK.getInstance();
+//     const domain = "test.hub";
+//     const novaAddress = "0xf133A029e3Bb7E70250DB0B22E39A9F0d3C77423";
+//     const metadataUri = "ipfs://bafybeib2";
+//     debugger;
+
+//     const novaRegistry: NovaRegistry = sdk.initService<NovaRegistry>(
+//       NovaRegistry,
+//       "0x98363e09Fe3224d660FE0B7A320C2611Dbf19093" // @ant from query server api novaRegistryAddress
+//     );
+//     const tx = await novaRegistry.contract.contract.registerDomain(
+//       domain,
+//       novaAddress,
+//       metadataUri
+//     );
+//     const result = await tx.wait();
+//     return {
+//       data: result
+//     };
+//   } catch (error) {
+//     return {
+//       error: error?.message
+//     };
+//   }
+// };
 export const registerDomain = async (body: any, api: BaseQueryApi) => {
   try {
     const sdk = await AutSDK.getInstance();
-    debugger;
     const { domain, novaAddress, metadataUri } = body;
 
-    const result = await sdk.nova.contract.functions.registerDomain(
+    const result = await sdk.novaRegistry.contract.functions.registerDomain(
       domain,
       novaAddress,
       metadataUri
     );
-    return {
-      data: result
-    };
+
+    const receipt: ContractTransactionReceipt = await result.wait();
+    // const receipt: any = await new Promise((resolve) => {
+    //   setTimeout(() => {
+    //     resolve({
+    //       status: 1,
+    //       hash: "asdasda",
+    //       blockNumber: "1414124",
+    //       gasUsed: "124124"
+    //     });
+    //   }, 3000);
+    // });
+    if (receipt.status === 1) {
+      return {
+        data: {
+          success: true,
+          transactionHash: receipt.hash,
+          blockNumber: receipt.blockNumber,
+          gasUsed: receipt.gasUsed.toString()
+        }
+      };
+    } else {
+      return {
+        error: {
+          success: false,
+          message: "Transaction failed",
+          transactionHash: receipt.hash
+        }
+      };
+    }
   } catch (error) {
     return {
-      error: error?.message
+      error: {
+        success: false,
+        message:
+          error instanceof Error ? error.message : "An unknown error occurred"
+      }
     };
   }
 };
@@ -455,9 +513,69 @@ export const communityApi = createApi({
       query: (body) => ({
         body,
         url: "registerDomain"
-      })
-      // Optionally, you can invalidate relevant queries here
-      // invalidatesTags: ["AllNovas"]
+      }),
+      // async onQueryStarted(
+      //   { domain, novaAddress },
+      //   { dispatch, queryFulfilled }
+      // ) {
+      //   debugger;
+      //   const patchResult = dispatch(
+      //     communityApi.util.updateQueryData(
+      //       "getAllNovas",
+      //       undefined,
+      //       (draft) => {
+      //         debugger;
+      //         const novaToUpdate = draft.daos.find(
+      //           (dao) => dao.properties.address === novaAddress
+      //         );
+      //         if (novaToUpdate) {
+      //           novaToUpdate.properties.domain = domain;
+      //         }
+      //       }
+      //     )
+      //   );
+      //   try {
+      //     await queryFulfilled;
+      //   } catch {
+      //     patchResult.undo();
+      //   }
+      // },
+      // onQueryStarted: async (arg, { dispatch, queryFulfilled, getState }) => {
+      //   try {
+      //     await queryFulfilled;
+      //     const allQueries = getState().communityApi.queries;
+      //     Object.entries(allQueries).forEach(([queryKey, queryValue]) => {
+      //       if (queryKey.includes("getAllNovas")) {
+      //         dispatch(
+      //           communityApi.util.updateQueryData(
+      //             "getAllNovas",
+      //             queryValue.originalArgs,
+      //             (draft) => {
+      //               debugger;
+      //               const index = draft.daos.findIndex(
+      //                 (dao) => dao?.properties.address === arg.novaAddress
+      //               );
+      //               console.log(draft);
+      //               if (index !== -1) {
+      //                 const newObj = {
+      //                   ...draft.daos[index]
+      //                 };
+      //                 debugger;
+      //                 newObj.properties.domain = arg.domain;
+      //                 draft.daos[index] = {
+      //                   ...newObj
+      //                 };
+      //               }
+      //             }
+      //           )
+      //         );
+      //       }
+      //     });
+      //   } catch (error) {
+      //     // Handle error, possibly undo optimistic updates
+      //   }
+      // },
+      invalidatesTags: ["AllNovas"]
     }),
     getCommunity: builder.query<
       {
