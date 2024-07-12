@@ -477,7 +477,7 @@ const NovaDetails = () => {
           });
           if ((result as any)?.data?.success) {
             // hack cause query fails to refetch
-            setDomain(domain);
+            setDomain(`${domain}.hub`);
           }
         }}
       ></DomainRegistrationDialog>
