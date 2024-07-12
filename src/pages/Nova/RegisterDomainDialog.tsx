@@ -7,7 +7,8 @@ import {
   TextField,
   Typography,
   Box,
-  styled
+  styled,
+  InputAdornment
 } from "@mui/material";
 import { AutOsButton } from "@components/AutButton";
 
@@ -59,26 +60,27 @@ const DomainRegistrationDialog = ({ open, onClose, onRegister }) => {
   }, [domain]);
 
   const validateDomain = (value) => {
-    const domainRegex =
-      /^[a-zA-Z0-9](?:[a-zA-Z0-9]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z]{2,})+$/;
-    const hubEndingRegex = /\.hub$/i;
+    // Domain regex breakdown:
+    // ^[a-zA-Z0-9]                 - Start with a letter or number
+    // (?:[a-zA-Z0-9]{0,61}         - Followed by 0 to 61 letters or numbers
+    //   [a-zA-Z0-9])?              - Ending with a letter or number (optional group)
+    const domainRegex = /^[a-zA-Z0-9](?:[a-zA-Z0-9]{0,61}[a-zA-Z0-9])?$/;
     const trimmedValue = value.trim().toLowerCase();
 
     if (trimmedValue === "") {
       setIsValid(false);
-      setErrorMessage("Domain name is required");
+      setErrorMessage("Please enter a domain name");
     } else if (trimmedValue.includes("-")) {
       setIsValid(false);
-      setErrorMessage("Domain name cannot contain dashes");
+      setErrorMessage("Domain name cannot contain hyphens");
     } else if (!domainRegex.test(trimmedValue)) {
       setIsValid(false);
-      setErrorMessage("Invalid domain format");
+      setErrorMessage(
+        "Please enter a valid domain name (Cannot contain symbols or spaces)"
+      );
     } else if (trimmedValue.length > 253) {
       setIsValid(false);
-      setErrorMessage("Domain name is too long (max 253 characters)");
-    } else if (!hubEndingRegex.test(trimmedValue)) {
-      setIsValid(false);
-      setErrorMessage("Domain must end with '.hub'");
+      setErrorMessage("Domain name exceeds maximum length of 253 characters");
     } else {
       setIsValid(true);
       setErrorMessage("");
@@ -102,13 +104,22 @@ const DomainRegistrationDialog = ({ open, onClose, onRegister }) => {
           Enter a domain name for your Nova.
         </Typography>
         <StyledTextField
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <Typography variant="body2" color="offWhite.main">
+                  .hub
+                </Typography>
+              </InputAdornment>
+            )
+          }}
           autoFocus
           margin="dense"
           label="Domain"
           type="text"
           fullWidth
           value={domain}
-          onChange={(e) => setDomain(e.target.value)}
+          onChange={(e) => setDomain(e.target.value.toLowerCase())}
           helperText={errorMessage || " "}
           error={Boolean(errorMessage)}
         />

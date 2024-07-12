@@ -471,7 +471,7 @@ const NovaDetails = () => {
         onClose={() => setOpenDomainDialog(false)}
         onRegister={async (domain: string) => {
           const result = await registerDomain({
-            domain,
+            domain: `${domain}.hub`,
             novaAddress: nova.properties.address,
             metadataUri: nova.properties.metadataUri
           });
