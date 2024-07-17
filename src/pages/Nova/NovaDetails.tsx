@@ -432,6 +432,20 @@ const NovaDetails = () => {
     }
   }, [nova]);
 
+  const canSeeRegisterDomain = useMemo(() => {
+    if (!nova) {
+      return false;
+    }
+    if (!address) {
+      return false;
+    }
+
+    return (
+      address.toLowerCase() === nova?.properties.deployer.toLowerCase() &&
+      !nova?.properties.domain
+    );
+  }, [address, nova]);
+
   return (
     <>
       {nova && (
@@ -957,26 +971,24 @@ const NovaDetails = () => {
                       </Typography>
                     </AutOsButton>
                   )}
-                  {address.toLowerCase() ===
-                    nova.properties.deployer.toLowerCase() &&
-                    !nova.properties.domain && (
-                      <Box marginTop={theme.spacing(2)}>
-                        <AutOsButton
-                          onClick={() => setOpenDomainDialog(true)}
-                          type="button"
-                          color="primary"
-                          variant="outlined"
+                  {canSeeRegisterDomain && (
+                    <Box marginTop={theme.spacing(2)}>
+                      <AutOsButton
+                        onClick={() => setOpenDomainDialog(true)}
+                        type="button"
+                        color="primary"
+                        variant="outlined"
+                      >
+                        <Typography
+                          fontWeight="700"
+                          fontSize="16px"
+                          lineHeight="26px"
                         >
-                          <Typography
-                            fontWeight="700"
-                            fontSize="16px"
-                            lineHeight="26px"
-                          >
-                            Register Domain
-                          </Typography>
-                        </AutOsButton>
-                      </Box>
-                    )}
+                          Register Domain
+                        </Typography>
+                      </AutOsButton>
+                    </Box>
+                  )}
                 </Box>
               </Stack>
             </LeftWrapper>
