@@ -432,6 +432,20 @@ const NovaDetails = () => {
     }
   }, [nova]);
 
+  const canSeeRegisterDomain = useMemo(() => {
+    if (!nova) {
+      return false;
+    }
+    if (!address) {
+      return false;
+    }
+
+    return (
+      address.toLowerCase() === nova?.properties.deployer.toLowerCase() &&
+      !nova?.properties.domain
+    );
+  }, [address, nova]);
+
   return (
     <>
       {nova && (
@@ -471,13 +485,13 @@ const NovaDetails = () => {
         onClose={() => setOpenDomainDialog(false)}
         onRegister={async (domain: string) => {
           const result = await registerDomain({
-            domain,
+            domain: `${domain}.hub`,
             novaAddress: nova.properties.address,
             metadataUri: nova.properties.metadataUri
           });
           if ((result as any)?.data?.success) {
             // hack cause query fails to refetch
-            setDomain(domain);
+            setDomain(`${domain}.hub`);
           }
         }}
       ></DomainRegistrationDialog>
@@ -957,26 +971,24 @@ const NovaDetails = () => {
                       </Typography>
                     </AutOsButton>
                   )}
-                  {address.toLowerCase() ===
-                    nova.properties.deployer.toLowerCase() &&
-                    !nova.properties.domain && (
-                      <Box marginTop={theme.spacing(2)}>
-                        <AutOsButton
-                          onClick={() => setOpenDomainDialog(true)}
-                          type="button"
-                          color="primary"
-                          variant="outlined"
+                  {canSeeRegisterDomain && (
+                    <Box marginTop={theme.spacing(2)}>
+                      <AutOsButton
+                        onClick={() => setOpenDomainDialog(true)}
+                        type="button"
+                        color="primary"
+                        variant="outlined"
+                      >
+                        <Typography
+                          fontWeight="700"
+                          fontSize="16px"
+                          lineHeight="26px"
                         >
-                          <Typography
-                            fontWeight="700"
-                            fontSize="16px"
-                            lineHeight="26px"
-                          >
-                            Register Domain
-                          </Typography>
-                        </AutOsButton>
-                      </Box>
-                    )}
+                          Register Domain
+                        </Typography>
+                      </AutOsButton>
+                    </Box>
+                  )}
                 </Box>
               </Stack>
             </LeftWrapper>
