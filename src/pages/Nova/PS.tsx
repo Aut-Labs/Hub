@@ -388,7 +388,9 @@ const ParticipationScore = () => {
                       sx={{ color: "white", borderColor: "white" }}
                       variant="outlined"
                     >
-                      Copy Values to Other Members
+                      <Typography color="white" variant="subtitle2">
+                        Copy Values to Other Members
+                      </Typography>
                     </AutOsButton>
                   </Stack>
                   <Table size="medium">
@@ -537,54 +539,6 @@ const ParticipationScore = () => {
               />
             </Grid>
           </Grid>
-          <Typography color="white" variant="h5" gutterBottom>
-            Participation Score
-          </Typography>
-          <Box sx={{ height: 400, width: "100%" }}>
-            <ResponsiveContainer>
-              <LineChart margin={{ top: 5, right: 30, left: 20, bottom: 25 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="period"
-                  type="number"
-                  domain={[1, 10]}
-                  label={{
-                    value: "Period",
-                    position: "insideBottomRight",
-                    offset: -10
-                  }}
-                />
-                <YAxis yAxisId="left" orientation="left" stroke="#ffffff" />
-                <YAxis yAxisId="right" orientation="right" stroke="#ffffff" />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend verticalAlign="top" height={36} />
-                {membersData.map(
-                  (memberData, memberIndex) =>
-                    activeMembers[memberIndex] && (
-                      <React.Fragment key={memberIndex}>
-                        <Line
-                          yAxisId="left"
-                          type="monotone"
-                          dataKey="PS"
-                          data={memberData}
-                          stroke={memberColors[memberIndex]}
-                          name={`PS (Member ${memberIndex + 1})`}
-                        />
-                        <Line
-                          yAxisId="right"
-                          type="monotone"
-                          dataKey="TCM"
-                          data={memberData}
-                          stroke={memberColors[memberIndex]}
-                          strokeDasharray="5 5"
-                          name={`TCM (Member ${memberIndex + 1})`}
-                        />
-                      </React.Fragment>
-                    )
-                )}
-              </LineChart>
-            </ResponsiveContainer>
-          </Box>
         </StyledAccordion>
       </Box>
     </PerfectScrollbar>
