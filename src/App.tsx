@@ -17,7 +17,7 @@ import background1 from "@assets/autos/background1.png";
 import AutLoading from "@components/AutLoading";
 import AutWallet from "./AutWallet";
 import Callback from "./pages/Oauth2Callback/Callback";
-import SimulationChart from "./pages/Nova/Chart";
+import ParticipationScore from "./pages/Nova/PS";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -42,6 +42,8 @@ function App() {
         setError(true);
       });
   }, []);
+
+  const showToolbarConnector = location.pathname !== "/ps";
 
   return (
     <>
@@ -71,12 +73,12 @@ function App() {
                   left: 0
                 }}
               >
-                <ToolbarConnector />
+                {showToolbarConnector && <ToolbarConnector />}
                 <Routes>
                   <Route path="/:novaName?" element={<NovaList />} />
+                  <Route path="/ps" element={<ParticipationScore />} />
                   <Route path="callback" element={<Callback />} />
                   <Route path="project/:novaName" element={<NovaDetails />} />
-                  <Route path="chart" element={<SimulationChart />} />
                 </Routes>
               </Box>
             </>
