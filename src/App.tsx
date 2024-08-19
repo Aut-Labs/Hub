@@ -1,7 +1,6 @@
-/* eslint-disable max-len */
 import { useEffect, useState } from "react";
 import { Box } from "@mui/material";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import { useAppDispatch } from "@store/store.model";
 import SWSnackbar from "./components/snackbar";
 import { environment } from "@api/environment";
@@ -23,66 +22,76 @@ function App() {
   const dispatch = useAppDispatch();
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
+
+  const isParticipationScorePage = location.pathname === "/ps";
 
   useEffect(() => {
-    getAppConfig()
-      .then(async (res) => {
-        dispatch(setNetworks(res));
-        const sdk = new AutSDK({
-          ipfs: {
-            apiKey: environment.ipfsApiKey,
-            secretApiKey: environment.ipfsApiSecret,
-            gatewayUrl: environment.ipfsGatewayUrl
-          }
+    if (!isParticipationScorePage) {
+      getAppConfig()
+        .then(async (res) => {
+          dispatch(setNetworks(res));
+          const sdk = new AutSDK({
+            ipfs: {
+              apiKey: environment.ipfsApiKey,
+              secretApiKey: environment.ipfsApiSecret,
+              gatewayUrl: environment.ipfsGatewayUrl
+            }
+          });
+          setLoading(false);
+        })
+        .catch(() => {
+          setLoading(false);
+          setError(true);
         });
-        setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-        setError(true);
-      });
-  }, []);
+    } else {
+      setLoading(false);
+    }
+  }, [isParticipationScorePage]);
 
-  const showToolbarConnector = location.pathname !== "/ps";
+  const backgroundStyle = {
+    backgroundImage: `url(${backgroundImage}), url(${background1})`,
+    backgroundAttachment: "fixed",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    height: {
+      xs: window.innerHeight,
+      sm: "100%"
+    },
+    width: "100vw",
+    position: "fixed",
+    top: 0,
+    left: 0
+  };
+
+  if (error) {
+    return <ErrorPage />;
+  }
+
+  if (loading) {
+    return <AutLoading width="130px" height="130px" />;
+  }
 
   return (
     <>
       <SWSnackbar />
-      {error ? (
-        <ErrorPage />
+      {isParticipationScorePage ? (
+        <Box sx={backgroundStyle}>
+          <Routes>
+            <Route path="/ps" element={<ParticipationScore />} />
+          </Routes>
+        </Box>
       ) : (
         <>
-          {loading ? (
-            <AutLoading width="130px" height="130px" />
-          ) : (
-            <>
-              <AutWallet />
-              <Box
-                sx={{
-                  backgroundImage: `url(${backgroundImage}), url(${background1})`,
-                  backgroundAttachment: "fixed",
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  height: {
-                    xs: window.innerHeight,
-                    sm: "100%"
-                  },
-                  width: "100vw",
-                  position: "fixed",
-                  top: 0,
-                  left: 0
-                }}
-              >
-                {showToolbarConnector && <ToolbarConnector />}
-                <Routes>
-                  <Route path="/:novaName?" element={<NovaList />} />
-                  <Route path="/ps" element={<ParticipationScore />} />
-                  <Route path="callback" element={<Callback />} />
-                  <Route path="project/:novaName" element={<NovaDetails />} />
-                </Routes>
-              </Box>
-            </>
-          )}
+          <AutWallet />
+          <Box sx={backgroundStyle}>
+            <ToolbarConnector />
+            <Routes>
+              <Route path="/:novaName?" element={<NovaList />} />
+              <Route path="callback" element={<Callback />} />
+              <Route path="project/:novaName" element={<NovaDetails />} />
+            </Routes>
+          </Box>
         </>
       )}
     </>

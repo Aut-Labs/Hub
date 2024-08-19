@@ -20,7 +20,8 @@ import {
   Switch,
   Accordion,
   AccordionDetails,
-  AccordionSummary
+  AccordionSummary,
+  Tooltip as MuiTooltip
 } from "@mui/material";
 import {
   LineChart,
@@ -56,7 +57,7 @@ export const StyledAccordion = ({ title, children }) => {
         }}
         expandIcon={<ExpandMoreIcon sx={{ color: "white" }} />}
       >
-        <Typography color="white" variant="h6">
+        <Typography fontFamily="FractulRegular" color="white" variant="h6">
           {title}
         </Typography>
       </AccordionSummary>
@@ -150,7 +151,12 @@ const CustomTooltip: React.FC<TooltipProps<number, string>> = ({
             Period: {Number(label) + 1}
           </Typography> */}
         {payload.map((entry, index) => (
-          <Typography key={index} variant="body2" color={entry.color}>
+          <Typography
+            fontFamily="FractulRegular"
+            key={index}
+            variant="body2"
+            color={entry.color}
+          >
             {entry.name}: {entry.value.toFixed(2)}
           </Typography>
         ))}
@@ -171,7 +177,12 @@ const ValueChart = ({
 
   return (
     <Box sx={{ height: 300, width: "100%", mb: 4 }}>
-      <Typography color="white" variant="h6" gutterBottom>
+      <Typography
+        fontFamily="FractulRegular"
+        color="white"
+        variant="h6"
+        gutterBottom
+      >
         {title}
       </Typography>
       <ResponsiveContainer>
@@ -214,18 +225,47 @@ const ValueChart = ({
 const ParticipationScore = () => {
   const [autoIncrementTCM, setAutoIncrementTCM] = useState(true);
   const [tcmIncrementPercentage, setTcmIncrementPercentage] = useState(20);
+  const [memberIncrementPercentages, setMemberIncrementPercentages] = useState([
+    20, 20, 20
+  ]);
   const [membersData, setMembersData] = useState(() => [
     generateInitialData(),
     generateInitialData(),
     generateInitialData()
   ]);
   const [activeMembers, setActiveMembers] = useState([true, false, false]);
+  const [copyValuesEnabled, setCopyValuesEnabled] = useState([
+    false,
+    false,
+    false
+  ]);
+  const [memberAutoIncrement, setMemberAutoIncrement] = useState([
+    true,
+    true,
+    true
+  ]);
 
   const toggleMember = (index) => {
     setActiveMembers((prev) => {
       const newActiveMembers = [...prev];
       newActiveMembers[index] = !newActiveMembers[index];
       return newActiveMembers;
+    });
+  };
+
+  const toggleCopyValues = (index) => {
+    setCopyValuesEnabled((prev) => {
+      const newCopyValuesEnabled = [...prev];
+      newCopyValuesEnabled[index] = !newCopyValuesEnabled[index];
+      return newCopyValuesEnabled;
+    });
+  };
+
+  const handleIncrementPercentageChange = (index, value) => {
+    setMemberIncrementPercentages((prev) => {
+      const newPercentages = [...prev];
+      newPercentages[index] = Number(value);
+      return newPercentages;
     });
   };
 
@@ -243,47 +283,77 @@ const ParticipationScore = () => {
     setMembersData(newMemberData);
   };
 
+  const toggleMemberAutoIncrement = (index) => {
+    setMemberAutoIncrement((prev) => {
+      const newAutoIncrement = [...prev];
+      newAutoIncrement[index] = !newAutoIncrement[index];
+      return newAutoIncrement;
+    });
+  };
+
   const handleInputChange = (memberIndex, pointIndex, field, value) => {
     setMembersData((prevMembersData) => {
       const newMembersData = [...prevMembersData];
-      const newMemberData = [...newMembersData[memberIndex]];
-      newMemberData[pointIndex] = {
-        ...newMemberData[pointIndex],
-        [field]: Number(value)
+
+      // Define a function to update a single member's data
+      const updateMemberData = (memberData) => {
+        const newMemberData = [...memberData];
+        newMemberData[pointIndex] = {
+          ...newMemberData[pointIndex],
+          [field]: Number(value)
+        };
+
+        // Recalculate values for this point and all subsequent points
+        for (let i = pointIndex; i < newMemberData.length; i++) {
+          const point = newMemberData[i];
+          const prevPoint = i > 0 ? newMemberData[i - 1] : null;
+
+          // Update tiCL, fiCL, TCP, and EC if TCM or avgICL changed
+          if (field === "TCM" || field === "avgICL") {
+            point.tiCL = calculateTiCl(point.TCM, point.avgICL);
+            point.fiCL = calculateFiCl(point.iCl, point.tiCL);
+            point.TCP = calculateTCP(point.TCM);
+            point.EC = calculateEC(point.TCP, point.fiCL);
+          }
+
+          // Update PS if P changed or if it's the first point and TCM changed
+          if (field === "P" || (i === pointIndex && field === "TCM")) {
+            point.PS =
+              i === 0
+                ? calculatePSInitial(point.P)
+                : calculatePS(prevPoint.PS, point.P);
+          }
+
+          // Auto-increment TCM for the next point if enabled
+          if (
+            field === "TCM" &&
+            i < newMemberData.length - 1 &&
+            memberAutoIncrement[memberIndex]
+          ) {
+            newMemberData[i + 1].TCM = incrementTCMByPercent(
+              point.TCM,
+              memberIncrementPercentages[memberIndex] / 100
+            );
+          }
+        }
+
+        return newMemberData;
       };
 
-      // Recalculate values for this point and all subsequent points
-      for (let i = pointIndex; i < newMemberData.length; i++) {
-        const point = newMemberData[i];
-        const prevPoint = i > 0 ? newMemberData[i - 1] : null;
+      // Update the current member's data
+      newMembersData[memberIndex] = updateMemberData(
+        newMembersData[memberIndex]
+      );
 
-        if (field === "TCM" || field === "avgICL") {
-          point.tiCL = calculateTiCl(point.TCM, point.avgICL);
-          point.fiCL = calculateFiCl(point.iCl, point.tiCL);
-          point.TCP = calculateTCP(point.TCM);
-          point.EC = calculateEC(point.TCP, point.fiCL);
-        }
-
-        if (field === "P" || (i === pointIndex && field === "TCM")) {
-          point.PS =
-            i === 0
-              ? calculatePSInitial(point.P)
-              : calculatePS(prevPoint.PS, point.P);
-        }
-
-        if (
-          field === "TCM" &&
-          i < newMemberData.length - 1 &&
-          autoIncrementTCM
-        ) {
-          newMemberData[i + 1].TCM = incrementTCMByPercent(
-            point.TCM,
-            tcmIncrementPercentage / 100
-          );
-        }
+      // If copy values is enabled for this member, update all other members
+      if (copyValuesEnabled[memberIndex]) {
+        newMembersData.forEach((memberData, index) => {
+          if (index !== memberIndex) {
+            newMembersData[index] = updateMemberData(memberData);
+          }
+        });
       }
 
-      newMembersData[memberIndex] = newMemberData;
       return newMembersData;
     });
   };
@@ -291,6 +361,9 @@ const ParticipationScore = () => {
   const formatValue = (value) => {
     return typeof value === "number" ? value.toFixed(2) : value;
   };
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const memberColors = ["#ff7300", "#82ca9d", "#8884d8"];
 
@@ -301,16 +374,22 @@ const ParticipationScore = () => {
         flexDirection: "column"
       }}
     >
-      <Box sx={{ p: 3, mt: 4 }}>
-        <Typography color="white" variant="h4" gutterBottom>
-          Participation Score Progression
+      <Box sx={{ p: isMobile ? 0 : 3, mt: isMobile ? 0 : 4 }}>
+        <Typography
+          fontFamily="FractulRegular"
+          color="white"
+          variant="h4"
+          gutterBottom
+          sx={{ p: isMobile ? 2 : 0 }}
+        >
+          PS Playground
         </Typography>
-        <StyledAccordion title="Participation Score Progression">
+        {/* <StyledAccordion title="Participation Score Progression">
           <Stack
             alignItems="center"
             justifyContent="center"
             gap={2}
-            direction="row"
+            direction={isMobile ? "column" : "row"}
             sx={{ mb: 4 }}
           >
             <FormControlLabel
@@ -322,7 +401,11 @@ const ParticipationScore = () => {
                   color="primary"
                 />
               }
-              label="Auto-increment TCM"
+              label={
+                <Typography fontFamily="FractulRegular" color="white">
+                  Auto-increment TCM
+                </Typography>
+              }
             />
 
             {autoIncrementTCM && (
@@ -336,83 +419,178 @@ const ParticipationScore = () => {
                 }
                 inputProps={{ min: 0, step: 5 }}
                 sx={{
-                  ml: 2,
+                  ml: isMobile ? 0 : 2,
                   width: "100px",
                   "& .MuiFormLabel-root": {
-                    color: "white"
+                    color: "white",
+                    fontFamily: "FractulRegular"
+                  },
+                  "& .MuiInputBase-root": {
+                    fontFamily: "FractulRegular"
                   }
                 }}
                 label="Increment %"
               />
             )}
-
-            <Box>
-              {[0, 1, 2].map((index) => (
-                <FormControlLabel
-                  key={index}
-                  control={
-                    <Switch
-                      checked={activeMembers[index]}
-                      onChange={() => toggleMember(index)}
-                      color="primary"
-                    />
-                  }
-                  label={`Member ${index + 1}`}
-                  sx={{ color: "white", mr: 2 }}
-                />
-              ))}
-            </Box>
           </Stack>
-        </StyledAccordion>
+        </StyledAccordion> */}
 
         <StyledAccordion title="Members Data">
-          {membersData.map(
-            (memberData, memberIndex) =>
-              activeMembers[memberIndex] && (
+          <Grid container spacing={isMobile ? 0 : 2}>
+            {membersData.map((memberData, memberIndex) => (
+              <Grid item xs={12} md={6} key={memberIndex}>
                 <TableContainer
-                  key={memberIndex}
                   sx={{
+                    maxWidth: "100%",
+                    minWidth: "520px",
                     mb: 4,
                     backgroundColor: "rgba(255, 255, 255, 0.1)",
-                    borderRadius: "15px"
+                    borderRadius: isMobile ? 0 : "15px"
                   }}
                 >
-                  <Stack direction="row" alignItems="center" gap={2}>
-                    <Typography color="white" variant="h6" sx={{ p: 2 }}>
+                  <Box sx={{ p: 2 }}>
+                    <Typography
+                      fontFamily="FractulRegular"
+                      color="white"
+                      variant="h6"
+                      gutterBottom
+                    >
                       Member {memberIndex + 1}
                     </Typography>
-
-                    <AutOsButton
-                      onClick={() => copyValuesToOtherMembers(memberIndex)}
-                      s
-                      sx={{ color: "white", borderColor: "white" }}
-                      variant="outlined"
-                    >
-                      <Typography color="white" variant="subtitle2">
-                        Copy Values to Other Members
-                      </Typography>
-                    </AutOsButton>
-                  </Stack>
+                    <Grid container spacing={2} alignItems="center">
+                      <Grid item xs={12} sm={6}>
+                        <FormControlLabel
+                          control={
+                            <Switch
+                              checked={memberAutoIncrement[memberIndex]}
+                              onChange={() =>
+                                toggleMemberAutoIncrement(memberIndex)
+                              }
+                              color="primary"
+                            />
+                          }
+                          label={
+                            <Typography
+                              fontFamily="FractulRegular"
+                              color="white"
+                            >
+                              Auto-increment TCM
+                            </Typography>
+                          }
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <FormControlLabel
+                          control={
+                            <Switch
+                              checked={copyValuesEnabled[memberIndex]}
+                              onChange={() => toggleCopyValues(memberIndex)}
+                              color="primary"
+                            />
+                          }
+                          label={
+                            <Typography
+                              fontFamily="FractulRegular"
+                              color="white"
+                            >
+                              Copy Values to Others
+                            </Typography>
+                          }
+                        />
+                      </Grid>
+                      {memberAutoIncrement[memberIndex] && (
+                        <Grid item xs={12} sm={6}>
+                          <AutTextField
+                            type="number"
+                            color="offWhite"
+                            variant="outlined"
+                            value={memberIncrementPercentages[memberIndex]}
+                            onChange={(e) =>
+                              handleIncrementPercentageChange(
+                                memberIndex,
+                                e.target.value
+                              )
+                            }
+                            inputProps={{ min: 0, step: 5 }}
+                            sx={{
+                              width: "100%",
+                              "& .MuiFormLabel-root": {
+                                color: "white",
+                                fontFamily: "FractulRegular"
+                              },
+                              "& .MuiInputBase-root": {
+                                fontFamily: "FractulRegular"
+                              }
+                            }}
+                            label="Increment %"
+                          />
+                        </Grid>
+                      )}
+                    </Grid>
+                  </Box>
                   <Table size="medium">
                     <TableHead>
                       <TableRow>
-                        <TableCell sx={{ color: "white" }}>Period</TableCell>
-                        <TableCell sx={{ color: "white" }}>TCM</TableCell>
-                        <TableCell sx={{ color: "white" }}>avgICL</TableCell>
-                        <TableCell sx={{ color: "white" }}>P</TableCell>
-                        <TableCell sx={{ color: "white" }}>PS</TableCell>
+                        {[
+                          {
+                            label: "Period",
+                            tooltip: "The current period in the simulation"
+                          },
+                          {
+                            label: "TCM",
+                            tooltip:
+                              "Total Community Members: The number of members in the community for each period"
+                          },
+                          {
+                            label: "avgICL",
+                            tooltip:
+                              // eslint-disable-next-line max-len
+                              "Average Individual Commitment Level: The average commitment level of all members in the community for each period"
+                          },
+                          {
+                            label: "P",
+                            tooltip:
+                              "Performance: The ratio of Given Contribution Points to Expected Contribution Points"
+                          }
+                          // {
+                          //   label: "PS",
+                          //   tooltip:
+                          //     "Participation Score: The cumulative participation score for each member"
+                          // }
+                        ].map(({ label, tooltip }) => (
+                          <TableCell key={label} sx={{ color: "white" }}>
+                            <MuiTooltip title={tooltip} arrow>
+                              <Typography
+                                fontFamily="FractulRegular"
+                                color="white"
+                              >
+                                {label}
+                              </Typography>
+                            </MuiTooltip>
+                          </TableCell>
+                        ))}
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {memberData.map((point, index) => (
                         <TableRow key={index}>
-                          <TableCell>
-                            <Typography color="white" variant="body">
+                          <TableCell sx={{ minWidth: "40px" }}>
+                            <Typography
+                              fontFamily="FractulRegular"
+                              color="white"
+                              variant="body1"
+                            >
                               {point.period}
                             </Typography>
                           </TableCell>
                           <TableCell>
                             <AutTextField
+                              sx={{
+                                minWidth: { xs: "60px", sm: "120px" },
+                                "& .MuiInputBase-root": {
+                                  fontFamily: "FractulRegular"
+                                }
+                              }}
                               type="number"
                               color="offWhite"
                               variant="outlined"
@@ -434,13 +612,14 @@ const ParticipationScore = () => {
                               sx={{
                                 height: "30px",
                                 width: {
-                                  xs: "175px",
-                                  sm: "250px",
-                                  md: "400px",
-                                  lg: "450px"
+                                  xs: "70px",
+                                  sm: "100px",
+                                  md: "150px",
+                                  lg: "150px"
                                 },
                                 "& .MuiSlider-markLabel": {
-                                  color: "white"
+                                  color: "white",
+                                  fontFamily: "FractulRegular"
                                 },
                                 "& .MuiSlider-mark": {
                                   color: "transparent"
@@ -448,6 +627,9 @@ const ParticipationScore = () => {
                                 "& .MuiSlider-thumb": {
                                   width: "40px",
                                   height: "40px"
+                                },
+                                "& .MuiSlider-valueLabel": {
+                                  fontFamily: "FractulRegular"
                                 }
                               }}
                               color="offWhite"
@@ -459,7 +641,7 @@ const ParticipationScore = () => {
                                   newValue
                                 )
                               }
-                              min={0.1}
+                              min={1}
                               max={10}
                               step={0.1}
                               valueLabelDisplay="auto"
@@ -472,7 +654,13 @@ const ParticipationScore = () => {
                           <TableCell>
                             <AutTextField
                               type="number"
-                              sx={{ height: "35px" }}
+                              sx={{
+                                height: "35px",
+                                minWidth: "50px",
+                                "& .MuiInputBase-root": {
+                                  fontFamily: "FractulRegular"
+                                }
+                              }}
                               color="offWhite"
                               variant="outlined"
                               value={point.P}
@@ -487,21 +675,46 @@ const ParticipationScore = () => {
                               inputProps={{ min: 0.01, step: 0.01 }}
                             />
                           </TableCell>
-                          <TableCell>
-                            <Typography color="white" variant="body">
+                          {/* <TableCell>
+                            <Typography
+                              fontFamily="FractulRegular"
+                              color="white"
+                              variant="body1"
+                            >
                               {formatValue(point.PS)}
                             </Typography>
-                          </TableCell>
+                          </TableCell> */}
                         </TableRow>
                       ))}
                     </TableBody>
                   </Table>
                 </TableContainer>
-              )
-          )}
+              </Grid>
+            ))}
+          </Grid>
         </StyledAccordion>
         <StyledAccordion title="In-Depth Visualization">
-          <Grid container spacing={2}>
+          <Box sx={{ mb: 2 }}>
+            {[0, 1, 2].map((index) => (
+              <FormControlLabel
+                key={index}
+                control={
+                  <Switch
+                    checked={activeMembers[index]}
+                    onChange={() => toggleMember(index)}
+                    color="primary"
+                  />
+                }
+                label={
+                  <Typography fontFamily="FractulRegular" color="white">
+                    Member {index + 1}
+                  </Typography>
+                }
+                sx={{ color: "white", mr: 2, mb: isMobile ? 1 : 0 }}
+              />
+            ))}
+          </Box>
+          <Grid container spacing={isMobile ? 0 : 2}>
             <Grid item xs={12} md={6}>
               <ValueChart
                 membersData={membersData}
@@ -524,7 +737,7 @@ const ParticipationScore = () => {
               <ValueChart
                 membersData={membersData}
                 dataKey="avgICL"
-                title="Average Individual Contribution Level (avgICL)"
+                title="Average Individual Commitment Level (avgICL)"
                 yAxisLabel="avgICL"
                 activeMembers={activeMembers}
               />
