@@ -5,7 +5,8 @@ import {
   Typography,
   styled,
   keyframes,
-  SvgIcon
+  SvgIcon,
+  useTheme
 } from "@mui/material";
 import { memo, useMemo, useState } from "react";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
@@ -17,6 +18,7 @@ import { ReactComponent as Check } from "@assets/autos/check.svg";
 import { MarketTemplates } from "@api/community.model";
 import { useAccount } from "wagmi";
 import { ArchetypeTypes } from "@api/community.api";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 const getRoleName = (daoData, quest) => {
   const role = daoData.properties.rolesSets[0].roles.find(
@@ -168,6 +170,7 @@ export const NovaCard = ({
   const navigate = useNavigate();
   const [isFlipped, setFlipped] = useState(false);
   const [hasTimePassed, setHasTimePassed] = useState(false);
+  const theme = useTheme();
   const { address } = useAccount();
   const selectedArchetype = useMemo(() => {
     if (!daoData?.properties?.archetype?.default) {
@@ -229,6 +232,17 @@ export const NovaCard = ({
               }}
             >
               {daoData.name}
+              {daoData.properties.domain && (
+                <SvgIcon
+                  component={CheckCircleIcon}
+                  sx={{
+                    fontSize: "0.8em",
+                    marginLeft: "4px",
+                    verticalAlign: "middle",
+                    color: theme.palette.success.main
+                  }}
+                />
+              )}
             </Typography>
             <Box
               sx={{
@@ -463,6 +477,17 @@ export const NovaCard = ({
                   fontSize={calculateFontSize(daoData?.name as string)}
                 >
                   {daoData?.name}
+                  {daoData.properties.domain && (
+                    <SvgIcon
+                      component={CheckCircleIcon}
+                      sx={{
+                        fontSize: "0.8em",
+                        marginLeft: "4px",
+                        verticalAlign: "middle",
+                        color: theme.palette.success.main
+                      }}
+                    />
+                  )}
                 </Typography>
               </div>
             </Box>
