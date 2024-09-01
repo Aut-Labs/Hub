@@ -6,7 +6,8 @@ import {
   styled,
   keyframes,
   SvgIcon,
-  useTheme
+  useTheme,
+  Tooltip
 } from "@mui/material";
 import { memo, useMemo, useState } from "react";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
@@ -15,20 +16,12 @@ import FlipIcon from "@assets/flip.svg";
 import { useNavigate } from "react-router-dom";
 import AutIconLabel from "./AutIconLabel";
 import { ReactComponent as Check } from "@assets/autos/check.svg";
-import { MarketTemplates } from "@api/community.model";
+import { HubOSHub, MarketTemplates } from "@api/hub.model";
 import { useAccount } from "wagmi";
-import { ArchetypeTypes } from "@api/community.api";
+import { ArchetypeTypes } from "@api/hub.api";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { Role } from "@aut-labs/sdk/dist/models/role";
 
-const getRoleName = (daoData, quest) => {
-  const role = daoData.properties.rolesSets[0].roles.find(
-    (r) => r.id === quest.role
-  );
-  if (role) {
-    return role.roleName;
-  }
-  return "N/A";
-};
 export const pulsate = keyframes`
   0% {
     box-shadow: 0 0 0 0 rgba(27, 95, 168, 0.9);
@@ -48,50 +41,57 @@ const AutCardFront = styled("div")({
 });
 
 const SeeQuestButton = styled(Button)(({ theme }) => ({
-  height: "70px",
+  height: "60px",
   borderRadius: "9px !important",
   [theme.breakpoints.up("xs")]: {
-    width: "330px"
+    width: "280px"
   },
   [theme.breakpoints.up("sm")]: {
-    width: "330px"
+    width: "280px"
   },
   [theme.breakpoints.up("md")]: {
-    width: "330px"
+    width: "300px"
   },
   [theme.breakpoints.up("xl")]: {
-    width: "350px"
+    width: "320px"
   },
   [theme.breakpoints.up("xxl")]: {
-    width: "350px"
+    width: "320px"
   }
+}));
+
+const AnimatedText = styled("div")(({ theme }) => ({
+  transition: theme.transitions.create(["opacity"]),
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)"
 }));
 
 const AutCardContainer = styled("div")<{ isHighlighted?: boolean }>(
   ({ theme, isHighlighted }) => ({
     [theme.breakpoints.up("xs")]: {
-      width: "330px",
-      height: "350px"
+      width: "280px",
+      height: "300px"
     },
     [theme.breakpoints.up("sm")]: {
-      width: "330px",
-      height: "350px"
+      width: "285px",
+      height: "310px"
     },
     [theme.breakpoints.up("md")]: {
-      width: "330px",
-      height: "350px"
+      width: "290px",
+      height: "320px"
     },
     [theme.breakpoints.up("xl")]: {
-      width: "350px",
-      height: "380px"
+      width: "320px",
+      height: "360px"
     },
     [theme.breakpoints.up("xxl")]: {
-      width: "350px",
-      height: "430px"
+      width: "320px",
+      height: "370px"
     },
     boxShadow:
       "0px 4px 5px -2px rgba(0,0,0,0.2), 0px 7px 10px 1px rgba(0,0,0,0.14), 0px 2px 16px 1px rgba(0,0,0,0.12)",
-    // boxShadow: "10px 10px 10px black",
     backgroundColor: "#FFF",
     borderColor: "#3f3f40",
     borderStyle: "solid",
@@ -99,10 +99,6 @@ const AutCardContainer = styled("div")<{ isHighlighted?: boolean }>(
     padding: "0px 5px",
     overflow: "hidden",
     borderRadius: "16px",
-    // borderTopLeftRadius: "16px",
-    // borderTopRightRadius: "16px",
-    // borderBottomLeftRadius: "0",
-    // borderBottomRightRadius: "0",
     display: "flex",
     justifyContent: "flex-start",
     alignItems: "center",
@@ -123,68 +119,57 @@ const AutCardBack = styled("div")({
   width: "100%"
 });
 
-const Countdown = styled("div")({
-  display: "flex",
-  flexDirection: "column",
-  marginTop: "45px",
-  justifyContent: "center",
-  alignItems: "center",
-  "& > DIV > DIV:nth-of-type(even)": {
-    marginLeft: "4px",
-    marginRight: "4px"
-  },
-  "& > DIV > DIV:nth-of-type(odd) > DIV:nth-of-type(2)": {
-    marginRight: "2px"
-  }
-});
-
-const calculateFontSize = (name: string) => {
-  const words = name.split(" ");
-  const longestWordLength = Math.max(...words.map((word) => word.length));
-  if (longestWordLength >= 22) {
-    return "0.85rem !important";
-  } else if (longestWordLength >= 20) {
-    return "0.95rem !important";
-  } else if (longestWordLength >= 18) {
-    return "1.05rem !important";
-  } else if (longestWordLength >= 16) {
-    return "1.15rem !important";
-  } else if (longestWordLength >= 14) {
-    return "1.25rem !important";
-  } else if (longestWordLength >= 12) {
-    return "1.35rem !important";
-  } else if (longestWordLength >= 10) {
-    return "1.45rem !important";
-  } else {
-    return "";
-  }
-};
-
-export const NovaCard = ({
-  daoData,
+export const HubCard = ({
+  hubData,
   isHighlighted
 }: {
-  daoData: any;
+  hubData: HubOSHub;
   isHighlighted?: boolean;
 }) => {
   const navigate = useNavigate();
   const [isFlipped, setFlipped] = useState(false);
   const [hasTimePassed, setHasTimePassed] = useState(false);
+  const [hoveredButton, setHoveredButton] = useState(false);
   const theme = useTheme();
   const { address } = useAccount();
   const selectedArchetype = useMemo(() => {
-    if (!daoData?.properties?.archetype?.default) {
+    if (!hubData?.properties?.archetype?.default) {
       return null;
     }
-    return ArchetypeTypes[daoData?.properties?.archetype?.default];
-  }, [daoData]);
+    return ArchetypeTypes[hubData?.properties?.archetype?.default];
+  }, [hubData]);
 
   const marketTemplate = useMemo(() => {
-    const marketName = daoData?.properties?.market;
+    const marketName = hubData?.properties?.market;
     return MarketTemplates.find(
-      (v) => v.title === marketName || v.market === marketName
+      (v) => v.title === marketName || (v.market as any) === marketName
     );
-  }, [daoData]);
+  }, [hubData]);
+
+  const userHubState = useMemo(() => {
+    const member = hubData?.properties?.members.find(
+      (aut) => aut.properties.address.toLowerCase() === address?.toLowerCase()
+    );
+    const joinedHub = member?.properties.joinedHubs.find(
+      (hub) =>
+        hub.hubAddress?.toLowerCase() ===
+        hubData?.properties?.address?.toLowerCase()
+    );
+    const hasJoined = !!member;
+    const hasDeployed =
+      hubData?.properties?.deployer?.toLowerCase() === address?.toLowerCase();
+    const isAdmin = joinedHub?.isAdmin;
+    const selectedRole = hubData.roles.find(
+      (role) => +role.id === +joinedHub?.role
+    );
+
+    return {
+      hasJoined,
+      hasDeployed,
+      isAdmin,
+      selectedRole
+    };
+  }, [hubData]);
 
   const flipCard = () => {
     if (isFlipped) {
@@ -195,11 +180,7 @@ export const NovaCard = ({
   };
 
   return (
-    <div
-    // style={{
-    //   marginBottom: "65px"
-    // }}
-    >
+    <div>
       <Flipcard
         isFlipped={isFlipped}
         onClick={flipCard}
@@ -213,8 +194,8 @@ export const NovaCard = ({
             className={`aut-card-container front`}
           >
             <img
-              src={ipfsCIDToHttpUrl(daoData?.image)}
-              alt="Dao image"
+              src={ipfsCIDToHttpUrl(hubData?.image)}
+              alt="Hub image"
               style={{
                 marginTop: "15px",
                 width: "100px",
@@ -231,8 +212,8 @@ export const NovaCard = ({
                 color: "#000"
               }}
             >
-              {daoData.name}
-              {daoData.properties.domain && (
+              {hubData.name}
+              {hubData.properties.domain && (
                 <SvgIcon
                   component={CheckCircleIcon}
                   sx={{
@@ -271,7 +252,7 @@ export const NovaCard = ({
                     color: "#000"
                   }}
                 >
-                  {daoData.properties.prestige}
+                  {hubData.prestige}
                 </Typography>
                 <Typography
                   fontWeight="bold"
@@ -305,7 +286,7 @@ export const NovaCard = ({
                     color: "#000"
                   }}
                 >
-                  {daoData.properties.members}
+                  {hubData.properties.members?.length}
                 </Typography>
                 <Typography
                   fontWeight="bold"
@@ -332,46 +313,56 @@ export const NovaCard = ({
               width="90%"
               marginBottom="10px"
             >
-              {daoData.properties.roles.map((role: any) => (
-                <Box
-                  key={role.roleName}
-                  sx={{
-                    minHeight: "33px",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    padding: "0px 10px",
-                    alignItems: "center",
-                    flexDirection: "row",
-                    flex: "1",
-                    color: "#000",
-                    maxWidth: "85px",
-                    fontFamily: "FractulAltLight",
-                    fontSize: "10px",
-                    overflow: "hidden",
-                    border: "2px solid #000",
-                    borderRadius: "24px",
-                    borderColor: "#000"
-                  }}
-                >
-                  <Typography
-                    fontFamily="FractulRegular"
-                    variant="body"
+              {hubData.roles.map((role: Role) => (
+                <Tooltip title={role?.roleName} key={role.roleName}>
+                  <Box
+                    key={role.roleName}
                     sx={{
+                      minHeight: "33px",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      padding: "0px 10px",
+                      alignItems: "center",
+                      flexDirection: "row",
+                      flex: "1",
                       color: "#000",
-                      whiteSpace: "nowrap",
+                      maxWidth: "85px",
+                      fontFamily: "FractulAltLight",
+                      fontSize: "10px",
                       overflow: "hidden",
-                      textOverflow: "ellipsis"
+                      border: "2px solid #000",
+                      borderRadius: "24px",
+                      borderColor: "#000",
+                      ...(userHubState?.selectedRole?.roleName ===
+                        role.roleName && {
+                        backgroundColor: "#000",
+                        color: "white"
+                      })
                     }}
                   >
-                    {role.roleName}
-                  </Typography>
-                  <Check
-                    style={{
-                      minHeight: "15px",
-                      minWidth: "15px"
-                    }}
-                  />
-                </Box>
+                    <Typography
+                      fontFamily="FractulRegular"
+                      variant="body"
+                      sx={{
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis"
+                      }}
+                    >
+                      {role.roleName}
+                    </Typography>
+                    <Check
+                      style={{
+                        minHeight: "15px",
+                        minWidth: "15px",
+                        fill:
+                          userHubState?.selectedRole?.roleName === role.roleName
+                            ? "white"
+                            : "#000"
+                      }}
+                    />
+                  </Box>
+                </Tooltip>
                 // <Button
                 //   key={role.roleName}
                 //   sx={{
@@ -459,7 +450,7 @@ export const NovaCard = ({
                   background: "transparent"
                 }}
                 aria-label="avatar"
-                src={ipfsCIDToHttpUrl(daoData?.image as string)}
+                src={ipfsCIDToHttpUrl(hubData?.image as string)}
               />
               <div
                 style={{
@@ -470,14 +461,16 @@ export const NovaCard = ({
                 }}
               >
                 <Typography
-                  color="#000"
-                  textAlign="left"
-                  lineHeight={1}
-                  variant="h3"
-                  fontSize={calculateFontSize(daoData?.name as string)}
+                  fontWeight="bold"
+                  fontFamily="FractulAltBold"
+                  variant="subtitle1"
+                  sx={{
+                    mb: "0px",
+                    color: "#000"
+                  }}
                 >
-                  {daoData?.name}
-                  {daoData.properties.domain && (
+                  {hubData?.name}
+                  {hubData.properties.domain && (
                     <SvgIcon
                       component={CheckCircleIcon}
                       sx={{
@@ -500,7 +493,7 @@ export const NovaCard = ({
                 color: "#000"
               }}
             >
-              {daoData?.description}
+              {hubData?.description}
             </Typography>
             <Box
               sx={{
@@ -586,10 +579,11 @@ export const NovaCard = ({
           sx={{
             border: "2px solid #FFF",
             borderRadius: "9px",
+            position: "relative",
             width: "100%",
-            mt: "24px",
+            mt: 2,
             animation:
-              daoData.properties.members == 0
+              !userHubState?.hasJoined && !userHubState?.hasDeployed
                 ? `${pulsate} 2s infinite`
                 : "none",
             boxShadow:
@@ -598,25 +592,42 @@ export const NovaCard = ({
           variant="outlined"
           size="normal"
           color="offWhite"
+          onMouseEnter={() => setHoveredButton(true)}
+          onMouseLeave={() => setHoveredButton(false)}
           onClick={() => {
-            if (daoData?.properties?.deployer === address?.toLowerCase()) {
-              navigate(`/project/${daoData.name}?tab=roles`);
+            if (userHubState?.hasDeployed) {
+              navigate(`/project/${hubData.name}?tab=roles`);
             } else {
-              navigate(`/project/${daoData.name}?tab=archetype`);
+              navigate(`/project/${hubData.name}?tab=archetype`);
             }
           }}
         >
-          {daoData?.properties?.members === 0
-            ? daoData?.properties?.deployer === address?.toLowerCase()
-              ? "Verify"
-              : "Join"
-            : daoData?.properties?.deployer === address?.toLowerCase()
-              ? "Verified"
-              : "Join"}
+          <AnimatedText style={{ opacity: hoveredButton ? 0 : 1 }}>
+            {!userHubState?.hasJoined
+              ? userHubState?.hasDeployed
+                ? "Verify"
+                : "Join"
+              : userHubState?.hasDeployed
+                ? "Verified"
+                : "Joined"}
+            {userHubState?.hasJoined && userHubState?.hasDeployed && (
+              <SvgIcon
+                component={CheckCircleIcon}
+                sx={{
+                  marginLeft: 1,
+                  verticalAlign: "middle",
+                  color: "#fff"
+                }}
+              />
+            )}
+          </AnimatedText>
+          <AnimatedText style={{ opacity: hoveredButton ? 1 : 0 }}>
+            View Hub
+          </AnimatedText>
         </SeeQuestButton>
       </div>
     </div>
   );
 };
 
-export default memo(NovaCard);
+export default memo(HubCard);

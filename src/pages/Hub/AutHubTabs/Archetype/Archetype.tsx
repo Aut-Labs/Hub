@@ -5,12 +5,17 @@ import ArchetypePieChart from "./ArchetypePieChart";
 import { AutOsButton } from "@components/AutButton";
 import { useAutConnector, useWalletConnector } from "@aut-labs/connector";
 import { ArchetypeDialog } from "./ArchetypeDialog";
-import AutSDK, { Nova } from "@aut-labs/sdk";
+import AutSDK, { Hub } from "@aut-labs/sdk";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import { ResponsiveContainer } from "recharts";
 import { environment } from "@api/environment";
+import { HubOSHub } from "@api/hub.model";
 
-const Archetypes = ({ nova }) => {
+interface ArchetypesProps {
+  hub: HubOSHub;
+}
+
+const Archetypes = ({ hub }: ArchetypesProps) => {
   const [isArchetypeOpen, setIsArchetypeOpen] = React.useState(false);
   const [notAdminOpen, setNotAdminOpen] = React.useState(false);
   const handleClose = () => {
@@ -23,18 +28,25 @@ const Archetypes = ({ nova }) => {
   const { open } = useWalletConnector();
 
   const isArchetypeSet = React.useMemo(() => {
-    return !!nova?.properties?.archetype;
-  }, [nova]);
+    return !!hub?.properties?.archetype;
+  }, [hub]);
+
+  const isAdmin = React.useMemo(() => {
+    const autId = hub.properties.members?.find(
+      (m) => m.properties.address?.toLowerCase() === address?.toLowerCase()
+    );
+    if (!autId) return false;
+    const joinedHub = autId.properties.joinedHubs.find(
+      (h) =>
+        h.hubAddress.toLowerCase() === hub?.properties.address.toLowerCase()
+    );
+    return joinedHub?.isAdmin;
+  }, [hub]);
 
   const canSetArchetype = React.useMemo(() => {
     if (!address && !isArchetypeSet) return true;
-    if (
-      nova.properties?.userData?.isAdmin ||
-      address === nova?.properties?.deployer
-    ) {
-      return true;
-    }
-  }, [nova, address, isArchetypeSet]);
+    return isAdmin;
+  }, [isAdmin, address, isArchetypeSet]);
 
   const setArchtype = async () => {
     let addressToVerify = address as string;
@@ -43,10 +55,10 @@ const Archetypes = ({ nova }) => {
       addressToVerify = state?.address;
     }
     const sdk = await AutSDK.getInstance();
-    const novaContract = sdk.initService(Nova, nova.properties?.address);
+    const hubContract = sdk.initService(Hub, hub.properties?.address);
 
     const isAdmin =
-      await novaContract.contract.functions.isAdmin(addressToVerify);
+      await hubContract.contract.functions.isAdmin(addressToVerify);
 
     if (!isAdmin) {
       setNotAdminOpen(true);
@@ -68,10 +80,10 @@ const Archetypes = ({ nova }) => {
         />
         <ArchetypeDialog
           open={isArchetypeOpen}
-          archetype={nova?.properties?.archetype}
+          archetype={hub?.properties?.archetype}
           title="Archetype"
           onClose={handleClose}
-          nova={nova}
+          hub={hub}
         />
         {!isArchetypeSet && (
           <Box
@@ -82,32 +94,9 @@ const Archetypes = ({ nova }) => {
               justifyContent: "center",
               gridGap: "12px",
               textAlign: "center",
-              padding: {
-                xs: "30px 20px"
-              },
-              position: {
-                xs: "relative",
-                sm: "absolute"
-              },
-              width: {
-                xs: "100%"
-              },
-              top: {
-                xs: "0",
-                sm: "60px"
-              },
-              left: {
-                xs: "0",
-                sm: "60px"
-              },
-              right: {
-                xs: "0",
-                sm: "60px"
-              },
-              bottom: {
-                xs: "0",
-                sm: "60px"
-              },
+              padding: "30px 20px",
+              position: "relative",
+              width: "100%",
               zIndex: 99,
               backdropFilter: "blur(12px)",
               background: "rgba(128, 128, 128, 0.06)",
@@ -158,7 +147,7 @@ const Archetypes = ({ nova }) => {
               }}
             >
               <ResponsiveContainer width="100%" height="100%">
-                <ArchetypePieChart archetype={nova?.properties?.archetype} />
+                <ArchetypePieChart archetype={hub?.properties?.archetype} />
               </ResponsiveContainer>
 
               <Box
@@ -200,7 +189,7 @@ const Archetypes = ({ nova }) => {
             </Box>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
-              <ArchetypePieChart archetype={nova?.properties?.archetype} />
+              <ArchetypePieChart archetype={hub?.properties?.archetype} />
             </ResponsiveContainer>
           )}
         </Box>
@@ -209,4 +198,4 @@ const Archetypes = ({ nova }) => {
   );
 };
 
-export default Archetypes;
+export default React.memo(Archetypes);

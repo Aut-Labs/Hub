@@ -2,7 +2,7 @@
 import { Box, Avatar, Typography, Stack } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { AutOsButton } from "./AutButton";
-import { useLazyCheckOnboardingAllowlistQuery } from "@api/community.api";
+import { useLazyCheckOnboardingAllowlistQuery } from "@api/hub.api";
 import LoadingDialog from "./Dialog/LoadingPopup";
 import SuccessDialog from "./Dialog/SuccessPopup";
 import Community from "@assets/community.png";

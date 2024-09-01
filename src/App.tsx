@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Box } from "@mui/material";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { useAppDispatch } from "@store/store.model";
@@ -8,15 +8,16 @@ import { setNetworks } from "@store/WalletProvider/WalletProvider";
 import { getAppConfig } from "@api/aut.api";
 import AutSDK from "@aut-labs/sdk";
 import ErrorPage from "@components/ErrorPage";
-import { ToolbarConnector } from "./pages/Nova/ToolbarConnector";
-import { NovaList } from "./pages/Nova/NovaList";
-import NovaDetails from "./pages/Nova/NovaDetails";
 import backgroundImage from "@assets/autos/background.svg";
 import background1 from "@assets/autos/background1.png";
 import AutLoading from "@components/AutLoading";
-import AutWallet from "./AutWallet";
-import Callback from "./pages/Oauth2Callback/Callback";
-import ParticipationScore from "./pages/Nova/PS";
+
+const HubList = lazy(() => import("./pages/Hub/HubList"));
+const ParticipationScore = lazy(() => import("./pages/Hub/PS"));
+const Callback = lazy(() => import("./pages/Oauth2Callback/Callback"));
+const AutWallet = lazy(() => import("./AutWallet"));
+const HubDetails = lazy(() => import("./pages/Hub/HubDetails"));
+const ToolbarConnector = lazy(() => import("./pages/Hub/ToolbarConnector"));
 
 function App() {
   const dispatch = useAppDispatch();
@@ -77,20 +78,24 @@ function App() {
       <SWSnackbar />
       {isParticipationScorePage ? (
         <Box sx={backgroundStyle}>
-          <Routes>
-            <Route path="/ps" element={<ParticipationScore />} />
-          </Routes>
+          <Suspense fallback={<AutLoading />}>
+            <Routes>
+              <Route path="/ps" element={<ParticipationScore />} />
+            </Routes>
+          </Suspense>
         </Box>
       ) : (
         <>
           <AutWallet />
           <Box sx={backgroundStyle}>
             <ToolbarConnector />
-            <Routes>
-              <Route path="/:novaName?" element={<NovaList />} />
-              <Route path="callback" element={<Callback />} />
-              <Route path="project/:novaName" element={<NovaDetails />} />
-            </Routes>
+            <Suspense fallback={<AutLoading />}>
+              <Routes>
+                <Route path="/:hubName?" element={<HubList />} />
+                <Route path="callback" element={<Callback />} />
+                <Route path="project/:hubName" element={<HubDetails />} />
+              </Routes>
+            </Suspense>
           </Box>
         </>
       )}

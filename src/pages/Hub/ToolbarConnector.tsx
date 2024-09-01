@@ -1,14 +1,15 @@
-import { Box, Button, Link, Toolbar } from "@mui/material";
+import { Box, Button, Link, Toolbar, Typography } from "@mui/material";
 import AppTitle from "@components/AppTitle";
 import { useAutConnector, useWalletConnector } from "@aut-labs/connector";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "@store/store.model";
-import { communityApi } from "@api/community.api";
+import { hubApi } from "@api/hub.api";
 import { autUrls, environment } from "@api/environment";
+import { memo } from "react";
 
 export const TOOLBAR_HEIGHT = 70;
 
-export const ToolbarConnector = () => {
+const ToolbarConnector = () => {
   const { isConnected, disconnect } = useAutConnector({
     defaultChainId: +environment.defaultChainId
   });
@@ -16,11 +17,10 @@ export const ToolbarConnector = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  console.log("isConnected: ", isConnected);
   const connectDisconnectToggle = async () => {
     if (isConnected) {
       disconnect();
-      await dispatch(communityApi.util.invalidateTags(["hasMinted"]));
+      await dispatch(hubApi.util.invalidateTags(["hasMinted"]));
     } else {
       open();
     }
@@ -92,7 +92,6 @@ export const ToolbarConnector = () => {
           }}
         >
           <Link
-            fontSize={24}
             color="#FFF"
             href={autUrls().landingPage}
             target="_blank"
@@ -106,10 +105,9 @@ export const ToolbarConnector = () => {
               }
             }}
           >
-            Āut Labs
+            <Typography variant="subtitle2">Āut Labs</Typography>
           </Link>
           <Link
-            fontSize={24}
             color="#FFF"
             href={autUrls().launchpad}
             target="_blank"
@@ -127,10 +125,9 @@ export const ToolbarConnector = () => {
               }
             }}
           >
-            Launchpad
+            <Typography variant="subtitle2">Launchpad</Typography>
           </Link>
           <Link
-            fontSize={24}
             color="#FFF"
             href="https://docs.aut.id/v2/intro/what-is-aut"
             target="_blank"
@@ -152,13 +149,13 @@ export const ToolbarConnector = () => {
               }
             }}
           >
-            Docs
+            <Typography variant="subtitle2">Docs</Typography>
           </Link>
           <Button
             onClick={connectDisconnectToggle}
             sx={{
-              width: "220px",
-              height: "55px"
+              width: "200px",
+              height: "50px"
             }}
             color="offWhite"
             variant="outlined"
@@ -170,3 +167,5 @@ export const ToolbarConnector = () => {
     </Box>
   );
 };
+
+export default memo(ToolbarConnector);

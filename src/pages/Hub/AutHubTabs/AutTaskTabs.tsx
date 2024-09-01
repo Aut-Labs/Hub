@@ -1,38 +1,29 @@
 import AutOsTabs from "@components/AutOsTabs";
-import { EmptyNovaOnboardingCards, NovaTasksGrid } from "../NovaDetails";
-import { useMemo } from "react";
+import { HubRoles, HubTasksGrid } from "../HubDetails";
+import { memo, useMemo } from "react";
 import Archetypes from "./Archetype/Archetype";
-import { useAccount } from "wagmi";
 import { useSearchParams } from "react-router-dom";
+import { HubOSHub } from "@api/hub.model";
 
 interface AutTaskTabsProps {
-  nova: any;
+  hub: HubOSHub;
   tasks: any[];
   selectedTab: any;
 }
 
-const AutTaskTabs = ({ nova, tasks, selectedTab }: AutTaskTabsProps) => {
+const AutTaskTabs = ({ hub, tasks, selectedTab }: AutTaskTabsProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const handleTabChange = (index: number) => {
     const tabRoute = index === 0 ? "archetype" : "roles";
     setSearchParams({ tab: tabRoute }, { replace: true });
   };
-  const { address } = useAccount();
-  const canSetArchetype = useMemo(() => {
-    if (
-      nova?.properties?.userData?.isAdmin ||
-      address === nova?.properties?.deployer
-    ) {
-      return true;
-    }
-  }, [nova, address]);
 
   const tabs = useMemo(() => {
     const _tabs: any[] = [];
     _tabs.push({
       label: "Archetypes",
       props: {
-        nova
+        hub
       },
       component: Archetypes
     });
@@ -42,20 +33,19 @@ const AutTaskTabs = ({ nova, tasks, selectedTab }: AutTaskTabsProps) => {
         props: {
           tasks
         },
-        component: NovaTasksGrid
+        component: HubTasksGrid
       });
     } else {
-      const roles = nova?.properties?.roles;
       _tabs.push({
         label: "Roles",
         props: {
-          roles
+          hub
         },
-        component: EmptyNovaOnboardingCards
+        component: HubRoles
       });
     }
     return _tabs;
-  }, [nova, tasks]);
+  }, [hub, tasks]);
 
   return (
     <>
@@ -68,4 +58,4 @@ const AutTaskTabs = ({ nova, tasks, selectedTab }: AutTaskTabsProps) => {
   );
 };
 
-export default AutTaskTabs;
+export default memo(AutTaskTabs);

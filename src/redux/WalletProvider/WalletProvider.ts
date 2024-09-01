@@ -9,14 +9,14 @@ export enum ConnectorTypes {
 export interface WalletProviderState {
   selectedNetwork: NetworkConfig;
   networksConfig: NetworkConfig[];
-  novaAddress: string;
+  hubAddress: string;
   selectedRoleId: string;
 }
 
 const initialState: WalletProviderState = {
   selectedNetwork: null,
   networksConfig: [],
-  novaAddress: null,
+  hubAddress: null,
   selectedRoleId: null
 };
 
@@ -32,8 +32,8 @@ export const walletProviderSlice = createSlice({
     setNetworks(state, action) {
       state.networksConfig = action.payload;
     },
-    setNovaAddress(state, action) {
-      state.novaAddress = action.payload;
+    setHubAddress(state, action) {
+      state.hubAddress = action.payload;
     },
     setSelectedRoleId(state, action) {
       state.selectedRoleId = action.payload;
@@ -46,21 +46,19 @@ export const {
   setNetworks,
   updateWalletProviderState,
   setSelectedRoleId,
-  setNovaAddress
+  setHubAddress
 } = walletProviderSlice.actions;
 
-export const networksConfig = (state: any) =>
+export const NetworksConfig = (state: any) =>
   state.walletProvider.networksConfig as NetworkConfig[];
-export const NetworksConfig = createSelector([networksConfig], (a) => a);
 
-export const selectedNetwork = (state: any) =>
+export const SelectedNetwork = (state: any) =>
   state.walletProvider.selectedNetwork as NetworkConfig;
-export const SelectedNetwork = createSelector([selectedNetwork], (a) => a);
 
 export const SelectedRoleId = (state: any) =>
   state.walletProvider.selectedRoleId;
 
-export const NovaAddress = (state: any) => state.walletProvider.novaAddress;
+export const HubAddress = (state: any) => state.walletProvider.hubAddress;
 
 export const BlockExplorerUrl = createSelector(SelectedNetwork, (config) => {
   if (config) {

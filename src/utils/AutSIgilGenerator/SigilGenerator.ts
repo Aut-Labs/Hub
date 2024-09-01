@@ -15,6 +15,8 @@ import {
   loadImage
 } from "canvas";
 
+const sigilCache: { [key: string]: SigilOutput } = {};
+
 const drawSigil = async (ctx: CanvasRenderingContext2D, address: string) => {
   const url3 = Scratch(500, 500);
   const url2 = Scratch(500 - 500 / 3, 500 - 500 / 3);
@@ -86,9 +88,12 @@ const drawSigil = async (ctx: CanvasRenderingContext2D, address: string) => {
   // drawHole(lastHoleFromBase9, ctx, hole, zoneHeight);
 };
 
-export const generateAutIdDAOSigil = async (
+export const generateAutIdHubSigil = async (
   address: string
 ): Promise<SigilOutput> => {
+  if (sigilCache[address]) {
+    return sigilCache[address];
+  }
   const canvasWidth = 600;
   const canvasHeight = 600;
   const canvas = createCanvas(canvasWidth, canvasHeight);
@@ -101,8 +106,10 @@ export const generateAutIdDAOSigil = async (
   canvas.height = canvasHeight;
   await drawSigil(ctx, address);
 
-  return {
+  const result: SigilOutput = {
     previewElement: canvas,
     toBase64: () => canvas.toDataURL()
-  } as SigilOutput;
+  };
+  sigilCache[address] = result;
+  return result;
 };

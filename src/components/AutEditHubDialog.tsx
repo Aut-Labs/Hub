@@ -24,10 +24,10 @@ import { AutTextField } from "@theme/field-text-styles";
 import { useSelector } from "react-redux";
 import { IsAuthenticated } from "@auth/auth.reducer";
 import { useOAuthSocials } from "./Oauth2/oauth2";
-import { Community } from "@api/community.model";
+import { HubOSHub } from "@api/hub.model";
 import ErrorDialog from "./Dialog/ErrorPopup";
 import LoadingDialog from "./Dialog/LoadingPopup";
-import { useUpdateNovaMutation } from "@api/community.api";
+import { useUpdateHubMutation } from "@api/hub.api";
 
 export interface EditDialogProps {
   title: string;
@@ -35,7 +35,7 @@ export interface EditDialogProps {
   open?: boolean;
   onClose?: () => void;
   hideCloseBtn?: boolean;
-  nova: any;
+  hub: HubOSHub;
 }
 
 const AutStyledDialog = styled(Dialog)(({ theme }) => ({
@@ -141,7 +141,7 @@ export enum SocialLinkPrefixes {
   GitHub = "https://github.com/"
 }
 
-export function AutEditNovaDialog(props: EditDialogProps) {
+export function AutEditHubDialog(props: EditDialogProps) {
   const { getAuthGithub, getAuthX, getAuthDiscord, authenticating } =
     useOAuthSocials();
   const theme = useTheme();
@@ -150,7 +150,7 @@ export function AutEditNovaDialog(props: EditDialogProps) {
   const navigate = useNavigate();
   const isAuthenticated = useSelector(IsAuthenticated);
   const [editInitiated, setEditInitiated] = useState(false);
-  //TODO: watch out!! the index of each icon should match the socials in the nova.properties!
+  //TODO: watch out!! the index of each icon should match the socials in the hub.properties!
   const socialIcons = {
     discord: DiscordIcon,
     // eth: null,
@@ -161,7 +161,7 @@ export function AutEditNovaDialog(props: EditDialogProps) {
   };
 
   const filteredSocials =
-    (props.nova as Community)?.properties?.socials?.filter(
+    (props.hub as HubOSHub)?.properties?.socials?.filter(
       (social) =>
         social.type !== "telegram" &&
         social.type !== "lensfrens" &&
@@ -188,8 +188,8 @@ export function AutEditNovaDialog(props: EditDialogProps) {
     return value.replace(prefix, "");
   }
 
-  const [updateNova, { error, isError, isLoading, reset }] =
-    useUpdateNovaMutation();
+  const [updateHub, { error, isError, isLoading, reset }] =
+    useUpdateHubMutation();
 
   const {
     control,
@@ -199,8 +199,8 @@ export function AutEditNovaDialog(props: EditDialogProps) {
   } = useForm({
     mode: "onChange",
     defaultValues: {
-      name: props.nova?.name,
-      description: props.nova?.description,
+      name: props.hub?.name,
+      description: props.hub?.description,
       socials: filteredSocials
     }
   });
@@ -216,16 +216,16 @@ export function AutEditNovaDialog(props: EditDialogProps) {
     // }
   };
 
-  const onEditNova = async (data: any) => {
-    updateNova({
-      ...props.nova,
+  const onEditHub = async (data: any) => {
+    updateHub({
+      ...props.hub,
       name: data.name,
       description: data.description,
       properties: {
-        ...props.nova.properties,
+        ...props.hub.properties,
         socials: data.socials
       }
-    });
+    } as HubOSHub);
     setEditInitiated(false);
   };
 
@@ -237,7 +237,7 @@ export function AutEditNovaDialog(props: EditDialogProps) {
       open={props.open}
     >
       <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
-      <LoadingDialog open={isLoading} message="Updating Nova..." />
+      <LoadingDialog open={isLoading} message="Updating hub..." />
       <DialogContent
         sx={{
           border: 0,
@@ -641,7 +641,7 @@ export function AutEditNovaDialog(props: EditDialogProps) {
           }}
         >
           <AutOsButton
-            onClick={handleSubmit(onEditNova)}
+            onClick={handleSubmit(onEditHub)}
             type="button"
             color="primary"
             variant="outlined"

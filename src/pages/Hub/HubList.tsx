@@ -8,14 +8,15 @@ import {
   useTheme,
   styled,
   MenuItem,
-  InputAdornment
+  InputAdornment,
+  Container
 } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import PerfectScrollbar from "react-perfect-scrollbar";
-import { useMemo, useState } from "react";
-import NovaCard from "@components/NovaCard";
+import { memo, useMemo, useState } from "react";
+import HubCard from "@components/HubCard";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
-import { useGetAllNovasQuery } from "@api/community.api";
+import { useGetAllHubsQuery } from "@api/hub.api";
 import { TOOLBAR_HEIGHT } from "./ToolbarConnector";
 import { AutSelectField } from "@theme/field-select-styles";
 import { ReactComponent as Markets } from "@assets/icons/markets.svg";
@@ -23,18 +24,13 @@ import { ReactComponent as Archetypes } from "@assets/icons/archetype.svg";
 import { ReactComponent as Filters } from "@assets/icons/filters.svg";
 import { useParams } from "react-router-dom";
 import { useAccount } from "wagmi";
-import { Community, MarketTemplates } from "@api/community.model";
-import { filterActiveNovas } from "./utils";
+import { HubOSHub, MarketTemplates } from "@api/hub.model";
+import { filterActiveHubs } from "./utils";
 
-const AutContainer = styled("div")(() => ({
+const AutContainer = styled(Container)(() => ({
   display: "flex",
   flexDirection: "column",
-  height: "100%",
-  paddingLeft: "60px",
-  paddingRight: "60px"
-  // backgroundImage: `url(${backgroundImage})`,
-  // backgroundBlendMode: "hard-light",
-  // backgroundSize: "cover"
+  height: "100%"
 }));
 
 export const GridBox = styled(Box)(({ theme }) => ({
@@ -53,16 +49,18 @@ export const GridBox = styled(Box)(({ theme }) => ({
   }
 }));
 
-export const NovaList = () => {
+const MemoizedAutSelectField = memo(AutSelectField);
+
+const HubList = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [marketFilter, setMarketFilter] = useState("");
-  const [novaFilter, setNovaFilter] = useState("");
+  const [hubFilter, setHubFilter] = useState("");
   const [archetypeFilter, setArchetypeFilter] = useState("");
-  const { novaName } = useParams();
+  const { hubName } = useParams();
   const { address } = useAccount();
 
-  const { data, isLoading, isFetching, refetch } = useGetAllNovasQuery(
+  const { data, isLoading, isFetching, refetch } = useGetAllHubsQuery(
     {
       connectedAddress: address
     },
@@ -72,20 +70,20 @@ export const NovaList = () => {
     }
   );
 
-  const filteredNovas: Community[] = useMemo(() => {
-    let novas: Community[] = data?.daos || [];
+  const filteredHubs: HubOSHub[] = useMemo(() => {
+    let hubs: HubOSHub[] = data?.hubs || [];
     const userAddress = address?.toLowerCase();
 
-    if (!novas) {
+    if (!hubs) {
       return [];
     }
-    novas = [...novas];
+    hubs = [...hubs];
 
-    if (novaName) {
-      novas = novas.sort((a, b) => {
-        if (a.name?.toLowerCase() === novaName?.toLowerCase()) {
+    if (hubName) {
+      hubs = hubs.sort((a, b) => {
+        if (a.name?.toLowerCase() === hubName?.toLowerCase()) {
           return -1;
-        } else if (b.name?.toLowerCase() === novaName?.toLowerCase()) {
+        } else if (b.name?.toLowerCase() === hubName?.toLowerCase()) {
           return 1;
         } else {
           return 0;
@@ -94,7 +92,7 @@ export const NovaList = () => {
     }
 
     if (userAddress) {
-      novas = novas.sort((a, b) => {
+      hubs = hubs.sort((a, b) => {
         if (a.properties.deployer?.toLowerCase() === userAddress) {
           return -1;
         } else if (b.properties.deployer?.toLowerCase() === userAddress) {
@@ -103,24 +101,25 @@ export const NovaList = () => {
           return 0;
         }
       });
-      if (novaFilter === "My Hub") {
-        novas = novas.filter(
-          (nova) =>
-            nova.properties.deployer?.toLowerCase() ===
+      if (hubFilter === "my-hubs") {
+        hubs = hubs.filter(
+          (hub) =>
+            hub.properties.deployer?.toLowerCase() ===
               userAddress.toLowerCase() ||
-            nova.properties.membersList.some(
-              (autId) => autId.id.toLowerCase() === userAddress.toLowerCase()
+            hub.properties.members.some(
+              (autId) =>
+                autId.properties.address.toLowerCase() ===
+                userAddress.toLowerCase()
             )
         );
       }
     }
 
-    novas = filterActiveNovas(novas, userAddress);
+    hubs = filterActiveHubs(hubs, userAddress);
 
     if (archetypeFilter) {
-      novas = novas.filter(
-        (nova) =>
-          nova?.properties?.archetype?.default === Number(archetypeFilter)
+      hubs = hubs.filter(
+        (hub) => hub?.properties?.archetype?.default === Number(archetypeFilter)
       );
     }
 
@@ -128,12 +127,10 @@ export const NovaList = () => {
       const marketNum = MarketTemplates.find(
         (v) => v.title === marketFilter || v.market === +marketFilter
       );
-      novas = novas.filter(
-        (nova) => nova?.properties?.market === marketNum?.title
-      );
+      hubs = hubs.filter((hub) => hub?.properties?.market === marketNum?.title);
     }
-    return novas;
-  }, [data, novaName, address, archetypeFilter, marketFilter, novaFilter]);
+    return hubs;
+  }, [data, hubName, address, archetypeFilter, marketFilter, hubFilter]);
 
   return (
     <PerfectScrollbar
@@ -151,7 +148,6 @@ export const NovaList = () => {
       }}
     >
       <AutContainer>
-        <ErrorDialog handleClose={() => null} open={null} message={null} />
         <Box
           sx={{
             display: "flex",
@@ -187,12 +183,12 @@ export const NovaList = () => {
           }}
         >
           {address && (
-            <AutSelectField
-              value={novaFilter}
+            <MemoizedAutSelectField
+              value={hubFilter}
               color="offWhite"
               defaultValue={""}
               placeholder="Onboarding Status"
-              onChange={(e) => setNovaFilter(e.target.value as string)}
+              onChange={(e) => setHubFilter(e.target.value as string)}
               startAdornment={
                 <InputAdornment
                   position="start"
@@ -205,13 +201,13 @@ export const NovaList = () => {
               <MenuItem value="">
                 <em>All Hubs</em>
               </MenuItem>
-              <MenuItem value="My Hub">
-                <em>My Hub</em>
+              <MenuItem value="my-hubs">
+                <em>My Hubs</em>
               </MenuItem>
-            </AutSelectField>
+            </MemoizedAutSelectField>
           )}
 
-          <AutSelectField
+          <MemoizedAutSelectField
             value={marketFilter}
             color="offWhite"
             onChange={(e) => {
@@ -236,8 +232,8 @@ export const NovaList = () => {
                 </MenuItem>
               );
             })}
-          </AutSelectField>
-          <AutSelectField
+          </MemoizedAutSelectField>
+          <MemoizedAutSelectField
             value={archetypeFilter}
             color="offWhite"
             onChange={(e) => {
@@ -270,10 +266,10 @@ export const NovaList = () => {
             <MenuItem value="5">
               <em>Growth</em>
             </MenuItem>
-          </AutSelectField>
+          </MemoizedAutSelectField>
         </Box>
 
-        {!isLoading && !filteredNovas?.length && (
+        {!isLoading && !filteredHubs?.length && (
           <Box
             sx={{
               display: "flex",
@@ -285,7 +281,7 @@ export const NovaList = () => {
             }}
           >
             <Typography color="rgb(107, 114, 128)" variant="subtitle2">
-              No Novas were found...
+              No Hubs were found...
             </Typography>
             {/* @ts-ignore */}
             <Button
@@ -305,15 +301,15 @@ export const NovaList = () => {
         )}
 
         {isLoading || isFetching ? (
-          <AutLoading width="130px" height="130px" />
+          <AutLoading width="120px" height="120px" />
         ) : (
           <>
             <GridBox sx={{ flexGrow: 1, mt: 4 }}>
-              {filteredNovas.map((dao, index) => (
-                <NovaCard
-                  key={`nova-card-${index}`}
-                  daoData={dao}
-                  isHighlighted={dao.name === novaName}
+              {filteredHubs.map((hub, index) => (
+                <HubCard
+                  key={`hub-card-${index}`}
+                  hubData={hub}
+                  isHighlighted={hub.name === hubName}
                 />
               ))}
             </GridBox>
@@ -323,3 +319,5 @@ export const NovaList = () => {
     </PerfectScrollbar>
   );
 };
+
+export default memo(HubList);
