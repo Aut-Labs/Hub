@@ -523,182 +523,193 @@ const ParticipationScore = () => {
         container
         sx={{
           display: "flex",
-          flexWrap: "nowrap",
+          // flexWrap: "nowrap",
           pb: 2,
           minHeight: "100%",
           justifyContent: "flex-start" // Align items at the start
         }}
       >
-        {/* Period column outside the box, only for the first member */}
-        <Grid item sx={{ width: 80, mr: 2 }}>
-          <Typography
-            fontFamily="FractulRegular"
-            color="white"
-            variant="body2"
-            sx={{ mt: "110px" }} // Adjust this value to align with the data rows
-          >
-            Period
-          </Typography>
-          {membersData[0].map((point, index) => (
-            <Box
-              key={index}
-              sx={{
-                mt: 1,
-                height: "64px",
-                display: "flex",
-                alignItems: "center", // Changed from "alignItem" to "alignItems"
-                justifyContent: "center"
-              }}
-            >
-              <Typography
-                fontFamily="FractulRegular"
-                color="white"
-                textAlign="center"
-                variant="body2"
-              >
-                {point.period}
-              </Typography>
-            </Box>
-          ))}
-        </Grid>
-
         {membersData.map((memberData, memberIndex) => (
           <Grid
             item
             key={memberIndex}
             sx={{
-              width: 350, // Fixed width for each member's box
+              // Fixed width for each member's box
               mr: 2 // Add some margin between boxes
             }}
           >
             <Box
               sx={{
                 height: "100%",
-                backgroundColor: "rgba(255, 255, 255, 0.1)",
-                p: 2,
-                borderRadius: "15px",
                 display: "flex",
-                flexDirection: "column"
+                flexDirection: "row"
               }}
             >
-              <Typography
-                fontFamily="FractulRegular"
-                color="white"
-                variant="h6"
-                gutterBottom
-              >
-                Member {memberIndex + 1}
-              </Typography>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={copyValuesEnabled[memberIndex]}
-                    onChange={() => toggleCopyValues(memberIndex)}
-                    color="primary"
-                  />
-                }
-                label={
-                  <Typography fontFamily="FractulRegular" color="white">
-                    Copy Values to Others
-                  </Typography>
-                }
-              />
-              <FormControlLabel
-                sx={{ visibility: memberIndex === 0 ? "hidden" : "visible" }}
-                control={
-                  <Switch
-                    checked={copyFromPrevious[memberIndex]}
-                    onChange={() => toggleCopyFromPrevious(memberIndex)}
-                    color="primary"
-                  />
-                }
-                label={
-                  <Typography fontFamily="FractulRegular" color="white">
-                    Copy from Previous Member
-                  </Typography>
-                }
-              />
-              <Box sx={{ mt: 2, flexGrow: 1, overflowY: "auto" }}>
-                <Grid container spacing={1} alignItems="center">
-                  <Grid item xs={6}>
-                    <MuiTooltip title="Individual Commitment Level" arrow>
-                      <Typography
-                        fontFamily="FractulRegular"
-                        color="white"
-                        variant="body2"
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          cursor: "help"
-                        }}
-                      >
-                        iCL
-                        <InfoOutlinedIcon sx={{ fontSize: 16, ml: 0.5 }} />
-                      </Typography>
-                    </MuiTooltip>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <MuiTooltip title="Performance" arrow>
-                      <Typography
-                        fontFamily="FractulRegular"
-                        color="white"
-                        variant="body2"
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          cursor: "help"
-                        }}
-                      >
-                        P
-                        <InfoOutlinedIcon sx={{ fontSize: 16, ml: 0.5 }} />
-                      </Typography>
-                    </MuiTooltip>
-                  </Grid>
-                </Grid>
-                {memberData.map((point, index) => (
-                  <Grid
-                    container
-                    spacing={1}
-                    alignItems="center"
-                    key={index}
-                    sx={{ mt: 1 }}
+              {memberIndex === 0 && (
+                <Box sx={{ width: 80, mr: 2 }}>
+                  <Typography
+                    fontFamily="FractulRegular"
+                    color="white"
+                    variant="body2"
+                    sx={{ mt: "148px" }} // Adjust this value to align with the data rows
                   >
+                    Period
+                  </Typography>
+                  {membersData[0].map((point, index) => (
+                    <Box
+                      key={index}
+                      sx={{
+                        mt: 1,
+                        height: "72px",
+                        display: "flex",
+                        alignItems: "center", // Changed from "alignItem" to "alignItems"
+                        justifyContent: "center"
+                      }}
+                    >
+                      <Typography
+                        fontFamily="FractulRegular"
+                        color="white"
+                        textAlign="center"
+                        variant="body2"
+                      >
+                        {point.period}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              )}
+              <Box
+                sx={{
+                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  borderRadius: "15px",
+                  p: 2,
+                  width: 350
+                }}
+              >
+                <Typography
+                  fontFamily="FractulRegular"
+                  color="white"
+                  variant="h6"
+                  gutterBottom
+                >
+                  Member {memberIndex + 1}
+                </Typography>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={copyValuesEnabled[memberIndex]}
+                      onChange={() => toggleCopyValues(memberIndex)}
+                      color="primary"
+                    />
+                  }
+                  label={
+                    <Typography fontFamily="FractulRegular" color="white">
+                      Copy Values to Others
+                    </Typography>
+                  }
+                />
+                <FormControlLabel
+                  sx={{ visibility: memberIndex === 0 ? "hidden" : "visible" }}
+                  control={
+                    <Switch
+                      checked={copyFromPrevious[memberIndex]}
+                      onChange={() => toggleCopyFromPrevious(memberIndex)}
+                      color="primary"
+                    />
+                  }
+                  label={
+                    <Typography fontFamily="FractulRegular" color="white">
+                      Copy from Previous Member
+                    </Typography>
+                  }
+                />
+                <Box sx={{ mt: 2, flexGrow: 1, overflowY: "auto" }}>
+                  <Grid container spacing={1} alignItems="center">
                     <Grid item xs={6}>
-                      <CustomSlider
-                        value={point.iCL}
-                        onChange={(e, newValue) =>
-                          handleInputChange(memberIndex, index, "iCL", newValue)
-                        }
-                        min={1}
-                        max={10}
-                        step={0.1}
-                      />
+                      <MuiTooltip title="Individual Commitment Level" arrow>
+                        <Typography
+                          fontFamily="FractulRegular"
+                          color="white"
+                          variant="body2"
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            cursor: "help"
+                          }}
+                        >
+                          iCL
+                          <InfoOutlinedIcon sx={{ fontSize: 16, ml: 0.5 }} />
+                        </Typography>
+                      </MuiTooltip>
                     </Grid>
                     <Grid item xs={6}>
-                      <AutTextField
-                        type="number"
-                        sx={{
-                          width: "100%",
-                          "& .MuiInputBase-root": {
-                            fontFamily: "FractulRegular"
-                          }
-                        }}
-                        color="offWhite"
-                        variant="outlined"
-                        value={point.P}
-                        onChange={(e) =>
-                          handleInputChange(
-                            memberIndex,
-                            index,
-                            "P",
-                            e.target.value
-                          )
-                        }
-                        inputProps={{ min: 0.01, step: 0.01 }}
-                      />
+                      <MuiTooltip title="Performance" arrow>
+                        <Typography
+                          fontFamily="FractulRegular"
+                          color="white"
+                          variant="body2"
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            cursor: "help"
+                          }}
+                        >
+                          P
+                          <InfoOutlinedIcon sx={{ fontSize: 16, ml: 0.5 }} />
+                        </Typography>
+                      </MuiTooltip>
                     </Grid>
                   </Grid>
-                ))}
+                  {memberData.map((point, index) => (
+                    <Grid
+                      container
+                      spacing={1}
+                      alignItems="center"
+                      key={index}
+                      sx={{ mt: 1 }}
+                    >
+                      <Grid item xs={6}>
+                        <CustomSlider
+                          value={point.iCL}
+                          onChange={(e, newValue) =>
+                            handleInputChange(
+                              memberIndex,
+                              index,
+                              "iCL",
+                              newValue
+                            )
+                          }
+                          min={1}
+                          max={10}
+                          step={0.1}
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <AutTextField
+                          type="number"
+                          sx={{
+                            width: "100%",
+                            "& .MuiInputBase-root": {
+                              fontFamily: "FractulRegular"
+                            }
+                          }}
+                          color="offWhite"
+                          variant="outlined"
+                          value={point.P}
+                          onChange={(e) =>
+                            handleInputChange(
+                              memberIndex,
+                              index,
+                              "P",
+                              e.target.value
+                            )
+                          }
+                          inputProps={{ min: 0.01, step: 0.01 }}
+                        />
+                      </Grid>
+                    </Grid>
+                  ))}
+                </Box>
               </Box>
             </Box>
           </Grid>
@@ -713,7 +724,7 @@ const ParticipationScore = () => {
         container
         sx={{
           display: "flex",
-          flexWrap: "nowrap",
+          // flexWrap: "nowrap",
           pb: 2,
           minHeight: "100%",
           justifyContent: "flex-start"
@@ -724,7 +735,7 @@ const ParticipationScore = () => {
             fontFamily="FractulRegular"
             color="white"
             variant="body2"
-            sx={{ mt: "110px" }}
+            sx={{ mt: "116px" }}
           >
             Period
           </Typography>
@@ -733,7 +744,7 @@ const ParticipationScore = () => {
               key={index}
               sx={{
                 mt: 1,
-                height: "64px",
+                height: "72px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center"
