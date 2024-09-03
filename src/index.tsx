@@ -21,7 +21,7 @@ import { WalletConnectorProvider, wagmiConfig } from "@aut-labs/connector";
 //   project: `${process.env.REACT_APP_MARKER}`,
 //   reporter: {
 //     email: "frontend@aut.id",
-//     fullName: "Nova Showcase"
+//     fullName: "HubOS"
 //   }
 // });
 const queryClient = new QueryClient();

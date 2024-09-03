@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { memo, useMemo, useState } from "react";
 import {
   PieChart,
   Pie,
@@ -7,12 +7,12 @@ import {
   ResponsiveContainer,
   Sector
 } from "recharts";
-import {
-  NovaArchetype,
-  NovaArchetypeParameters
-} from "@aut-labs/sdk/dist/models/nova";
-import { ArchetypeTypes } from "@api/community.api";
+import { ArchetypeTypes } from "@api/hub.api";
 import { Box, Typography } from "@mui/material";
+import {
+  HubArchetype,
+  HubArchetypeParameters
+} from "@aut-labs/sdk/dist/models/hub";
 
 const COLORS = ["#9BA1ED", "#272D76", "#4A3398", "#5C0E8D", "#2360EA"];
 const RADIAN = Math.PI / 180;
@@ -47,79 +47,79 @@ const renderCustomizedLabel = ({
 };
 
 const archetypeLimits = {
-  [NovaArchetype.SIZE]: { min: 40, max: 60 },
-  [NovaArchetype.GROWTH]: { min: 40, max: 60 },
-  [NovaArchetype.PERFORMANCE]: { min: 40, max: 60 },
-  [NovaArchetype.REPUTATION]: { min: 40, max: 60 },
-  [NovaArchetype.CONVICTION]: { min: 40, max: 60 }
+  [HubArchetype.SIZE]: { min: 40, max: 60 },
+  [HubArchetype.GROWTH]: { min: 40, max: 60 },
+  [HubArchetype.PERFORMANCE]: { min: 40, max: 60 },
+  [HubArchetype.REPUTATION]: { min: 40, max: 60 },
+  [HubArchetype.CONVICTION]: { min: 40, max: 60 }
 };
 
-export const archetypeChartValues = (archetype: NovaArchetypeParameters) => {
-  const { min: sizeMin, max: sizeMax } = archetypeLimits[NovaArchetype.SIZE];
+export const archetypeChartValues = (archetype: HubArchetypeParameters) => {
+  const { min: sizeMin, max: sizeMax } = archetypeLimits[HubArchetype.SIZE];
   return {
-    [NovaArchetype.SIZE]: {
-      ...ArchetypeTypes[NovaArchetype.SIZE],
+    [HubArchetype.SIZE]: {
+      ...ArchetypeTypes[HubArchetype.SIZE],
       value: archetype?.size,
       min: sizeMin,
       max: sizeMax,
       defaults: {
-        [NovaArchetype.SIZE]: 40,
-        [NovaArchetype.GROWTH]: 15,
-        [NovaArchetype.PERFORMANCE]: 15,
-        [NovaArchetype.REPUTATION]: 15,
-        [NovaArchetype.CONVICTION]: 15
+        [HubArchetype.SIZE]: 40,
+        [HubArchetype.GROWTH]: 15,
+        [HubArchetype.PERFORMANCE]: 15,
+        [HubArchetype.REPUTATION]: 15,
+        [HubArchetype.CONVICTION]: 15
       }
     },
-    [NovaArchetype.REPUTATION]: {
-      ...ArchetypeTypes[NovaArchetype.REPUTATION],
+    [HubArchetype.REPUTATION]: {
+      ...ArchetypeTypes[HubArchetype.REPUTATION],
       value: archetype?.reputation,
       min: sizeMin,
       max: sizeMax,
       defaults: {
-        [NovaArchetype.SIZE]: 15,
-        [NovaArchetype.GROWTH]: 15,
-        [NovaArchetype.PERFORMANCE]: 15,
-        [NovaArchetype.REPUTATION]: 40,
-        [NovaArchetype.CONVICTION]: 15
+        [HubArchetype.SIZE]: 15,
+        [HubArchetype.GROWTH]: 15,
+        [HubArchetype.PERFORMANCE]: 15,
+        [HubArchetype.REPUTATION]: 40,
+        [HubArchetype.CONVICTION]: 15
       }
     },
-    [NovaArchetype.CONVICTION]: {
-      ...ArchetypeTypes[NovaArchetype.CONVICTION],
+    [HubArchetype.CONVICTION]: {
+      ...ArchetypeTypes[HubArchetype.CONVICTION],
       value: archetype?.conviction,
       min: sizeMin,
       max: sizeMax,
       defaults: {
-        [NovaArchetype.SIZE]: 15,
-        [NovaArchetype.GROWTH]: 15,
-        [NovaArchetype.PERFORMANCE]: 15,
-        [NovaArchetype.REPUTATION]: 15,
-        [NovaArchetype.CONVICTION]: 40
+        [HubArchetype.SIZE]: 15,
+        [HubArchetype.GROWTH]: 15,
+        [HubArchetype.PERFORMANCE]: 15,
+        [HubArchetype.REPUTATION]: 15,
+        [HubArchetype.CONVICTION]: 40
       }
     },
-    [NovaArchetype.PERFORMANCE]: {
-      ...ArchetypeTypes[NovaArchetype.PERFORMANCE],
+    [HubArchetype.PERFORMANCE]: {
+      ...ArchetypeTypes[HubArchetype.PERFORMANCE],
       value: archetype?.performance,
       min: sizeMin,
       max: sizeMax,
       defaults: {
-        [NovaArchetype.SIZE]: 15,
-        [NovaArchetype.GROWTH]: 15,
-        [NovaArchetype.PERFORMANCE]: 40,
-        [NovaArchetype.REPUTATION]: 15,
-        [NovaArchetype.CONVICTION]: 15
+        [HubArchetype.SIZE]: 15,
+        [HubArchetype.GROWTH]: 15,
+        [HubArchetype.PERFORMANCE]: 40,
+        [HubArchetype.REPUTATION]: 15,
+        [HubArchetype.CONVICTION]: 15
       }
     },
-    [NovaArchetype.GROWTH]: {
-      ...ArchetypeTypes[NovaArchetype.GROWTH],
+    [HubArchetype.GROWTH]: {
+      ...ArchetypeTypes[HubArchetype.GROWTH],
       value: archetype?.growth,
       min: sizeMin,
       max: sizeMax,
       defaults: {
-        [NovaArchetype.SIZE]: 15,
-        [NovaArchetype.GROWTH]: 40,
-        [NovaArchetype.PERFORMANCE]: 15,
-        [NovaArchetype.REPUTATION]: 15,
-        [NovaArchetype.CONVICTION]: 15
+        [HubArchetype.SIZE]: 15,
+        [HubArchetype.GROWTH]: 40,
+        [HubArchetype.PERFORMANCE]: 15,
+        [HubArchetype.REPUTATION]: 15,
+        [HubArchetype.CONVICTION]: 15
       }
     }
   };
@@ -168,10 +168,10 @@ const ArchetypePieChart = ({
 }: {
   archetype: {
     default: number;
-    parameters: NovaArchetypeParameters;
+    parameters: HubArchetypeParameters;
   };
 }) => {
-  const mappedArchetype: NovaArchetypeParameters = useMemo(() => {
+  const mappedArchetype: HubArchetypeParameters = useMemo(() => {
     return {
       archetype: archetype?.default,
       ...archetype?.parameters
@@ -382,4 +382,4 @@ const renderActiveShape = (props) => {
   );
 };
 
-export default ArchetypePieChart;
+export default memo(ArchetypePieChart);

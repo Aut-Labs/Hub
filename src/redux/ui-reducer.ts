@@ -1,4 +1,3 @@
-import { Community } from "@api/community.model";
 import {
   DiscordMessage,
   DiscordPollInput,
@@ -7,31 +6,32 @@ import {
   postDiscordPoll
 } from "@api/discord.api";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { RootState } from "./store.model";
+import { HubOSHub } from "@api/hub.model";
 
 export const sendDiscordNotification = createAsyncThunk(
   "discord/notification",
   async (message: DiscordMessage, { dispatch, getState }) => {
     try {
-      const state: any = getState();
-      const communities = state.community.communities as Community[];
-      const communityAddress = state.community
-        .selectedCommunityAddress as string;
-      const community = communities.find(
-        (c) => c.properties.address === communityAddress
+      const state: RootState = getState() as RootState;
+      const hubs = state.hub.hubs as HubOSHub[];
+      const hubAddress = state.hub.selectedHubAddress as string;
+      const hub = hubs.find(
+        (c) => c.properties.address.toLowerCase() === hubAddress.toLowerCase()
       );
       const { userInfo } = state.auth;
       const discordMsg = new MessageEmbed({
         author: {
-          name: userInfo.nickname,
-          image: userInfo.imageUrl
+          name: userInfo.name,
+          image: userInfo.image
         },
         message,
         footer: {
-          text: `${community.name}@Āut`,
-          image: community.image as string
+          text: `${hub.name}@Āut`,
+          image: hub.image as string
         }
       });
-      // return await sendNotification(community.discordWebhookUrl, discordMsg);
+      // return await sendNotification(hub.discordWebhookUrl, discordMsg);
     } catch (error) {
       const message = "Could not send notification to discord";
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -44,24 +44,23 @@ export const sendDiscordPoll = createAsyncThunk(
   "discord/poll",
   async (input: DiscordPollInput, { dispatch, getState }) => {
     try {
-      const state = getState() as any;
-      const communities = state.community.communities as Community[];
-      const communityAddress = state.community
-        .selectedCommunityAddress as string;
-      const community = communities.find(
-        (c) => c.properties.address === communityAddress
+      const state: RootState = getState() as RootState;
+      const hubs = state.hub.hubs as HubOSHub[];
+      const hubAddress = state.hub.selectedHubAddress as string;
+      const hub = hubs.find(
+        (c) => c.properties.address.toLowerCase() === hubAddress.toLowerCase()
       );
       const { userInfo } = state.auth;
 
       const discordMsg = new MessageEmbed({
         author: {
-          name: userInfo.nickname,
-          image: userInfo.imageUrl
+          name: userInfo.name,
+          image: userInfo.image
         },
         message: input.message,
         footer: {
-          text: `${community.name}@Āut`,
-          image: community.image as string
+          text: `${hub.name}@Āut`,
+          image: hub.image as string
         }
       });
       return await postDiscordPoll("https://dev-api.olympics.community/poll", {
@@ -85,7 +84,7 @@ const initialState = {
     severity: "success",
     duration: 2000
   },
-  openEditNova: false,
+  openEditHub: false,
   logs: [],
   previousRoute: "/",
   transactionState: null,
@@ -115,8 +114,8 @@ export const uiSlice = createSlice({
         open: false
       };
     },
-    setOpenEditNova(state, action) {
-      state.openEditNova = action.payload;
+    setOpenEditHub(state, action) {
+      state.openEditHub = action.payload;
     },
     updateTransactionState(state, action) {
       state.transactionState = action.payload;
@@ -137,11 +136,11 @@ export const {
   setTitle,
   addLog,
   setPreviusRoute,
-  setOpenEditNova,
+  setOpenEditHub,
   updateTransactionState
 } = uiSlice.actions;
 
 export const AppTitle = (state) => state.ui.title as string;
-export const IsEditingNova = (state) => state.ui.openEditNova as boolean;
+export const IsEditingHub = (state) => state.ui.openEditHub as boolean;
 
 export default uiSlice.reducer;

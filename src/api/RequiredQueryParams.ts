@@ -1,6 +1,6 @@
 export enum RequiredQueryParams {
-  DaoAddress = "daoAddress",
-  DaoName = "daoName",
+  HubAddress = "hubAddress",
+  HubName = "hubName",
   OnboardingQuestAddress = "onboardingQuestAddress",
   QuestId = "questId"
 }

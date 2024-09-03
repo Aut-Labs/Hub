@@ -101,7 +101,7 @@ const DomainRegistrationDialog = ({ open, onClose, onRegister }) => {
       </DialogTitle>
       <DialogContent>
         <Typography variant="body2" color="offWhite.main" gutterBottom>
-          Enter a domain name for your Nova.
+          Enter a domain name for your Hub.
         </Typography>
         <StyledTextField
           InputProps={{

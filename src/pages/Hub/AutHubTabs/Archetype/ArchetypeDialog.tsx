@@ -1,8 +1,4 @@
 /* eslint-disable max-len */
-import {
-  NovaArchetype,
-  NovaArchetypeParameters
-} from "@aut-labs/sdk/dist/models/nova";
 import { AutOsButton } from "@components/AutButton";
 import {
   Avatar,
@@ -21,7 +17,12 @@ import React from "react";
 import { archetypeChartValues } from "./ArchetypePieChart";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
-import { useSetArchetypeMutation } from "@api/community.api";
+import { useSetArchetypeMutation } from "@api/hub.api";
+import { HubOSHub } from "@api/hub.model";
+import {
+  HubArchetype,
+  HubArchetypeParameters
+} from "@aut-labs/sdk/dist/models/hub";
 
 export interface InteractionsDialogProps {
   title: string;
@@ -29,7 +30,7 @@ export interface InteractionsDialogProps {
   open?: boolean;
   onClose?: () => void;
   archetype: any;
-  nova: any;
+  hub: HubOSHub;
 }
 
 const AutStyledDialog = styled(Dialog)(({ theme }) => ({
@@ -222,19 +223,19 @@ export function ArchetypeDialog(props: InteractionsDialogProps) {
 
   const updateArchetype = async (selectedArchetype) => {
     const archetype = state[selectedArchetype.type];
-    const updatedArchetype: Partial<NovaArchetypeParameters> = {
-      size: archetype?.defaults[NovaArchetype.SIZE],
-      growth: archetype?.defaults[NovaArchetype.GROWTH],
-      conviction: archetype?.defaults[NovaArchetype.CONVICTION],
-      performance: archetype?.defaults[NovaArchetype.PERFORMANCE],
-      reputation: archetype?.defaults[NovaArchetype.REPUTATION]
+    const updatedArchetype: Partial<HubArchetypeParameters> = {
+      size: archetype?.defaults[HubArchetype.SIZE],
+      growth: archetype?.defaults[HubArchetype.GROWTH],
+      conviction: archetype?.defaults[HubArchetype.CONVICTION],
+      performance: archetype?.defaults[HubArchetype.PERFORMANCE],
+      reputation: archetype?.defaults[HubArchetype.REPUTATION]
     };
     try {
       setArchetype({
-        nova: props.nova,
+        hub: props.hub,
         archetype: {
           default: selectedArchetype.type,
-          parameters: updatedArchetype as NovaArchetypeParameters
+          parameters: updatedArchetype as unknown as HubArchetypeParameters
         }
       });
     } catch (error) {
@@ -268,7 +269,7 @@ export function ArchetypeDialog(props: InteractionsDialogProps) {
           variant="subtitle2"
           my={4}
         >
-          Your Nova is a combination of parameters with customizable weight,
+          Your Hub is a combination of parameters with customizable weight,
           representing its KPIs in different areas.
           <br /> By setting an <b>Archetype</b>, you select the type of your
           project, and the main driver behind it.
@@ -307,49 +308,48 @@ export function ArchetypeDialog(props: InteractionsDialogProps) {
           <ArchetypeCard
             isLoading={isLoading}
             activeArchetype={
-              props?.nova?.properties?.archetype?.default === NovaArchetype.SIZE
+              props?.hub?.properties?.archetype?.default === HubArchetype.SIZE
             }
             onSelect={updateArchetype}
-            {...state[NovaArchetype.SIZE]}
+            {...state[HubArchetype.SIZE]}
           />
           <ArchetypeCard
             activeArchetype={
-              props?.nova?.properties?.archetype?.default ===
-              NovaArchetype.REPUTATION
+              props?.hub?.properties?.archetype?.default ===
+              HubArchetype.REPUTATION
             }
             isLoading={isLoading}
             onSelect={updateArchetype}
-            {...state[NovaArchetype.REPUTATION]}
-          />
-
-          <ArchetypeCard
-            isLoading={isLoading}
-            activeArchetype={
-              props?.nova?.properties?.archetype?.default ===
-              NovaArchetype.CONVICTION
-            }
-            onSelect={updateArchetype}
-            {...state[NovaArchetype.CONVICTION]}
+            {...state[HubArchetype.REPUTATION]}
           />
 
           <ArchetypeCard
             isLoading={isLoading}
             activeArchetype={
-              props?.nova?.properties?.archetype?.default ===
-              NovaArchetype.PERFORMANCE
+              props?.hub?.properties?.archetype?.default ===
+              HubArchetype.CONVICTION
             }
             onSelect={updateArchetype}
-            {...state[NovaArchetype.PERFORMANCE]}
+            {...state[HubArchetype.CONVICTION]}
           />
 
           <ArchetypeCard
             isLoading={isLoading}
             activeArchetype={
-              props?.nova?.properties?.archetype?.default ===
-              NovaArchetype.GROWTH
+              props?.hub?.properties?.archetype?.default ===
+              HubArchetype.PERFORMANCE
             }
             onSelect={updateArchetype}
-            {...state[NovaArchetype.GROWTH]}
+            {...state[HubArchetype.PERFORMANCE]}
+          />
+
+          <ArchetypeCard
+            isLoading={isLoading}
+            activeArchetype={
+              props?.hub?.properties?.archetype?.default === HubArchetype.GROWTH
+            }
+            onSelect={updateArchetype}
+            {...state[HubArchetype.GROWTH]}
           />
         </Box>
       </DialogContent>

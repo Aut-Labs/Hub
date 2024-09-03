@@ -5,11 +5,8 @@ import {
   Link,
   Stack,
   SvgIcon,
-  TableCell,
-  TableRow,
   Typography,
   styled,
-  tableCellClasses,
   useMediaQuery,
   useTheme
 } from "@mui/material";
@@ -21,41 +18,41 @@ import CalendarIcon from "@assets/icons/calendar.png";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 import {
-  useCheckHasMintedForNovaQuery,
+  useCheckHasMintedForHubQuery,
   ArchetypeTypes,
-  useGetAllNovasQuery,
-  useGetNovaTasksQuery,
-  communityApi,
+  useGetAllHubsQuery,
+  useGetHubTasksQuery,
+  hubApi,
   useRegisterDomainMutation
-} from "@api/community.api";
+} from "@api/hub.api";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
 import { ReactComponent as DiscordIcon } from "@assets/SocialIcons/DiscordIcon.svg";
 import { ReactComponent as GitHubIcon } from "@assets/SocialIcons/GitHubIcon.svg";
 import { ReactComponent as LensfrensIcon } from "@assets/SocialIcons/LensfrensIcon.svg";
 import { ReactComponent as TelegramIcon } from "@assets/SocialIcons/TelegramIcon.svg";
 import { ReactComponent as TwitterIcon } from "@assets/SocialIcons/TwitterIcon.svg";
-import { socialUrls } from "@api/aut.model";
-import AutTaskTabs from "./AutNovaTabs/AutTaskTabs";
+import AutTaskTabs from "./AutHubTabs/AutTaskTabs";
 import AutIconLabel from "@components/AutIconLabel";
 import TaskCard from "@components/TaskCard";
-import { parseNovaTimestamp } from "@utils/date-format";
 import RoleCard from "@components/RoleCard";
 import { AutOsButton } from "@components/AutButton";
 import { useAppDispatch } from "@store/store.model";
-import { IsEditingNova, setOpenEditNova } from "@store/ui-reducer";
+import { IsEditingHub, setOpenEditHub } from "@store/ui-reducer";
 import { useSelector } from "react-redux";
-import { AutEditNovaDialog } from "@components/AutEditNovaDialog";
 import { useAccount } from "wagmi";
-import { setNovaAddress } from "@store/WalletProvider/WalletProvider";
-import { MarketTemplates } from "@api/community.model";
+import { HubOSHub } from "@api/hub.model";
 import AutLoading from "@components/AutLoading";
-import { filterActiveNovas } from "./utils";
-import { generateAutIdDAOSigil } from "@utils/AutSIgilGenerator/SigilGenerator";
-import { register } from "module";
+import { generateAutIdHubSigil } from "@utils/AutSIgilGenerator/SigilGenerator";
 import DomainRegistrationDialog from "./RegisterDomainDialog";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import SuccessDialog from "@components/Dialog/SuccessPopup";
+import { setHubAddress } from "@store/WalletProvider/WalletProvider";
+import { HubOSAutID } from "@api/aut.model";
+import { filterActiveHubs } from "./utils";
+import { AutEditHubDialog } from "@components/AutEditHubDialog";
+import { SocialUrls } from "@aut-labs/sdk/dist/models/aut.model";
+import { Role } from "@aut-labs/sdk/dist/models/role";
 
 const socialIcons = {
   discord: DiscordIcon,
@@ -135,9 +132,9 @@ const RightWrapper = styled(Box)(({ theme }) => ({
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "flex-start",
-  px: "30px",
-  marginRight: "25px",
-  marginLeft: "25px",
+  padding: "32px 16px",
+  // marginRight: "25px",
+  // marginLeft: "25px",
   height: "100%",
   position: "relative",
   // width: "70%",
@@ -163,27 +160,7 @@ export const IconContainer = styled("div")(({ theme }) => ({
   }
 }));
 
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}, &.${tableCellClasses.body}`]: {
-    color: theme.palette.common.white,
-    borderColor: "#576176",
-    padding: theme.spacing(3),
-    "&:nth-of-type(2)": {
-      padding: `${theme.spacing(3)} 0 ${theme.spacing(3)} ${theme.spacing(3)}`
-    },
-    "&:nth-of-type(3)": {
-      padding: `${theme.spacing(3)} ${theme.spacing(3)} ${theme.spacing(3)} 0`
-    }
-  }
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:last-child td, &:last-child th": {
-    border: 0
-  }
-}));
-
-export const NovaTasksGrid = ({ header, tasks }) => {
+export const HubTasksGrid = ({ header, tasks }) => {
   const theme = useTheme();
   return (
     <Box
@@ -220,8 +197,9 @@ export const NovaTasksGrid = ({ header, tasks }) => {
   );
 };
 
-export const EmptyNovaOnboardingCards = ({ roles }) => {
+export const HubRoles = ({ hub }) => {
   const theme = useTheme();
+
   return (
     <Box
       sx={{
@@ -250,20 +228,24 @@ export const EmptyNovaOnboardingCards = ({ roles }) => {
         }
       }}
     >
-      {roles?.map((role, index) => (
-        <RoleCard key={`role-item-${role.roleName}`} role={role} />
+      {hub.roles?.map((role: Role, index: number) => (
+        <RoleCard
+          key={`role-item-${role.roleName}-${index}`}
+          hub={hub}
+          role={role}
+        />
       ))}
     </Box>
   );
 };
 
-const NovaDetails = () => {
+const HubDetails = () => {
   const theme = useTheme();
   const dispatch = useAppDispatch();
   const ps = useRef<HTMLElement>();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isEditingNova = useSelector(IsEditingNova);
-  const { novaName } = useParams();
+  const isEditingHub = useSelector(IsEditingHub);
+  const { hubName } = useParams();
   const { address } = useAccount();
   const navigate = useNavigate();
   const [openDomainDialog, setOpenDomainDialog] = useState(false);
@@ -279,7 +261,7 @@ const NovaDetails = () => {
     }
   ] = useRegisterDomainMutation();
 
-  const { data, isSuccess } = useGetAllNovasQuery(
+  const { data, isSuccess } = useGetAllHubsQuery(
     {
       connectedAddress: address
     },
@@ -292,26 +274,40 @@ const NovaDetails = () => {
     }
   );
 
-  const nova = useMemo(() => {
-    const novaResult = filterActiveNovas(data?.daos || [], address).find(
-      (d) => {
-        return d.name?.toLowerCase() === novaName?.toLowerCase();
-      }
-    );
+  const hub: HubOSHub = useMemo(() => {
+    const hubResult = filterActiveHubs(data?.hubs || [], address).find((d) => {
+      return d.name?.toLowerCase() === hubName?.toLowerCase();
+    });
     if (domain) {
-      novaResult.properties.domain = domain;
+      hubResult.properties.domain = domain;
     }
-    return novaResult;
-  }, [data, novaName, address, domain]);
+    return hubResult;
+  }, [data, hubName, address, domain]);
+
+  const autId: HubOSAutID = useMemo(() => {
+    if (!address) return null;
+    return (data?.autIDs || [])?.find(
+      (m) => m.properties.address?.toLowerCase() === address?.toLowerCase()
+    );
+  }, [data, address]);
+
+  const isAdmin = useMemo(() => {
+    if (!autId) return false;
+    const joinedHub = autId.properties.joinedHubs.find(
+      (h) =>
+        h.hubAddress.toLowerCase() === hub?.properties.address.toLowerCase()
+    );
+    return joinedHub?.isAdmin;
+  }, [autId, hub]);
 
   const [sigil, setSigil] = useState<string | null>(null);
 
   useEffect(() => {
     const generate = async () => {
-      const { toBase64 } = await generateAutIdDAOSigil(nova.properties.address);
+      const { toBase64 } = await generateAutIdHubSigil(hub.properties.address);
       setSigil(toBase64());
     };
-    if (nova) {
+    if (hub) {
       generate();
     }
   }, []);
@@ -320,64 +316,46 @@ const NovaDetails = () => {
     data: result,
     isLoading: checkingIfMinted,
     isUninitialized
-  } = useCheckHasMintedForNovaQuery(
-    { address, novaAddress: nova?.properties?.address },
+  } = useCheckHasMintedForHubQuery(
+    { address, hubAddress: hub?.properties?.address },
     {
-      skip: !address || !nova
+      skip: !address || !hub
     }
   );
 
   useEffect(() => {
-    if (nova) {
-      dispatch(setNovaAddress(nova?.properties?.address));
-    } else if (!nova && isSuccess) {
+    if (hub) {
+      dispatch(setHubAddress(hub?.properties?.address));
+    } else if (!hub && isSuccess) {
       navigate("/");
     }
-  }, [nova, isSuccess]);
+  }, [hub, isSuccess]);
 
   const canSetArchetype = useMemo(() => {
-    if (
-      nova?.properties?.userData?.isAdmin ||
-      address === nova?.properties?.deployer
-    ) {
-      return true;
-    }
-  }, [nova, address]);
+    return isAdmin;
+  }, [isAdmin]);
 
   const selectedArchetype = useMemo(() => {
-    if (!nova?.properties?.archetype?.default) {
+    if (!hub?.properties?.archetype?.default) {
       return null;
     }
-    return ArchetypeTypes[nova?.properties?.archetype?.default];
-  }, [nova]);
+    return ArchetypeTypes[hub?.properties?.archetype?.default];
+  }, [hub]);
 
-  const marketTemplate = useMemo(() => {
-    const marketName = nova?.properties?.market;
-    return MarketTemplates.find(
-      (v) => v.title === marketName || v.market === +marketName
-    );
-  }, [nova]);
-
-  const { data: tasks } = useGetNovaTasksQuery(nova?.properties.address, {
-    skip: !nova?.properties.address,
+  const { data: tasks } = useGetHubTasksQuery(hub?.properties.address, {
+    skip: !hub?.properties.address,
     refetchOnMountOrArgChange: true
   });
 
   const [searchParams] = useSearchParams();
   const selectedTab = searchParams.get("tab") === "archetype" ? 0 : 1;
 
-  const handleDialogClose = () => {};
-
-  // const archetype = useMemo(() => {
-  //   return archetypeChartValues(nova?.properties.archetype);
-  // }, [nova]);
-
-  const openEditNovaModal = () => {
-    dispatch(setOpenEditNova(true));
+  const openEditHubModal = () => {
+    dispatch(setOpenEditHub(true));
   };
 
   const handleClose = () => {
-    dispatch(setOpenEditNova(false));
+    dispatch(setOpenEditHub(false));
   };
 
   useEffect(() => {
@@ -386,54 +364,33 @@ const NovaDetails = () => {
     if (button) {
       button.style.display = "none";
     }
-
-    // return () => {
-    //   if (button) {
-    //     button.style.display = ""; // Reset the style when the component unmounts
-    //   }
-    // };
   }, []);
 
-  // if (nova?.properties && address) {
-  //   const bool = address === nova.properties.deployer.toLowerCase();
-  //   debugger;
-  // }
-
   const onMinted = async (event: CustomEvent) => {
-    dispatch(communityApi.util.invalidateTags(["hasMinted"]));
+    dispatch(hubApi.util.invalidateTags(["hasMinted"]));
   };
 
   useEffect(() => {
     window.addEventListener("aut-minted", onMinted);
-    // window.addEventListener("aut_profile", onAutMenuProfile);
-    // window.addEventListener("aut-Init", onAutInit);
-    // window.addEventListener("aut-onConnected", onAutLogin);
-    // window.addEventListener("aut-onDisconnected", onDisconnected);
-
+    window.addEventListener("aut-joined", onMinted);
     return () => {
-      // window.removeEventListener("aut_profile", onAutMenuProfile);
-      // window.removeEventListener("aut-Init", onAutInit);
-      // window.removeEventListener("aut-onConnected", onAutLogin);
-      // window.removeEventListener("aut-onDisconnected", onAutLogin);
-      // if (abort.current) {
-      //   abort.current.abort();
-      // }
       window.removeEventListener("aut-minted", onMinted);
+      window.removeEventListener("aut-joined", onMinted);
     };
   }, []);
 
   const parsedTimeStamp = useMemo(() => {
-    if (nova?.properties?.timestamp) {
+    if (hub?.properties?.timestamp) {
       return new Intl.DateTimeFormat("en-US", {
         year: "numeric",
         month: "long",
         day: "2-digit"
-      }).format(parseNovaTimestamp(nova?.properties?.timestamp));
+      }).format(hub?.properties?.timestamp);
     }
-  }, [nova]);
+  }, [hub]);
 
   const canSeeRegisterDomain = useMemo(() => {
-    if (!nova) {
+    if (!hub) {
       return false;
     }
     if (!address) {
@@ -441,19 +398,19 @@ const NovaDetails = () => {
     }
 
     return (
-      address.toLowerCase() === nova?.properties.deployer.toLowerCase() &&
-      !nova?.properties.domain
+      address.toLowerCase() === hub?.properties.deployer.toLowerCase() &&
+      !hub?.properties.domain
     );
-  }, [address, nova]);
+  }, [address, hub]);
 
   return (
     <>
-      {nova && (
-        <AutEditNovaDialog
-          open={isEditingNova}
+      {hub && (
+        <AutEditHubDialog
+          open={isEditingHub}
           hideCloseBtn={false}
           title="Edit Hub"
-          nova={nova}
+          hub={hub}
           onClose={handleClose}
         />
       )}
@@ -486,8 +443,8 @@ const NovaDetails = () => {
         onRegister={async (domain: string) => {
           const result = await registerDomain({
             domain: `${domain}.hub`,
-            novaAddress: nova.properties.address,
-            metadataUri: nova.properties.metadataUri
+            hubAddress: hub.properties.address,
+            metadataUri: hub.properties.metadataUri
           });
           if ((result as any)?.data?.success) {
             // hack cause query fails to refetch
@@ -510,7 +467,7 @@ const NovaDetails = () => {
           flexDirection: "column"
         }}
       >
-        {!!nova && !checkingIfMinted ? (
+        {!!hub && !checkingIfMinted ? (
           <AutContainer>
             <LeftWrapper>
               <Stack
@@ -560,7 +517,7 @@ const NovaDetails = () => {
                       aria-label="avatar"
                     >
                       <img
-                        src={ipfsCIDToHttpUrl(nova?.image as string)}
+                        src={ipfsCIDToHttpUrl(hub?.image as string)}
                         style={{
                           objectFit: "contain",
                           width: "100%",
@@ -679,10 +636,10 @@ const NovaDetails = () => {
                       lineHeight={1}
                       variant="h3"
                       marginBottom={2}
-                      fontSize={calculateFontSize(nova?.name as string)}
+                      fontSize={calculateFontSize(hub?.name as string)}
                     >
-                      {nova?.name}
-                      {nova.properties.domain && (
+                      {hub?.name}
+                      {hub.properties.domain && (
                         <SvgIcon
                           component={CheckCircleIcon}
                           sx={{
@@ -694,7 +651,7 @@ const NovaDetails = () => {
                         />
                       )}
                     </Typography>
-                    <CopyAddress address={nova?.properties.address} />
+                    <CopyAddress address={hub?.properties.address} />
                     {/* Add domain information here */}
                     <Typography
                       color="offWhite.main"
@@ -702,8 +659,8 @@ const NovaDetails = () => {
                       variant="body2"
                       marginTop={1}
                     >
-                      {nova.properties.domain
-                        ? nova.properties.domain
+                      {hub.properties.domain
+                        ? hub.properties.domain
                         : "Domain not registered"}
                     </Typography>
                   </div>
@@ -741,7 +698,7 @@ const NovaDetails = () => {
                           color: "#FFF"
                         }}
                       >
-                        {nova?.properties.members}
+                        {hub?.properties.members?.length}
                       </Typography>
                       <Typography
                         fontWeight="bold"
@@ -773,7 +730,7 @@ const NovaDetails = () => {
                           color: "#FFF"
                         }}
                       >
-                        {nova?.properties.prestige}
+                        {hub?.prestige}
                       </Typography>
                       <Typography
                         fontWeight="bold"
@@ -809,10 +766,10 @@ const NovaDetails = () => {
                             width: "16px"
                           }}
                           inheritViewBox
-                          component={marketTemplate?.icon}
+                          component={hub?.marketTemplate?.icon}
                         ></SvgIcon>
                       }
-                      label={marketTemplate?.title}
+                      label={hub?.marketTemplate?.title}
                     ></AutIconLabel>
                     <AutIconLabel
                       textColor="#FFF"
@@ -853,7 +810,7 @@ const NovaDetails = () => {
                       textAlign="left"
                       variant="body"
                     >
-                      {nova?.description || "No description yet..."}
+                      {hub?.description || "No description yet..."}
                     </Typography>
                   </Box>
                 </Box>
@@ -869,7 +826,7 @@ const NovaDetails = () => {
                   }}
                 >
                   <IconContainer>
-                    {nova?.properties.socials.map((social, index) => {
+                    {hub?.properties.socials.map((social, index) => {
                       const AutIcon =
                         socialIcons[Object.keys(socialIcons)[index]];
 
@@ -888,7 +845,7 @@ const NovaDetails = () => {
                           })}
                           {...((!social.link ||
                             social.link ===
-                              socialUrls[social.type]?.prefix) && {
+                              SocialUrls[social.type]?.prefix) && {
                             sx: {
                               // display: "none",
                               svg: {
@@ -949,14 +906,16 @@ const NovaDetails = () => {
 
                 <Box
                   sx={{
+                    width: "100%",
                     display: "flex",
                     justifyContent: "center",
+                    gap: 2,
                     marginTop: theme.spacing(2)
                   }}
                 >
                   {canSetArchetype && (
                     <AutOsButton
-                      onClick={openEditNovaModal}
+                      onClick={openEditHubModal}
                       type="button"
                       color="primary"
                       disabled={!canSetArchetype}
@@ -972,30 +931,28 @@ const NovaDetails = () => {
                     </AutOsButton>
                   )}
                   {canSeeRegisterDomain && (
-                    <Box marginTop={theme.spacing(2)}>
-                      <AutOsButton
-                        onClick={() => setOpenDomainDialog(true)}
-                        type="button"
-                        color="primary"
-                        variant="outlined"
+                    <AutOsButton
+                      onClick={() => setOpenDomainDialog(true)}
+                      type="button"
+                      color="primary"
+                      variant="outlined"
+                    >
+                      <Typography
+                        fontWeight="700"
+                        fontSize="16px"
+                        lineHeight="26px"
                       >
-                        <Typography
-                          fontWeight="700"
-                          fontSize="16px"
-                          lineHeight="26px"
-                        >
-                          Register Domain
-                        </Typography>
-                      </AutOsButton>
-                    </Box>
+                        Register Domain
+                      </Typography>
+                    </AutOsButton>
                   )}
                 </Box>
               </Stack>
             </LeftWrapper>
             <RightWrapper>
-              {!!tasks && !!nova && (
+              {!!tasks && !!hub && (
                 <AutTaskTabs
-                  nova={nova}
+                  hub={hub}
                   tasks={tasks.tasks}
                   selectedTab={selectedTab}
                 />
@@ -1010,4 +967,4 @@ const NovaDetails = () => {
   );
 };
 
-export default memo(NovaDetails);
+export default memo(HubDetails);

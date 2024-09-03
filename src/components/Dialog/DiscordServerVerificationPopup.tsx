@@ -1,4 +1,3 @@
-// import { updateDiscordSocials } from "@api/community.api";
 import {
   getServerDetails,
   verifyDiscordServerOwnership
@@ -7,7 +6,7 @@ import { AutButton } from "@components/buttons";
 import { FormHelperText } from "@components/Fields";
 import { useOAuth } from "@components/Oauth2/oauth2";
 import { Typography } from "@mui/material";
-import { CommunityData } from "@store/Community/community.reducer";
+import { HubData } from "@store/Hub/hub.reducer";
 import { useAppDispatch } from "@store/store.model";
 import { AutTextField } from "@theme/field-text-styles";
 import { pxToRem } from "@utils/text-size";
@@ -26,7 +25,7 @@ const DiscordServerVerificationPopup = ({
   fullScreen = false,
   handleClose
 }: any) => {
-  const communityData = useSelector(CommunityData);
+  const hubData = useSelector(HubData);
   const { getAuth, authenticating } = useOAuth();
   const [loading, setLoading] = useState(false);
   const dispatch = useAppDispatch();
@@ -55,17 +54,17 @@ const DiscordServerVerificationPopup = ({
         if (result.meta.requestStatus === "rejected") {
           setLoading(false);
         } else {
-          const community = { ...communityData };
-          for (let i = 0; i < community.properties.socials.length; i++) {
-            const element = community.properties.socials[i];
+          const hub = { ...hubData };
+          for (let i = 0; i < hub.properties.socials.length; i++) {
+            const element = hub.properties.socials[i];
             if (element.type === "discord") {
               element.link = values.inviteLink;
             }
           }
-          // const communityUpdateResult = await dispatch(
-          //   updateDiscordSocials({ community, inviteLink })
+          // const hubUpdateResult = await dispatch(
+          //   updateDiscordSocials({ hub, inviteLink })
           // );
-          // if (communityUpdateResult.meta.requestStatus !== "rejected") {
+          // if (hubUpdateResult.meta.requestStatus !== "rejected") {
           //   handleClose();
           // }
           setLoading(false);

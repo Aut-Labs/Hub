@@ -6,6 +6,7 @@
     "noImplicitAny": false,
     "allowJs": true,
     "skipLibCheck": true,
+    "sourceMap": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": false,

@@ -1,50 +1,13 @@
-import { BaseNFTModel } from "@aut-labs/sdk/dist/models/baseNFTModel";
-import { CommunityMembershipDetails } from "@aut-labs/sdk/dist/models/holder";
-import { Community } from "./community.model";
-import { httpUrlToIpfsCID } from "./storage.api";
-
-export const socialUrls = {
-  discord: {
-    hidePrefix: true,
-    placeholder: "name#1234",
-    prefix: "https://discord.com/users/"
-  },
-  github: {
-    prefix: "https://github.com/",
-    placeholder: ""
-  },
-  twitter: {
-    prefix: "https://twitter.com/",
-    placeholder: ""
-  },
-  telegram: {
-    prefix: "https://t.me/",
-    placeholder: ""
-  },
-  lensfrens: {
-    prefix: "https://www.lensfrens.xyz/",
-    placeholder: ""
-  }
-};
-
-/* eslint-disable no-shadow */
 export enum ActivityTypes {
   Polls = 1,
   Gatherings,
   Tasks
 }
 
-export enum CommunityEventTypes {
+export enum HubEventTypes {
   Ongoing,
   Upcoming,
   Past
-}
-
-export interface HolderData {
-  daos: CommunityMembershipDetails[];
-  address: string;
-  tokenId: string;
-  metadataUri: string;
 }
 
 export interface AutSocial {
@@ -90,7 +53,7 @@ export interface ActivityPollData {
   roleName?: string;
   allRoles: boolean;
 }
-export interface CommunityContractError {
+export interface HubContractError {
   code: number;
   message: string;
   data: {

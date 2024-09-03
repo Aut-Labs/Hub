@@ -1,10 +1,9 @@
-import { AutID } from "@api/aut.model";
+import { HubOSAutID } from "@api/aut.model";
 import { createSelector, createSlice } from "@reduxjs/toolkit";
-import { ResultState } from "@store/result-status";
 
 export interface AuthState {
   isAuthenticated: boolean;
-  userInfo: any;
+  userInfo: HubOSAutID;
   userAddress: string;
 }
 
@@ -33,9 +32,8 @@ export const authSlice = createSlice({
 export const { setAuthenticated, setUserAddress, resetAuthState } =
   authSlice.actions;
 
-export const userInfo = (state) => state.auth.userInfo as AutID;
+export const userInfo = (state) => state.auth.userInfo as HubOSAutID;
 export const UserInfo = createSelector([userInfo], (a) => a);
-export const isAuthenticated = (state) => state.auth.isAuthenticated as boolean;
-export const IsAuthenticated = createSelector([isAuthenticated], (a) => a);
+export const IsAuthenticated = (state) => state.auth.isAuthenticated as boolean;
 
 export default authSlice.reducer;

@@ -1,95 +1,56 @@
 /* eslint-disable max-len */
 import { Box, Typography, Stack, useTheme } from "@mui/material";
-import React, { useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { AutOsButton } from "./AutButton";
-import {
-  useCheckHasMintedForNovaQuery,
-  useGetAllNovasQuery
-} from "@api/community.api";
+import { useLazyCheckHasMintedForHubQuery } from "@api/hub.api";
 import SuccessDialog from "./Dialog/SuccessPopup";
 import ErrorDialog from "./Dialog/ErrorPopup";
-import { useWalletConnector } from "@aut-labs/connector";
 import { useAccount } from "wagmi";
-import { pulsate } from "./NovaCard";
+import { pulsate } from "./HubCard";
 import { setSelectedRoleId } from "@store/WalletProvider/WalletProvider";
 import { useAppDispatch } from "@store/store.model";
-import { useParams } from "react-router-dom";
+import { Role } from "@aut-labs/sdk/dist/models/role";
+import { HubOSHub } from "@api/hub.model";
 
-const RoleCard = ({ role }) => {
+interface RoleCardProps {
+  role: Role;
+  hub: HubOSHub;
+}
+
+const RoleCard = ({ role, hub }: RoleCardProps) => {
   const [openSuccess, setOpenSuccess] = useState(false);
   const [openError, setOpenError] = useState(false);
-  const { address, isConnected } = useAccount();
-  const { open } = useWalletConnector();
+  const { address } = useAccount();
   const dispatch = useAppDispatch();
-  const { novaName } = useParams();
+  const theme = useTheme();
 
-  const { data: nova } = useGetAllNovasQuery(
-    {
-      connectedAddress: address
-    },
-    {
-      selectFromResult: ({ data }) => ({
-        data: (data?.daos || []).find((d) => {
-          return d.name === novaName;
-        })
-      }),
-      refetchOnMountOrArgChange: true
-      // skip: !address
-    }
-  );
-
-  // const [checkHasMinted, { data: lazyCheckResult, isLoading }] =
-  //   useLazyCheckHasMintedForNovaQuery();
-
-  const { isLoading: checkLoading, data: checkResult } =
-    useCheckHasMintedForNovaQuery(
-      { address, novaAddress: nova?.properties?.address },
-      {
-        skip: !nova,
-        refetchOnMountOrArgChange: true
-      }
-    );
+  const [checkHasMinted, { data: checkResult, isLoading: checkLoading }] =
+    useLazyCheckHasMintedForHubQuery();
 
   const handleClick = async () => {
     await dispatch(setSelectedRoleId(role?.id));
     handleMint();
-    // if (lazyCheckResult && !lazyCheckResult?.hasMinted && isConnected) {
-    //   handleMint();
-    // } else {
-    //   let addressToVerify = address as string;
-    //   if (!addressToVerify) {
-    //     const state = await open();
-    //     addressToVerify = state?.address;
-    //   }
-    //   const result = await checkHasMinted({
-    //     address: addressToVerify,
-    //     novaAddress: nova?.properties?.address
-    //   });
-    //   if (result?.data && result?.data?.hasMinted) {
-    //     setOpenError(true);
-    //   } else if (result?.data && !result?.data?.hasMinted) {
-    //     handleMint();
-    //   }
-    // }
   };
 
-  // const handleDialogClose = () => {
-  //   console.log("Verify task close");
-  // };
+  const refetchData = async () => {
+    await checkHasMinted(
+      {
+        address,
+        hubAddress: hub?.properties?.address
+      },
+      false
+    );
+  };
 
-  // useEffect(() => {
-  //   // if (isUninitialized && address) {
-  //   //   checkOnboardingAllowlist(address);
-  //   // }
-  // }, [isUninitialized, address]);
-
-  // useEffect(() => {
-  //   if (lazyCheckResult && lazyCheckResult?.hasMinted) {
-  //     setOpenError(true);
-  //   } else if (lazyCheckResult && !lazyCheckResult?.hasMinted) {
-  //     handleMint();
-  //   }
-  // }, [lazyCheckResult]);
+  useEffect(() => {
+    refetchData();
+    window.addEventListener("aut-minted", refetchData);
+    window.addEventListener("aut-joined", refetchData);
+    return () => {
+      window.removeEventListener("aut-minted", refetchData);
+      window.removeEventListener("aut-joined", refetchData);
+    };
+  }, [address]);
 
   const handleMint = async () => {
     setOpenSuccess(false);
@@ -97,20 +58,12 @@ const RoleCard = ({ role }) => {
       composed: true,
       cancelable: true,
       bubbles: true
-      // detail: payload
     });
     window.dispatchEvent(event);
   };
 
-  const theme = useTheme();
-
   return (
     <>
-      {/* <LoadingDialog
-        handleClose={openSuccess}
-        open={isLoading}
-        message="Checking requirements..."
-      /> */}
       <SuccessDialog
         titleVariant="h3"
         message="Congrats!"
@@ -177,6 +130,7 @@ const RoleCard = ({ role }) => {
             textAlign="left"
             lineHeight={1}
             variant="body1"
+            component="div"
           >
             <Typography
               marginTop={3}
@@ -186,7 +140,7 @@ const RoleCard = ({ role }) => {
               lineHeight={1}
               variant="subtitle2"
             >
-              Claim your role in this community as {role?.roleName}
+              Claim your role in this hub as {role?.roleName}
             </Typography>
           </Typography>
           {/* <AutOsButton
@@ -217,8 +171,8 @@ const RoleCard = ({ role }) => {
                     background: "linear-gradient(#2037e0, #17a1e0)"
                   },
                   ...(checkResult?.hasMinted &&
-                    checkResult?.hasMintedForNova &&
-                    checkResult?.role == role?.id && {
+                    checkResult?.hasMintedForHub &&
+                    +checkResult?.role == +role?.id && {
                       background: (theme) => theme.palette.success.main,
                       "&:hover": {
                         background: (theme) => theme.palette.success.main
@@ -229,16 +183,16 @@ const RoleCard = ({ role }) => {
               onClick={() => handleClick()}
               disabled={
                 (checkLoading || !!checkResult) &&
-                (checkResult?.hasMinted || checkResult?.hasMintedForNova)
+                (checkResult?.hasMinted || checkResult?.hasMintedForHub)
               }
             >
               <Typography variant="body" fontWeight="normal" color="white">
-                {checkResult?.role == role?.id && checkResult?.hasMintedForNova
+                {+checkResult?.role == +role?.id && checkResult?.hasMintedForHub
                   ? "Current Role"
                   : checkResult?.hasMinted
                     ? "Unavailable"
                     : "Join"}
-                {/* {checkResult?.role == role?.id && checkResult?.hasMintedForNova
+                {/* {checkResult?.role == role?.id && checkResult?.hasMintedForHub
                   ? "Current Role"
                   : checkResult?.hasMinted
                     ? "Unavailable"
@@ -252,4 +206,4 @@ const RoleCard = ({ role }) => {
   );
 };
 
-export default RoleCard;
+export default memo(RoleCard);

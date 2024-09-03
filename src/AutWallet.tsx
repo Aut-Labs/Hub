@@ -2,28 +2,24 @@ import { memo, useEffect, useRef } from "react";
 import { Init } from "@aut-labs/d-aut";
 import { AutWalletConnector, useAutConnector } from "@aut-labs/connector";
 import { useSelector } from "react-redux";
-import { useConnect } from "wagmi";
+import { Connector, useConnect } from "wagmi";
 import { NetworkConfig } from "@api/ProviderFactory/network.config";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { MultiSigner } from "@aut-labs/sdk/dist/models/models";
-import { communityUpdateState } from "@store/Community/community.reducer";
+import { hubUpdateState } from "@store/Hub/hub.reducer";
 import AutLoading from "@components/AutLoading";
 import AppTitle from "@components/AppTitle";
 import { useSearchParams } from "react-router-dom";
 import { environment, EnvMode } from "@api/environment";
 import AutSDK from "@aut-labs/sdk";
 import {
+  HubAddress,
   NetworksConfig,
-  NovaAddress,
   SelectedRoleId,
   updateWalletProviderState
 } from "@store/WalletProvider/WalletProvider";
 import { useAppDispatch } from "@store/store.model";
-
-const btnConfig = {
-  metaMask: true,
-  walletConnect: true
-};
+import { IAutButtonConfig } from "@aut-labs/d-aut/build/components/AutButtonMenu/AutMenuUtils";
 
 const AutWallet = () => {
   const dispatch = useAppDispatch();
@@ -46,7 +42,7 @@ const AutWallet = () => {
     defaultChainId: +environment.defaultChainId
   });
 
-  const novaAddress = useSelector(NovaAddress);
+  const hubAddress = useSelector(HubAddress);
   const selectedRoleId = useSelector(SelectedRoleId);
 
   const initialiseSDK = async (
@@ -55,9 +51,9 @@ const AutWallet = () => {
   ) => {
     const sdk = await AutSDK.getInstance(false);
     return sdk.init(multiSigner, {
-      novaAddress: novaAddress,
+      hubAddress,
       daoTypesAddress: network.contracts.daoTypesAddress,
-      novaRegistryAddress: network.contracts.novaRegistryAddress,
+      hubRegistryAddress: network.contracts.novaRegistryAddress,
       autIDAddress: network.contracts.autIDAddress,
       daoExpanderRegistryAddress: network.contracts.daoExpanderRegistryAddress,
       pluginRegistryAddress: network.contracts.pluginRegistryAddress
@@ -76,11 +72,11 @@ const AutWallet = () => {
           selectedNetwork: network
         })
       );
-      if (searchParams?.get(RequiredQueryParams.DaoAddress)) {
+      if (searchParams?.get(RequiredQueryParams.HubAddress)) {
         await dispatch(
-          communityUpdateState({
-            selectedCommunityAddress: searchParams?.get(
-              RequiredQueryParams.DaoAddress
+          hubUpdateState({
+            selectedHubAddress: searchParams?.get(
+              RequiredQueryParams.HubAddress
             )
           })
         );
@@ -89,7 +85,7 @@ const AutWallet = () => {
     if (multiSignerId) {
       start();
     }
-  }, [multiSignerId, novaAddress]); // re-initialiseSDK only when id changes
+  }, [multiSignerId, hubAddress]); // re-initialiseSDK only when id changes
 
   useEffect(() => {
     if (!dAutInitialized.current && multiSignerId) {
@@ -107,7 +103,7 @@ const AutWallet = () => {
           height: 50,
           padding: 3
         }
-      };
+      } as IAutButtonConfig;
 
       const btnConfig = {
         metaMask: true,
@@ -116,7 +112,7 @@ const AutWallet = () => {
         web3auth: true
       };
 
-      const allowedConnectors = Object.keys(btnConfig)
+      const allowedConnectors: Connector[] = Object.keys(btnConfig)
         .filter((connector) => btnConfig[connector])
         .map((connector) => connectors.find((c) => c.id === connector));
 
@@ -127,7 +123,8 @@ const AutWallet = () => {
           REACT_APP_GRAPH_API_URL: environment.graphApiUrl,
           REACT_APP_IPFS_API_KEY: environment.ipfsApiKey,
           REACT_APP_IPFS_API_SECRET: environment.ipfsApiSecret,
-          REACT_APP_IPFS_GATEWAY_URL: environment.ipfsGatewayUrl
+          REACT_APP_IPFS_GATEWAY_URL: environment.ipfsGatewayUrl,
+          REACT_APP_ENV: environment.env as EnvMode
         },
         connector: {
           connect,
@@ -137,6 +134,7 @@ const AutWallet = () => {
           networks,
           state: {
             multiSignerId,
+            chainId,
             multiSigner,
             isConnected,
             isConnecting,
@@ -163,7 +161,7 @@ const AutWallet = () => {
         menu-items='[{"name":"Profile","actionType":"event_emit","eventName":"aut_profile"}]'
         flow-config='{"mode" : "signup", "customCongratsMessage": ""}'
         allowed-role-id={selectedRoleId}
-        nova-address={novaAddress}
+        hub-address={hubAddress}
         ipfs-gateway={environment.ipfsGatewayUrl}
       />
       <AutWalletConnector

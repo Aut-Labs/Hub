@@ -1,5 +1,6 @@
 import { Stack, SvgIcon, Typography, TypographyProps } from "@mui/material";
 import { ReactComponent as AutIcon } from "@assets/aut_logo_offwhite.svg";
+
 const AppTitle = (props: TypographyProps) => {
   return (
     <Stack
@@ -17,11 +18,11 @@ const AppTitle = (props: TypographyProps) => {
         sx={{
           height: {
             xs: "40px",
-            md: "64px"
+            md: "55px"
           },
           width: {
             xs: "40px",
-            md: "64px"
+            md: "55px"
           }
         }}
         inheritViewBox
@@ -44,8 +45,7 @@ const AppTitle = (props: TypographyProps) => {
           }
         }}
       >
-        Showcase
-        {/* <Typography variant="body">(beta)</Typography> */}
+        The Hub
       </Typography>
     </Stack>
   );

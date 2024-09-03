@@ -37,7 +37,7 @@ export const parseTimestamp = (ts) => {
   return new Date(fullYear, month - 1, day, hours, minutes, seconds);
 };
 
-export const parseNovaTimestamp = (ts) => {
+export const parsTimestamp = (ts) => {
   const dateObj = new Date(parseInt(ts));
   const hours = dateObj.getHours();
   const minutes = dateObj.getMinutes();

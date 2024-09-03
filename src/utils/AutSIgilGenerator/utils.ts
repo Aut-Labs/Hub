@@ -21,3 +21,25 @@ export function randomIntFromInterval(
     ? randomIntFromInterval(min, max, excludeNumber)
     : number;
 }
+
+export const calculateFontSize = (name: string) => {
+  const words = name.split(" ");
+  const longestWordLength = Math.max(...words.map((word) => word.length));
+  if (longestWordLength >= 22) {
+    return "0.85rem !important";
+  } else if (longestWordLength >= 20) {
+    return "0.95rem !important";
+  } else if (longestWordLength >= 18) {
+    return "1.05rem !important";
+  } else if (longestWordLength >= 16) {
+    return "1.15rem !important";
+  } else if (longestWordLength >= 14) {
+    return "1.25rem !important";
+  } else if (longestWordLength >= 12) {
+    return "1.35rem !important";
+  } else if (longestWordLength >= 10) {
+    return "1.45rem !important";
+  } else {
+    return "";
+  }
+};
