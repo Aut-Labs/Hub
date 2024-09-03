@@ -13,7 +13,7 @@ import background1 from "@assets/autos/background1.png";
 import AutLoading from "@components/AutLoading";
 
 const HubList = lazy(() => import("./pages/Hub/HubList"));
-const ParticipationScore = lazy(() => import("./pages/Hub/PS"));
+const ParticipationScore = lazy(() => import("./pages/Playground/PS"));
 const Callback = lazy(() => import("./pages/Oauth2Callback/Callback"));
 const AutWallet = lazy(() => import("./AutWallet"));
 const HubDetails = lazy(() => import("./pages/Hub/HubDetails"));
