@@ -16,7 +16,7 @@ import background1 from "@assets/autos/background1.png";
 import AutLoading from "@components/AutLoading";
 import AutWallet from "./AutWallet";
 import Callback from "./pages/Oauth2Callback/Callback";
-import ParticipationScore from "./pages/Nova/PS";
+import ParticipationScore from "./pages/Playground/PS";
 
 function App() {
   const dispatch = useAppDispatch();

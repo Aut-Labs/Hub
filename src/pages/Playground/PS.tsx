@@ -39,7 +39,6 @@ import {
   ResponsiveContainer,
   TooltipProps
 } from "recharts";
-import { TOOLBAR_HEIGHT } from "./ToolbarConnector";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { AutTextField } from "@theme/field-text-styles";
 import { AutOsButton } from "@components/AutButton";
@@ -122,6 +121,11 @@ const ParticipationScore = () => {
   // Generate
   const [showVisualization, setShowVisualization] = useState(false);
   const [expandedAccordion, setExpandedAccordion] = useState(false);
+  // Show More
+  const [showMoreGraphs, setShowMoreGraphs] = useState(false);
+  const toggleShowMoreGraphs = () => {
+    setShowMoreGraphs(!showMoreGraphs);
+  };
 
   const handleGenerateClick = () => {
     setShowVisualization(true);
@@ -1101,7 +1105,7 @@ const ParticipationScore = () => {
                     {renderMemberSwitches()}
                   </Box>
                   <Grid container spacing={isMobile ? 0 : 2}>
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={12}>
                       <ValueChart
                         membersData={membersData}
                         dataKey="PS"
@@ -1110,43 +1114,67 @@ const ParticipationScore = () => {
                         activeMembers={activeMembers}
                       />
                     </Grid>
-                    <Grid item xs={12} md={6}>
-                      <ValueChart
-                        membersData={membersData}
-                        dataKey="TCM"
-                        title="Total Community Members (TCM)"
-                        yAxisLabel="TCM"
-                        activeMembers={activeMembers}
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <ValueChart
-                        membersData={membersData}
-                        dataKey="avgICL"
-                        title="Average Individual Commitment Level (avgICL)"
-                        yAxisLabel="avgICL"
-                        activeMembers={activeMembers}
-                      />
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <ValueChart
-                        membersData={membersData}
-                        dataKey="P"
-                        title="Performance (P)"
-                        yAxisLabel="P"
-                        activeMembers={activeMembers}
-                      />
-                    </Grid>
                   </Grid>
-                  <Grid item xs={12} md={6}>
-                    <ValueChart
-                      membersData={membersData}
-                      dataKey="iCL"
-                      title="Individual Commitment Level (iCL)"
-                      yAxisLabel="iCL"
-                      activeMembers={activeMembers}
-                    />
-                  </Grid>
+                  <Box
+                    sx={{ mt: 2, display: "flex", justifyContent: "center" }}
+                  >
+                    <Button
+                      variant="contained"
+                      onClick={toggleShowMoreGraphs}
+                      sx={{
+                        fontFamily: "FractulRegular",
+                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                        color: "white",
+                        "&:hover": {
+                          backgroundColor: "rgba(255, 255, 255, 0.2)"
+                        }
+                      }}
+                    >
+                      {showMoreGraphs ? "Show Less" : "Show More"}
+                    </Button>
+                  </Box>
+                  {showMoreGraphs && (
+                    <Fade in={showMoreGraphs} timeout={500}>
+                      <Grid container spacing={isMobile ? 0 : 2} sx={{ mt: 2 }}>
+                        <Grid item xs={12} md={6}>
+                          <ValueChart
+                            membersData={membersData}
+                            dataKey="TCM"
+                            title="Total Community Members (TCM)"
+                            yAxisLabel="TCM"
+                            activeMembers={activeMembers}
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <ValueChart
+                            membersData={membersData}
+                            dataKey="avgICL"
+                            title="Average Individual Commitment Level (avgICL)"
+                            yAxisLabel="avgICL"
+                            activeMembers={activeMembers}
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <ValueChart
+                            membersData={membersData}
+                            dataKey="P"
+                            title="Performance (P)"
+                            yAxisLabel="P"
+                            activeMembers={activeMembers}
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <ValueChart
+                            membersData={membersData}
+                            dataKey="iCL"
+                            title="Individual Commitment Level (iCL)"
+                            yAxisLabel="iCL"
+                            activeMembers={activeMembers}
+                          />
+                        </Grid>
+                      </Grid>
+                    </Fade>
+                  )}
                 </StyledAccordion>
               </div>
             </Fade>
