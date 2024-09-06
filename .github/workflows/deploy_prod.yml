@@ -28,18 +28,8 @@ jobs:
             sudo git checkout mainnet;
             sudo git pull origin mainnet;
 
-            echo "Stopping and removing specific service: hub_mainnet"
             sudo docker-compose stop hub_mainnet
-            sudo docker-compose rm -f hub_mainnet
-
-            echo "Removing dangling images"
             sudo docker rmi $(sudo docker images -f "dangling=true" -q) || true
-
-            sudo docker build -t autlabs/hub:mainnet . --build-arg ENV_FILE=.env_prod
-            # sudo docker push autlabs/hub:mainnet
-
-            echo "Pulling the new image"
-            # sudo docker-compose pull hub_mainnet
-            docker-compose up -d --build hub_mainnet
+            sudo docker-compose up --build hub_mainnet -d
 
             exit 0;

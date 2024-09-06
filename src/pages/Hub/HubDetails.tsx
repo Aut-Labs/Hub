@@ -42,7 +42,6 @@ import { useSelector } from "react-redux";
 import { useAccount } from "wagmi";
 import { HubOSHub } from "@api/hub.model";
 import AutLoading from "@components/AutLoading";
-import { generateAutIdHubSigil } from "@utils/AutSIgilGenerator/SigilGenerator";
 import DomainRegistrationDialog from "./RegisterDomainDialog";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
@@ -53,6 +52,7 @@ import { filterActiveHubs } from "./utils";
 import { AutEditHubDialog } from "@components/AutEditHubDialog";
 import { SocialUrls } from "@aut-labs/sdk/dist/models/aut.model";
 import { Role } from "@aut-labs/sdk/dist/models/role";
+import { getHubSigil } from "@api/aut.api";
 
 const socialIcons = {
   discord: DiscordIcon,
@@ -304,24 +304,21 @@ const HubDetails = () => {
 
   useEffect(() => {
     const generate = async () => {
-      const { toBase64 } = await generateAutIdHubSigil(hub.properties.address);
-      setSigil(toBase64());
+      const toBase64 = await getHubSigil(hub.properties.address);
+      setSigil(toBase64);
     };
-    if (hub) {
+    if (hub?.properties?.address) {
       generate();
     }
-  }, []);
+  }, [hub?.properties?.address]);
 
-  const {
-    data: result,
-    isLoading: checkingIfMinted,
-    isUninitialized
-  } = useCheckHasMintedForHubQuery(
-    { address, hubAddress: hub?.properties?.address },
-    {
-      skip: !address || !hub
-    }
-  );
+  const { data: result, isLoading: checkingIfMinted } =
+    useCheckHasMintedForHubQuery(
+      { address, hubAddress: hub?.properties?.address },
+      {
+        skip: !address || !hub
+      }
+    );
 
   useEffect(() => {
     if (hub) {

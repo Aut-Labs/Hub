@@ -15,7 +15,6 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { memo, useMemo, useState } from "react";
 import HubCard from "@components/HubCard";
-import ErrorDialog from "@components/Dialog/ErrorPopup";
 import { useGetAllHubsQuery } from "@api/hub.api";
 import { TOOLBAR_HEIGHT } from "./ToolbarConnector";
 import { AutSelectField } from "@theme/field-select-styles";

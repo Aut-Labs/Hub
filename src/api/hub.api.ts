@@ -21,7 +21,9 @@ import {
 } from "@aut-labs/sdk/dist/models/hub";
 import { AutIdJoinedHubState } from "@aut-labs/d-aut";
 
-export const fetchHubsAndAutIDs = async (): Promise<{
+export const fetchHubsAndAutIDs = async (
+  connectedAddress: string
+): Promise<{
   hubs: HubOSHub[];
   autIDs: HubOSAutID[];
 }> => {
@@ -141,7 +143,8 @@ export const fetchHubsAndAutIDs = async (): Promise<{
           autID.properties.address.toLowerCase()
         ) {
           joinedHub.isAdmin = true;
-        } else {
+        } else if (connectedAddress) {
+          // it means a wallet is conneccted and we can query the blockchain
           const sdk = await AutSDK.getInstance(true);
           const isAdmin = await sdk
             .initService<Hub>(Hub, hub.properties.address)
@@ -206,7 +209,6 @@ interface Filters {
 
 export const registerDomain = async (body: any, api: BaseQueryApi) => {
   try {
-    debugger;
     const sdk = await AutSDK.getInstance();
     const { domain, hubAddress, metadataUri } = body;
 
@@ -246,10 +248,15 @@ export const registerDomain = async (body: any, api: BaseQueryApi) => {
   }
 };
 
-const getAllHubs = async (body: any, api: BaseQueryApi) => {
+const getAllHubs = async (
+  body: {
+    connectedAddress?: string;
+  },
+  api: BaseQueryApi
+) => {
   try {
     return {
-      data: await fetchHubsAndAutIDs()
+      data: await fetchHubsAndAutIDs(body.connectedAddress)
     };
   } catch (e) {
     console.log(e);

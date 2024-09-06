@@ -60,7 +60,7 @@ export const useOAuth = () => {
             onFailure(error);
           } else {
             const response = await axios.post(
-              `${environment.apiUrl}/autID/config/oauth2AccessToken`,
+              `${environment.apiUrl}/aut/config/oauth2AccessToken`,
               {
                 code: message.data.payload.code,
                 callbackUrl
@@ -130,7 +130,7 @@ export const useOAuthSocials = () => {
             onFailure(error);
           } else {
             const response = await axios.post(
-              `${environment.apiUrl}/autID/config/oauth2AccessTokenDiscord`,
+              `${environment.apiUrl}/aut/config/oauth2AccessTokenDiscord`,
               {
                 code: message.data.payload.code,
                 callbackUrl
@@ -191,7 +191,7 @@ export const useOAuthSocials = () => {
           } else {
             xCleanUp(xIntervalRef);
             const response = await axios.post(
-              `${environment.apiUrl}/autID/config/oauth2AccessTokenX`,
+              `${environment.apiUrl}/aut/config/oauth2AccessTokenX`,
               {
                 code: message.data.payload.code,
                 callbackUrl
@@ -235,7 +235,7 @@ export const useOAuthSocials = () => {
             onFailure(oauthResponse.error);
           } else {
             const response = await axios.post(
-              `${environment.apiUrl}/autID/config/oauth2AccessTokenX`,
+              `${environment.apiUrl}/aut/config/oauth2AccessTokenX`,
               {
                 code: oauthResponse.payload.code,
                 callbackUrl
@@ -280,7 +280,7 @@ export const useOAuthSocials = () => {
             onFailure(error);
           } else {
             const response = await axios.post(
-              `${environment.apiUrl}/autID/config/oauth2AccessTokenGithub`,
+              `${environment.apiUrl}/aut/config/oauth2AccessTokenGithub`,
               {
                 code: message.data.payload.code,
                 callbackUrl
