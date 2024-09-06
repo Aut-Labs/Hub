@@ -39,7 +39,7 @@
     "@apollo/client": "^3.9.1",
     "@aut-labs/abi-types": "^0.0.77-dev",
     "@aut-labs/connector": "^0.0.93",
-    "@aut-labs/d-aut": "^1.0.187-dev",
+    "@aut-labs/d-aut": "^1.0.188-dev",
     "@aut-labs/sdk": "^0.0.169-dev",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
