@@ -596,9 +596,9 @@ export const HubCard = ({
           onMouseLeave={() => setHoveredButton(false)}
           onClick={() => {
             if (userHubState?.hasDeployed) {
-              navigate(`/project/${hubData.name}?tab=roles`);
-            } else {
               navigate(`/project/${hubData.name}?tab=archetype`);
+            } else {
+              navigate(`/project/${hubData.name}?tab=roles`);
             }
           }}
         >
