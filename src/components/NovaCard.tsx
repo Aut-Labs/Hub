@@ -574,10 +574,14 @@ export const NovaCard = ({
           size="normal"
           color="offWhite"
           onClick={() => {
-            if (daoData?.properties?.deployer === address?.toLowerCase()) {
+            if (daoData?.properties?.members === 0) {
               navigate(`/project/${daoData.name}?tab=roles`);
-            } else {
+              return;
+            }
+            if (daoData?.properties?.deployer === address?.toLowerCase()) {
               navigate(`/project/${daoData.name}?tab=archetype`);
+            } else {
+              navigate(`/project/${daoData.name}?tab=roles`);
             }
           }}
         >
