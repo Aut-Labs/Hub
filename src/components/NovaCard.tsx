@@ -576,9 +576,9 @@ export const NovaCard = ({
           onClick={() => {
             if (daoData?.properties?.members === 0) {
               navigate(`/project/${daoData.name}?tab=roles`);
-              return;
-            }
-            if (daoData?.properties?.deployer === address?.toLowerCase()) {
+            } else if (
+              daoData?.properties?.deployer === address?.toLowerCase()
+            ) {
               navigate(`/project/${daoData.name}?tab=archetype`);
             } else {
               navigate(`/project/${daoData.name}?tab=roles`);
