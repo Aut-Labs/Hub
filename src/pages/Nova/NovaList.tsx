@@ -152,7 +152,7 @@ export const NovaList = () => {
     >
       <AutContainer>
         <ErrorDialog handleClose={() => null} open={null} message={null} />
-        <Box
+        {/* <Box
           sx={{
             display: "flex",
             justifyContent: isMobile ? "center" : "flex-end",
@@ -175,14 +175,14 @@ export const NovaList = () => {
               wisely - or wait till June '24.
             </Typography>
           </Box>
-        </Box>
+        </Box> */}
         <Box
           sx={{
             display: "flex",
             justifyContent: "center",
             alignItems: isMobile ? "center" : "flex-start",
             gap: "25px",
-            mt: "24px",
+            mt: "48px",
             flexDirection: isMobile ? "column" : "row"
           }}
         >
