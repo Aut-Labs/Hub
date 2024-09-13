@@ -436,6 +436,34 @@ const ParticipationScore = () => {
         });
       }
 
+      // New code: Apply changes to the next member if copyFromPrevious is true
+      for (let i = memberIndex + 1; i < newMembersData.length; i++) {
+        const prevMemberData = newMembersData[i - 1][pointIndex];
+        let fieldsToUpdate = {};
+
+        if (copyFromPrevious[i] && (field === "iCL" || field === "P")) {
+          fieldsToUpdate = {
+            ...fieldsToUpdate,
+            iCL: prevMemberData.iCL,
+            P: prevMemberData.P
+          };
+        }
+        
+        if (copyHubFromPrevious[i] && (field === "TCM" || field === "avgICL")) {
+          fieldsToUpdate = {
+            ...fieldsToUpdate,
+            TCM: prevMemberData.TCM,
+            avgICL: prevMemberData.avgICL
+          };
+        }
+
+        if (Object.keys(fieldsToUpdate).length > 0) {
+          newMembersData[i] = updateMemberData(newMembersData[i], fieldsToUpdate);
+        } else {
+          // If we encounter a member that doesn't have either copy option set for the changed field, we stop propagating changes
+          break;
+        }
+
       return newMembersData;
     });
   };
@@ -965,6 +993,8 @@ const ParticipationScore = () => {
       </Grid>
     </Box>
   );
+
+  console.log("render");
 
   return (
     <PerfectScrollbar
