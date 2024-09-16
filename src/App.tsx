@@ -73,9 +73,9 @@ function App() {
               >
                 <ToolbarConnector />
                 <Routes>
-                  <Route path="/:novaName?" element={<NovaList />} />
+                  <Route path="/:hubName?" element={<NovaList />} />
                   <Route path="callback" element={<Callback />} />
-                  <Route path="project/:novaName" element={<NovaDetails />} />
+                  <Route path="project/:hubName" element={<NovaDetails />} />
                   <Route path="chart" element={<SimulationChart />} />
                 </Routes>
               </Box>

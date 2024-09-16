@@ -237,7 +237,7 @@ export function AutEditNovaDialog(props: EditDialogProps) {
       open={props.open}
     >
       <ErrorDialog handleClose={() => reset()} open={isError} message={error} />
-      <LoadingDialog open={isLoading} message="Updating Nova..." />
+      <LoadingDialog open={isLoading} message="Updating Hub..." />
       <DialogContent
         sx={{
           border: 0,

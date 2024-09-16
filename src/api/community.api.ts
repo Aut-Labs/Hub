@@ -22,21 +22,21 @@ export const ArchetypeTypes = {
     type: NovaArchetype.SIZE,
     title: "Size",
     description:
-      "A relative value that represents how “big” a Nova compared to others in the ecosystem. This Archetype encourages the largest projects to verify & maintain a positive influence in the overall ecosystem.",
+      "A relative value that represents how “big” a Hub compared to others in the ecosystem. This Archetype encourages the largest projects to verify & maintain a positive influence in the overall ecosystem.",
     logo: Size
   },
   [NovaArchetype.REPUTATION]: {
     type: NovaArchetype.REPUTATION,
     title: "Reputation",
     description:
-      "The average Participation Score of a Nova’s Contributors. This Archetype gives more insights about the shared trust between members, and their constant effort towards a common goal.",
+      "The average Participation Score of a Hub’s Contributors. This Archetype gives more insights about the shared trust between members, and their constant effort towards a common goal.",
     logo: Reputation
   },
   [NovaArchetype.CONVICTION]: {
     type: NovaArchetype.CONVICTION,
     title: "Conviction",
     description:
-      "The avg. Commitment of the contributors of your Nova. This archetype is for the true believers – reflecting Members’ level of trust and belief in your project’s vision.",
+      "The avg. Commitment of the contributors of your Hub. This archetype is for the true believers – reflecting Members’ level of trust and belief in your project’s vision.",
     logo: Conviction
   },
   [NovaArchetype.PERFORMANCE]: {
@@ -50,7 +50,7 @@ export const ArchetypeTypes = {
     type: NovaArchetype.GROWTH,
     title: "Growth",
     description:
-      "Everything starts with something. This Archetype is not for the largest Novae, it’s for the ones with a continuous, organic, slow and steady growth determined by their scale.",
+      "Everything starts with something. This Archetype is not for the largest Hubs, it’s for the ones with a continuous, organic, slow and steady growth determined by their scale.",
     logo: Growth
   }
 };

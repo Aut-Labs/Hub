@@ -21,7 +21,7 @@ const RoleCard = ({ role }) => {
   const { address, isConnected } = useAccount();
   const { open } = useWalletConnector();
   const dispatch = useAppDispatch();
-  const { novaName } = useParams();
+  const { hubName } = useParams();
 
   const { data: nova } = useGetAllNovasQuery(
     {
@@ -30,7 +30,7 @@ const RoleCard = ({ role }) => {
     {
       selectFromResult: ({ data }) => ({
         data: (data?.daos || []).find((d) => {
-          return d.name === novaName;
+          return d.name === hubName;
         })
       }),
       refetchOnMountOrArgChange: true

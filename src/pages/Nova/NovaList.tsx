@@ -59,7 +59,7 @@ export const NovaList = () => {
   const [marketFilter, setMarketFilter] = useState("");
   const [novaFilter, setNovaFilter] = useState("");
   const [archetypeFilter, setArchetypeFilter] = useState("");
-  const { novaName } = useParams();
+  const { hubName } = useParams();
   const { address } = useAccount();
 
   const { data, isLoading, isFetching, refetch } = useGetAllNovasQuery(
@@ -81,11 +81,11 @@ export const NovaList = () => {
     }
     novas = [...novas];
 
-    if (novaName) {
+    if (hubName) {
       novas = novas.sort((a, b) => {
-        if (a.name?.toLowerCase() === novaName?.toLowerCase()) {
+        if (a.name?.toLowerCase() === hubName?.toLowerCase()) {
           return -1;
-        } else if (b.name?.toLowerCase() === novaName?.toLowerCase()) {
+        } else if (b.name?.toLowerCase() === hubName?.toLowerCase()) {
           return 1;
         } else {
           return 0;
@@ -133,7 +133,7 @@ export const NovaList = () => {
       );
     }
     return novas;
-  }, [data, novaName, address, archetypeFilter, marketFilter, novaFilter]);
+  }, [data, hubName, address, archetypeFilter, marketFilter, novaFilter]);
 
   return (
     <PerfectScrollbar
@@ -285,7 +285,7 @@ export const NovaList = () => {
             }}
           >
             <Typography color="rgb(107, 114, 128)" variant="subtitle2">
-              No Novas were found...
+              No Hubs were found...
             </Typography>
             {/* @ts-ignore */}
             <Button
@@ -313,7 +313,7 @@ export const NovaList = () => {
                 <NovaCard
                   key={`nova-card-${index}`}
                   daoData={dao}
-                  isHighlighted={dao.name === novaName}
+                  isHighlighted={dao.name === hubName}
                 />
               ))}
             </GridBox>

@@ -263,7 +263,7 @@ const NovaDetails = () => {
   const ps = useRef<HTMLElement>();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isEditingNova = useSelector(IsEditingNova);
-  const { novaName } = useParams();
+  const { hubName } = useParams();
   const { address } = useAccount();
   const navigate = useNavigate();
   const [openDomainDialog, setOpenDomainDialog] = useState(false);
@@ -295,14 +295,14 @@ const NovaDetails = () => {
   const nova = useMemo(() => {
     const novaResult = filterActiveNovas(data?.daos || [], address).find(
       (d) => {
-        return d.name?.toLowerCase() === novaName?.toLowerCase();
+        return d.name?.toLowerCase() === hubName?.toLowerCase();
       }
     );
     if (domain) {
       novaResult.properties.domain = domain;
     }
     return novaResult;
-  }, [data, novaName, address, domain]);
+  }, [data, hubName, address, domain]);
 
   const [sigil, setSigil] = useState<string | null>(null);
 
