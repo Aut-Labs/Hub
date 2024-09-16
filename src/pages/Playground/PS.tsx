@@ -140,7 +140,13 @@ const ParticipationScore = () => {
   const [showAllMembers, setShowAllMembers] = useState(true);
 
   const toggleShowAllMembers = () => {
-    setShowAllMembers(!showAllMembers);
+    setShowAllMembers((prev) => {
+      if (!prev) {
+        // If switching to "Show All Members", set all members to active
+        setActiveMembers(Array(memberCount).fill(true));
+      }
+      return !prev;
+    });
   };
 
   const renderMemberToggle = () => {
@@ -157,7 +163,7 @@ const ParticipationScore = () => {
         }
         label={
           <Typography fontFamily="FractulRegular" color="white">
-            {showAllMembers ? "Show All Members" : "Show One Member"}
+            {showAllMembers ? "Show All Members" : "Select Members"}
           </Typography>
         }
       />
@@ -165,50 +171,28 @@ const ParticipationScore = () => {
   };
 
   const renderMemberSwitches = () => {
-    if (showAllMembers) {
-      return [...Array(memberCount)].map((_, index) => (
-        <FormControlLabel
-          key={index}
-          control={
-            <Switch
-              checked={activeMembers[index]}
-              onChange={() => toggleMember(index)}
-              color="primary"
-            />
-          }
-          label={
-            <Typography fontFamily="FractulRegular" color="white">
-              Member {index + 1}
-            </Typography>
-          }
-          sx={{ color: "white", mr: 2, mb: isMobile ? 1 : 0 }}
-        />
-      ));
-    } else {
-      return (
-        <RadioGroup
-          row
-          value={activeMembers.findIndex(Boolean)}
-          onChange={(e) => {
-            const selectedIndex = parseInt(e.target.value, 10);
-            setActiveMembers(activeMembers.map((_, i) => i === selectedIndex));
-          }}
-        >
-          {[...Array(memberCount)].map((_, index) => (
-            <FormControlLabel
-              key={index}
-              value={index}
-              control={<Radio />}
-              label={
-                <Typography fontFamily="FractulRegular" color="white">
-                  Member {index + 1}
-                </Typography>
-              }
-            />
-          ))}
-        </RadioGroup>
-      );
-    }
+    return [...Array(memberCount)].map((_, index) => (
+      <FormControlLabel
+        key={index}
+        control={
+          <Switch
+            checked={showAllMembers || activeMembers[index]}
+            onChange={() => toggleMember(index)}
+            color="primary"
+            disabled={showAllMembers}
+          />
+        }
+        label={
+          <Typography
+            fontFamily="FractulRegular"
+            color={showAllMembers ? "rgba(255, 255, 255, 0.5)" : "white"}
+          >
+            Member {index + 1}
+          </Typography>
+        }
+        sx={{ color: "white", mr: 2, mb: isMobile ? 1 : 0 }}
+      />
+    ));
   };
 
   const [tabValue, setTabValue] = useState(0);
@@ -368,7 +352,7 @@ const ParticipationScore = () => {
     setMembersData((prevMembersData) => {
       const newMembersData = [...prevMembersData];
 
-      const updateMemberData = (memberData) => {
+      const updateMemberData = (memberData, fieldsToCopy) => {
         const newMemberData = [...memberData];
         newMemberData[pointIndex] = {
           ...newMemberData[pointIndex],
@@ -379,14 +363,21 @@ const ParticipationScore = () => {
           const point = newMemberData[i];
           const prevPoint = i > 0 ? newMemberData[i - 1] : null;
 
-          if (field === "TCM" || field === "avgICL" || field === "iCL") {
+          if (
+            fieldsToCopy.includes("TCM") ||
+            fieldsToCopy.includes("avgICL") ||
+            fieldsToCopy.includes("iCL")
+          ) {
             point.tiCL = calculateTiCl(point.TCM, point.avgICL);
             point.fiCL = calculateFiCl(point.iCL, point.tiCL);
             point.TCP = calculateTCP(point.TCM);
             point.EC = calculateEC(point.TCP, point.fiCL);
           }
 
-          if (field === "P" || (i === pointIndex && field === "TCM")) {
+          if (
+            fieldsToCopy.includes("P") ||
+            (i === pointIndex && fieldsToCopy.includes("TCM"))
+          ) {
             point.PS =
               i === 0
                 ? calculatePSInitial(point.P)
@@ -394,7 +385,7 @@ const ParticipationScore = () => {
           }
 
           if (
-            field === "TCM" &&
+            fieldsToCopy.includes("TCM") &&
             i < newMemberData.length - 1 &&
             memberAutoIncrement[memberIndex]
           ) {
@@ -410,19 +401,48 @@ const ParticipationScore = () => {
 
       // Update the changed member's data
       newMembersData[memberIndex] = updateMemberData(
-        newMembersData[memberIndex]
+        newMembersData[memberIndex],
+        [field]
       );
+
+      // Handle copyFromPrevious
+      for (let i = memberIndex + 1; i < newMembersData.length; i++) {
+        if (copyFromPrevious[i]) {
+          if (field === "iCL" || field === "P") {
+            newMembersData[i] = updateMemberData(newMembersData[i], [
+              "iCL",
+              "P"
+            ]);
+          }
+        } else {
+          break; // Stop if we encounter a member that doesn't have copyFromPrevious set
+        }
+      }
+
+      // Handle copyHubFromPrevious
+      if (!membersInSameHub) {
+        for (let i = memberIndex + 1; i < newMembersData.length; i++) {
+          if (copyHubFromPrevious[i]) {
+            if (field === "TCM" || field === "avgICL") {
+              newMembersData[i] = updateMemberData(newMembersData[i], [
+                "TCM",
+                "avgICL"
+              ]);
+            }
+          } else {
+            break; // Stop if we encounter a member that doesn't have copyHubFromPrevious set
+          }
+        }
+      }
 
       // If members are in the same hub, copy TCM and avgICL to other members
       if (membersInSameHub && (field === "TCM" || field === "avgICL")) {
         newMembersData.forEach((_, index) => {
           if (index !== memberIndex) {
-            newMembersData[index] = newMembersData[index].map(
-              (point, pIndex) => ({
-                ...point,
-                [field]: newMembersData[memberIndex][pIndex][field]
-              })
-            );
+            newMembersData[index] = updateMemberData(newMembersData[index], [
+              "TCM",
+              "avgICL"
+            ]);
           }
         });
       }
@@ -431,19 +451,9 @@ const ParticipationScore = () => {
       if (copyValuesEnabled[memberIndex]) {
         newMembersData.forEach((memberData, index) => {
           if (index !== memberIndex) {
-            newMembersData[index] = updateMemberData(memberData);
+            newMembersData[index] = updateMemberData(memberData, [field]);
           }
         });
-      }
-
-      // New code: Apply changes to the next member if copyFromPrevious is true
-      for (let i = memberIndex + 1; i < newMembersData.length; i++) {
-        if (copyFromPrevious[i]) {
-          newMembersData[i] = updateMemberData(newMembersData[i]);
-        } else {
-          // If we encounter a member that doesn't have copyFromPrevious set, we stop propagating changes
-          break;
-        }
       }
 
       return newMembersData;

@@ -5,7 +5,7 @@ import { NetworkConfig } from "./ProviderFactory/network.config";
 
 export const getAppConfig = async (): Promise<NetworkConfig[]> => {
   return axios
-    .get(`${environment.apiUrl}/aut/config/network/${environment.networkEnv}`)
+    .get(`${environment.apiUrl}/autId/config/network/${environment.networkEnv}`)
     .then((r) => r.data);
 };
 
