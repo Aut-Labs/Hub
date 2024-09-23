@@ -1,39 +1,36 @@
-import * as React from "react";
 import Typography from "@mui/material/Typography";
 import { Box, Container } from "@mui/material";
 import ArchetypePieChart from "./ArchetypePieChart";
 import { AutOsButton } from "@components/AutButton";
-import { useAutConnector, useWalletConnector } from "@aut-labs/connector";
+import { useWalletConnector } from "@aut-labs/connector";
 import { ArchetypeDialog } from "./ArchetypeDialog";
 import AutSDK, { Hub } from "@aut-labs/sdk";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import { ResponsiveContainer } from "recharts";
-import { environment } from "@api/environment";
 import { HubOSHub } from "@api/hub.model";
+import { memo, useMemo, useState } from "react";
 
 interface ArchetypesProps {
   hub: HubOSHub;
 }
 
 const Archetypes = ({ hub }: ArchetypesProps) => {
-  const [isArchetypeOpen, setIsArchetypeOpen] = React.useState(false);
-  const [notAdminOpen, setNotAdminOpen] = React.useState(false);
+  const [isArchetypeOpen, setIsArchetypeOpen] = useState(false);
+  const [notAdminOpen, setNotAdminOpen] = useState(false);
   const handleClose = () => {
     setIsArchetypeOpen(false);
   };
 
-  const { address } = useAutConnector({
-    defaultChainId: +environment.defaultChainId
-  });
-  const { open } = useWalletConnector();
+  const { open, state } = useWalletConnector();
 
-  const isArchetypeSet = React.useMemo(() => {
+  const isArchetypeSet = useMemo(() => {
     return !!hub?.properties?.archetype;
   }, [hub]);
 
-  const isAdmin = React.useMemo(() => {
+  const isAdmin = useMemo(() => {
     const autId = hub.properties.members?.find(
-      (m) => m.properties.address?.toLowerCase() === address?.toLowerCase()
+      (m) =>
+        m.properties.address?.toLowerCase() === state?.address?.toLowerCase()
     );
     if (!autId) return false;
     const joinedHub = autId.properties.joinedHubs.find(
@@ -41,15 +38,15 @@ const Archetypes = ({ hub }: ArchetypesProps) => {
         h.hubAddress.toLowerCase() === hub?.properties.address.toLowerCase()
     );
     return joinedHub?.isAdmin;
-  }, [hub]);
+  }, [hub, state]);
 
-  const canSetArchetype = React.useMemo(() => {
-    if (!address && !isArchetypeSet) return true;
+  const canSetArchetype = useMemo(() => {
+    if (!state.address && !isArchetypeSet) return true;
     return isAdmin;
-  }, [isAdmin, address, isArchetypeSet]);
+  }, [isAdmin, state.address, isArchetypeSet]);
 
   const setArchtype = async () => {
-    let addressToVerify = address as string;
+    let addressToVerify = state.address as string;
     if (!addressToVerify) {
       const state = await open();
       addressToVerify = state?.address;
@@ -198,4 +195,4 @@ const Archetypes = ({ hub }: ArchetypesProps) => {
   );
 };
 
-export default React.memo(Archetypes);
+export default memo(Archetypes);

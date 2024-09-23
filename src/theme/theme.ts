@@ -1,4 +1,4 @@
-/* eslint-disable max-len */
+ 
 import { createTheme } from "@mui/material/styles";
 import { Fade } from "@mui/material";
 import AutButtonStyles from "./button-styles";

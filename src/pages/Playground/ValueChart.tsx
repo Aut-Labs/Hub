@@ -11,7 +11,7 @@ import {
   TooltipProps
 } from "recharts";
 
-const CustomTooltip: React.FC<TooltipProps<number, string>> = ({
+const CustomTooltip: FC<TooltipProps<number, string>> = ({
   active,
   payload,
   label

@@ -1,6 +1,6 @@
-/* eslint-disable max-len */
+
 import { Box, Typography, Stack, useTheme } from "@mui/material";
-import React, { memo, useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { AutOsButton } from "./AutButton";
 import { useLazyCheckHasMintedForHubQuery } from "@api/hub.api";
 import SuccessDialog from "./Dialog/SuccessPopup";

@@ -1,4 +1,4 @@
-/* eslint-disable max-len */
+ 
 import { environment } from "@api/environment";
 import axios from "axios";
 import { useCallback, useState, useRef } from "react";

@@ -1,4 +1,3 @@
-import React from "react";
 import { Box, Slider, Typography } from "@mui/material";
 
 export const CustomSlider = ({ value, onChange, min, max, step }) => (

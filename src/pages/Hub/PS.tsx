@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import { FC, useState } from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   Box,
   Typography,
-  Button,
   TableContainer,
   Table,
   TableBody,
@@ -15,7 +14,6 @@ import {
   useTheme,
   useMediaQuery,
   Grid,
-  Stack,
   FormControlLabel,
   Switch,
   Accordion,
@@ -34,10 +32,8 @@ import {
   ResponsiveContainer,
   TooltipProps
 } from "recharts";
-import { TOOLBAR_HEIGHT } from "./ToolbarConnector";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { AutTextField } from "@theme/field-text-styles";
-import { AutOsButton } from "@components/AutButton";
 
 export const StyledAccordion = ({ title, children }) => {
   return (
@@ -139,7 +135,7 @@ const generateInitialData = () => {
   return initialPoints;
 };
 
-const CustomTooltip: React.FC<TooltipProps<number, string>> = ({
+const CustomTooltip: FC<TooltipProps<number, string>> = ({
   active,
   payload,
   label
@@ -544,7 +540,7 @@ const ParticipationScore = () => {
                           {
                             label: "avgICL",
                             tooltip:
-                              // eslint-disable-next-line max-len
+
                               "Average Individual Commitment Level: The average commitment level of all members in the community for each period"
                           },
                           {

@@ -9,14 +9,14 @@ import {
   useMediaQuery,
   useTheme
 } from "@mui/material";
-import { ReactComponent as DiscordIcon } from "@assets/SocialIcons/DiscordIcon.svg";
-import { ReactComponent as GitHubIcon } from "@assets/SocialIcons/GitHubIcon.svg";
-import { ReactComponent as TwitterIcon } from "@assets/SocialIcons/TwitterIcon.svg";
+import DiscordIcon from "@assets/SocialIcons/DiscordIcon.svg?react";
+import GitHubIcon from "@assets/SocialIcons/GitHubIcon.svg?react";
+import TwitterIcon from "@assets/SocialIcons/TwitterIcon.svg?react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { AutOsButton } from "./AutButton";
-import { ReactComponent as CloseIcon } from "@assets/autos/close-icon.svg";
-import { ReactComponent as SocialCheckIcon } from "@assets/autos/social-check.svg";
+import CloseIcon from "@assets/autos/close-icon.svg?react";
+import SocialCheckIcon from "@assets/autos/social-check.svg?react";
 import { useAppDispatch } from "@store/store.model";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";

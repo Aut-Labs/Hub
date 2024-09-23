@@ -15,7 +15,7 @@ import Flipcard from "@components/Flipcard";
 import FlipIcon from "@assets/flip.svg";
 import { useNavigate } from "react-router-dom";
 import AutIconLabel from "./AutIconLabel";
-import { ReactComponent as Check } from "@assets/autos/check.svg";
+import Check from "@assets/autos/check.svg?react";
 import { HubOSHub, MarketTemplates } from "@api/hub.model";
 import { useAccount } from "wagmi";
 import { ArchetypeTypes } from "@api/hub.api";
@@ -128,7 +128,6 @@ export const HubCard = ({
 }) => {
   const navigate = useNavigate();
   const [isFlipped, setFlipped] = useState(false);
-  const [hasTimePassed, setHasTimePassed] = useState(false);
   const [hoveredButton, setHoveredButton] = useState(false);
   const theme = useTheme();
   const { address } = useAccount();

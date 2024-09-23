@@ -1,10 +1,9 @@
-import * as React from "react";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import { SxProps, useTheme } from "@mui/material";
 import { useSearchParams } from "react-router-dom";
-import { useEffect } from "react";
+import { CSSProperties, memo, SyntheticEvent, useEffect, useState } from "react";
 
 interface AutOsTabParams {
   label: string | any;
@@ -18,8 +17,8 @@ interface AutOsTabParams {
 interface AutOsTabsParams {
   tabs: AutOsTabParams[];
   selectedTabIndex?: number;
-  selectedTab?: (value: any, event: React.SyntheticEvent) => void;
-  tabStyles?: React.CSSProperties | SxProps<any>;
+  selectedTab?: (value: any, event: SyntheticEvent) => void;
+  tabStyles?: CSSProperties | SxProps<any>;
 }
 
 function TabPanel(props: any) {
@@ -52,7 +51,7 @@ function TabPanel(props: any) {
 }
 
 function AutOsTabs(props: AutOsTabsParams) {
-  const [value, setSelectedIndex] = React.useState(props.selectedTabIndex || 0);
+  const [value, setSelectedIndex] = useState(props.selectedTabIndex || 0);
   const theme = useTheme();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -66,7 +65,7 @@ function AutOsTabs(props: AutOsTabsParams) {
     }
   }, [searchParams]);
 
-  const handleChange = (event: React.SyntheticEvent, index: number) => {
+  const handleChange = (event: SyntheticEvent, index: number) => {
     setSelectedIndex(index);
     props.selectedTab && props.selectedTab(index, event);
   };
@@ -167,4 +166,4 @@ function AutOsTabs(props: AutOsTabsParams) {
   );
 }
 
-export default React.memo(AutOsTabs);
+export default memo(AutOsTabs);

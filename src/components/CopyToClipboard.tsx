@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { styled, Typography } from "@mui/material";
 
 const CopyWrapper = styled("div")(

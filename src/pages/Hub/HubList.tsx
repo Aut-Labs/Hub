@@ -1,4 +1,4 @@
-/* eslint-disable max-len */
+ 
 import AutLoading from "@components/AutLoading";
 import {
   Box,
@@ -18,9 +18,9 @@ import HubCard from "@components/HubCard";
 import { useGetAllHubsQuery } from "@api/hub.api";
 import { TOOLBAR_HEIGHT } from "./ToolbarConnector";
 import { AutSelectField } from "@theme/field-select-styles";
-import { ReactComponent as Markets } from "@assets/icons/markets.svg";
-import { ReactComponent as Archetypes } from "@assets/icons/archetype.svg";
-import { ReactComponent as Filters } from "@assets/icons/filters.svg";
+import Markets from "@assets/icons/markets.svg?react";
+import Archetypes from "@assets/icons/archetype.svg?react";
+import Filters from "@assets/icons/filters.svg?react";
 import { useParams } from "react-router-dom";
 import { useAccount } from "wagmi";
 import { HubOSHub, MarketTemplates } from "@api/hub.model";

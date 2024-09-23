@@ -1,5 +1,5 @@
 import { Tooltip, Typography as Text, TypographyProps } from "@mui/material";
-import React, { memo, useMemo, useRef, useState } from "react";
+import { memo, useState } from "react";
 import LinesEllipsis from "react-lines-ellipsis";
 
 interface OverflowTooltipParams {

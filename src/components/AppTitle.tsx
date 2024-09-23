@@ -1,5 +1,5 @@
 import { Stack, SvgIcon, Typography, TypographyProps } from "@mui/material";
-import { ReactComponent as AutIcon } from "@assets/aut_logo_offwhite.svg";
+import AutIcon from "@assets/aut_logo_offwhite.svg?react";
 
 const AppTitle = (props: TypographyProps) => {
   return (

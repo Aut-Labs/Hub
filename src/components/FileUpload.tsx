@@ -1,7 +1,7 @@
 import { Avatar, SvgIcon, Typography, styled, useTheme } from "@mui/material";
 import { useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { ReactComponent as UploadIcon } from "@assets/aut/upload-icon.svg";
+import UploadIcon from "@assets/aut/upload-icon.svg?react";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 
 const UploadWrapper = styled("div")(({ theme, color }) => {

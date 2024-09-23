@@ -1,9 +1,9 @@
-import { ReactComponent as OpenSource } from "@assets/icons/opensource.svg";
-import { ReactComponent as Defi } from "@assets/icons/defi.svg";
-import { ReactComponent as Social } from "@assets/icons/social.svg";
-import { ReactComponent as Refi } from "@assets/icons/refi.svg";
-import { ReactComponent as Identity } from "@assets/icons/identity.svg";
-import { Role } from "@aut-labs/sdk/dist/models/role";
+import OpenSource from "@assets/icons/opensource.svg?react";
+import Defi from "@assets/icons/defi.svg?react";
+import Social from "@assets/icons/social.svg?react";
+import Refi from "@assets/icons/refi.svg?react";
+import Identity from "@assets/icons/identity.svg?react";
+import { Role } from "@aut-labs/sdk";
 import { HubOSAutID } from "./aut.model";
 import { DAutHub, HubProperties as BaseHubProperties } from "@aut-labs/d-aut";
 
@@ -59,6 +59,9 @@ export class HubOSHub<T = HubProperties> extends DAutHub<T> {
   }
 
   get roles(): Role[] {
+    if (!(this.properties as HubProperties).rolesSets) {
+      return [];
+    }
     return (this.properties as HubProperties).rolesSets[0].roles;
   }
 

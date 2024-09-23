@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 
 interface LinkWithQueryParams {
-  children: React.ReactNode;
+  children: ReactNode;
   to: string;
   innerRef?: any;
   preserveParams?: boolean;

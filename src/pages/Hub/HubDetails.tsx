@@ -26,11 +26,11 @@ import {
   useRegisterDomainMutation
 } from "@api/hub.api";
 import { ipfsCIDToHttpUrl } from "@api/storage.api";
-import { ReactComponent as DiscordIcon } from "@assets/SocialIcons/DiscordIcon.svg";
-import { ReactComponent as GitHubIcon } from "@assets/SocialIcons/GitHubIcon.svg";
-import { ReactComponent as LensfrensIcon } from "@assets/SocialIcons/LensfrensIcon.svg";
-import { ReactComponent as TelegramIcon } from "@assets/SocialIcons/TelegramIcon.svg";
-import { ReactComponent as TwitterIcon } from "@assets/SocialIcons/TwitterIcon.svg";
+import DiscordIcon from "@assets/SocialIcons/DiscordIcon.svg?react";
+import GitHubIcon from "@assets/SocialIcons/GitHubIcon.svg?react";
+import LensfrensIcon from "@assets/SocialIcons/LensfrensIcon.svg?react";
+import TelegramIcon from "@assets/SocialIcons/TelegramIcon.svg?react";
+import TwitterIcon from "@assets/SocialIcons/TwitterIcon.svg?react";
 import AutTaskTabs from "./AutHubTabs/AutTaskTabs";
 import AutIconLabel from "@components/AutIconLabel";
 import TaskCard from "@components/TaskCard";
@@ -50,9 +50,9 @@ import { setHubAddress } from "@store/WalletProvider/WalletProvider";
 import { HubOSAutID } from "@api/aut.model";
 import { filterActiveHubs } from "./utils";
 import { AutEditHubDialog } from "@components/AutEditHubDialog";
-import { SocialUrls } from "@aut-labs/sdk/dist/models/aut.model";
 import { Role } from "@aut-labs/sdk/dist/models/role";
 import { getHubSigil } from "@api/aut.api";
+import { SocialUrls } from "@aut-labs/sdk";
 
 const socialIcons = {
   discord: DiscordIcon,

@@ -1,21 +1,24 @@
 import { Box, Button, Link, Toolbar, Typography } from "@mui/material";
 import AppTitle from "@components/AppTitle";
-import { useAutConnector, useWalletConnector } from "@aut-labs/connector";
+import { useWalletConnector } from "@aut-labs/connector";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "@store/store.model";
 import { hubApi } from "@api/hub.api";
-import { autUrls, environment } from "@api/environment";
-import { memo } from "react";
+import { autUrls } from "@api/environment";
+import { memo, useMemo } from "react";
+import { useDisconnect } from "wagmi";
 
 export const TOOLBAR_HEIGHT = 70;
 
 const ToolbarConnector = () => {
-  const { isConnected, disconnect } = useAutConnector({
-    defaultChainId: +environment.defaultChainId
-  });
-  const { open } = useWalletConnector();
+  const { open, state } = useWalletConnector();
+  const { disconnect } = useDisconnect();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+
+  const isConnected = useMemo(() => {
+    return state.status === "connected";
+  }, [state.status]);
 
   const connectDisconnectToggle = async () => {
     if (isConnected) {
