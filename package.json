@@ -36,7 +36,7 @@
     "@aut-labs/abi-types": "^0.0.81-dev",
     "@aut-labs/connector": "^0.0.203",
     "@aut-labs/d-aut": "^1.0.202-dev",
-    "@aut-labs/sdk": "^0.0.202-dev",
+    "@aut-labs/sdk": "^0.0.210-dev",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.15.7",

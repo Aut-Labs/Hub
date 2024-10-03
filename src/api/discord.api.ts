@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { environment } from "./environment";
+import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 
 export interface TaskData {
   role: string;
@@ -19,7 +20,7 @@ export const oauthGetToken = (code: string) => {
   params.append("client_secret", environment.discordClientSecret);
   params.append("grant_type", "authorization_code");
   params.append("redirect_uri", environment.discordRedirectUri);
-  params.append("scope", "identify");
+  params.append("scope", "identify guilds");
   params.append("code", code);
   return fetch("https://discord.com/api/oauth2/token", {
     method: "POST",
@@ -56,21 +57,62 @@ export const getUserGuilds = (accessToken: string) => {
     .then((res) => res.data);
 };
 
-export const verifyDiscordServerOwnership = createAsyncThunk(
-  "discord/verify",
-  async (
-    guildVerificationData: GuildVerificationData,
-    { rejectWithValue, getState }
-  ) => {
-    const guilds = await getUserGuilds(guildVerificationData.accessToken);
-    const guild = guilds.find((g) => g.id === guildVerificationData.guildId);
-    if (!guild.owner) {
-      return rejectWithValue("User is not the owner.");
-    }
-    return true;
-  }
-);
+// export const verifyDiscordServerOwnership = createAsyncThunk(
+//   "discord/verify",
+//   async (
+//     guildVerificationData: GuildVerificationData,
+//     { rejectWithValue, getState }
+//   ) => {
+//     const guilds = await axios
+//       .get(`${environment.discordApiUrl}/users/@me/guilds`, {
+//         headers: {
+//           Authorization: `Bearer ${accessToken}`
+//         }
+//       })
+//       .then((res) => res.data);
+//     const guild = guilds.find((g) => g.id === guildVerificationData.guildId);
+//     if (!guild.owner) {
+//       return false;
+//     }
+//     return true;
+//   }
+// );
 
+const verifyGuildOwnership = async (
+  guildVerificationData: GuildVerificationData
+): Promise<VerificationResult> => {
+  const { accessToken, guildId } = guildVerificationData;
+
+  const guilds: any[] = await axios
+    .get(`${environment.discordApiUrl}/users/@me/guilds`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    })
+    .then((res) => res.data);
+
+  const guild = guilds.find((g) => g.id === guildId);
+
+  if (!guild || !guild.owner) {
+    return { isAdmin: false };
+  }
+
+  return { isAdmin: true, guild };
+};
+
+interface VerificationResult {
+  isAdmin: boolean;
+  guild?: any;
+}
+
+export const useVerifyGuildOwnershipMutation = (
+  options?: UseMutationOptions<VerificationResult, Error, GuildVerificationData>
+) => {
+  return useMutation({
+    ...options,
+    mutationFn: verifyGuildOwnership
+  });
+};
 export interface DiscordMessageInputField {
   name: string;
   value: string;
