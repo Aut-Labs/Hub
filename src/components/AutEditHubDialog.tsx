@@ -222,15 +222,6 @@ export function AutEditHubDialog(props: EditDialogProps) {
   };
 
   const onEditHub = async (data: any) => {
-    console.log("hub submit", {
-      ...props.hub,
-      name: data.name,
-      description: data.description,
-      properties: {
-        ...props.hub.properties,
-        socials: data.socials
-      }
-    });
     updateHub({
       ...props.hub,
       name: data.name,
