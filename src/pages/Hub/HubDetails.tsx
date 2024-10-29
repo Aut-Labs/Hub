@@ -56,8 +56,8 @@ import { SocialUrls } from "@aut-labs/sdk";
 
 const socialIcons = {
   discord: DiscordIcon,
-  github: GitHubIcon,
   twitter: TwitterIcon,
+  github: GitHubIcon,
   telegram: TelegramIcon,
   lensfrens: LensfrensIcon
 };
