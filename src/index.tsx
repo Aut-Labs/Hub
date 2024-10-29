@@ -17,13 +17,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
 import { WalletConnectorProvider, wagmiConfig } from "@aut-labs/connector";
 
-// markerSDK.loadWidget({
-//   project: `${process.env.MARKER}`,
-//   reporter: {
-//     email: "frontend@aut.id",
-//     fullName: "HubOS"
-//   }
-// });
 const queryClient = new QueryClient();
 const container = document.getElementById("root");
 const root = createRoot(container);

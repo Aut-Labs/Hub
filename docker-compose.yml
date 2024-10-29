@@ -3,7 +3,6 @@ version: "3.7"
 services:
   hub_mainnet:
     container_name: hub_mainnet
-    platform: linux/amd64
     build:
       context: .
       dockerfile: Dockerfile
@@ -18,7 +17,6 @@ services:
 
   hub_main:
     container_name: hub_main
-    platform: linux/amd64
     build:
       context: .
       dockerfile: Dockerfile
