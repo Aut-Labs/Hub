@@ -32,76 +32,6 @@ const xCleanUp = (xIntervalRef) => {
   }
 };
 
-export const useOAuth = () => {
-  const [authenticating, setAuthenticating] = useState(false);
-  const [finsihedFlow, setFinishedFlow] = useState(false);
-  const popupRef = useRef<Window>();
-  const intervalRef = useRef<ReturnType<typeof setInterval>>();
-
-  const getAuth = useCallback(async (onSuccess, onFailure) => {
-    setAuthenticating(true);
-    if (popupRef.current && !popupRef.current.closed) {
-      popupRef.current.close();
-    }
-
-    const callbackUrl = encodeURI(`${window.location.origin}/callback`);
-    popupRef.current = openPopup(
-      `https://discord.com/oauth2/authorize?response_type=code&client_id=1080508975780474900&scope=guilds&state=15773059ghq9183habn&redirect_uri=${callbackUrl}&prompt=consent`
-    ) as any;
-
-    async function handleMessageListener(message) {
-      try {
-        const type = message && message.data && message.data.type;
-        if (type === "OAUTH_RESPONSE") {
-          console.log("RECEIVE MESSAGE");
-          const error = message && message.data && message.data.error;
-          if (error) {
-            onFailure(error);
-          } else {
-            const response = await axios.post(
-              `${environment.apiUrl}/aut/config/oauth2AccessToken`,
-              {
-                code: message.data.payload.code,
-                callbackUrl
-              }
-            );
-            setAuthenticating(false);
-            clearInterval(intervalRef.current);
-            popupRef.current.close();
-            onSuccess(response.data);
-            cleanup(intervalRef, popupRef, handleMessageListener);
-          }
-        }
-      } catch (genericError) {
-        onFailure(genericError);
-        console.error(genericError);
-      }
-    }
-    window.addEventListener("message", handleMessageListener);
-
-    //Check for abrupt closing of popup
-    intervalRef.current = setInterval(() => {
-      const popupClosed =
-        !popupRef.current ||
-        !(popupRef.current as any).window ||
-        (popupRef.current as any).window.closed;
-      if (popupClosed) {
-        setAuthenticating(false);
-        clearInterval(intervalRef.current);
-        window.removeEventListener("message", handleMessageListener);
-        onFailure();
-      }
-    }, 550);
-
-    return () => {
-      setAuthenticating(false);
-      cleanup(intervalRef, popupRef, handleMessageListener);
-    };
-  }, []);
-
-  return { getAuth, authenticating };
-};
-
 export const useOAuthSocials = () => {
   const [authenticating, setAuthenticating] = useState(false);
   const [finsihedFlow, setFinishedFlow] = useState(false);
@@ -128,6 +58,8 @@ export const useOAuthSocials = () => {
           if (error) {
             onFailure(error);
           } else {
+            // eslint-disable-next-line no-debugger
+            debugger;
             const response = await axios.post(
               `${environment.apiUrl}/aut/config/oauth2AccessTokenDiscord`,
               {

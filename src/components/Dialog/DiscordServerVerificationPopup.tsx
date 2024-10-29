@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { useForm, Controller } from "react-hook-form";
 import { useAppDispatch } from "@store/store.model";
-import { useOAuth, useOAuthSocials } from "@components/Oauth2/oauth2";
+import { useOAuthSocials } from "@components/Oauth2/oauth2";
 import {
   getServerDetails,
   useVerifyGuildOwnershipMutation
