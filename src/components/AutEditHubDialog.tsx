@@ -31,6 +31,7 @@ import { useUpdateHubMutation } from "@api/hub.api";
 import DiscordServerVerificationPopup from "./Dialog/DiscordServerVerificationPopup";
 import { getServerDetails } from "@api/discord.api";
 import axios from "axios";
+import { environment } from "@api/environment";
 
 export interface EditDialogProps {
   title: string;
@@ -477,22 +478,24 @@ export function AutEditHubDialog(props: EditDialogProps) {
                                     getAuthX(
                                       async (data) => {
                                         const { access_token } = data;
-                                        const userMeResponse = await axios.get(
-                                          "https://api.twitter.com/2/users/me",
+                                        const response = await axios.post(
+                                          `${environment.apiUrl}/user/twitter/me`,
                                           {
-                                            headers: {
-                                              Authorization: `Bearer ${access_token}`,
-                                            },
+                                          accessToken: access_token
+                                          },
+                                          {
+                                          headers: {
+                                            "Content-Type": "application/json"
+                                          }
                                           }
                                         );
-                                        const responseData = userMeResponse.data;
+                                        const responseData = response.data;
                                         // const responseData = {
                                         //   id: "4889475844",
                                         //   name: "Antonio",
                                         //   username: "Antonio69459346"
                                         // };
-                                        const username =
-                                          responseData.username;
+                                        const username = responseData.username;
                                         onChange(username);
                                         const fullLink = `${SocialLinkPrefixes.X}${username}`;
                                         setValue(
