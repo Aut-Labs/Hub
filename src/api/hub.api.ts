@@ -418,23 +418,23 @@ export const updateHub = async (body: HubOSHub, api: BaseQueryApi) => {
     const overrides = await getOverrides(sdk.signer, 4000);
     const getMDres = await hubService.contract.metadata.getMetadataUri();
     console.log("getMDres", getMDres);
-    const tx = await (
-      await hubService.contract.metadata.functions.setMetadataUri(
-        uri,
-        overrides
-      )
-    ).wait();
-    console.log("tx", tx);
+    // const tx = await (
+    //   await hubService.contract.metadata.functions.setMetadataUri(
+    //     uri,
+    //     overrides
+    //   )
+    // ).wait();
+    // console.log("tx", tx);
 
-    const result = tx.getResult();
-    console.log("tx", result);
-    // const result = await hubService.contract.metadata.setMetadataUri(uri);
+    // const result = tx.getResult();
+    // console.log("tx", result);
+    const result = await hubService.contract.metadata.setMetadataUri(uri);
 
-    // if (!result?.isSuccess) {
-    //   return {
-    //     error: result?.errorMessage
-    //   };
-    // }
+    if (!result?.isSuccess) {
+      return {
+        error: result?.errorMessage
+      };
+    }
     return {
       data: { body }
     };
