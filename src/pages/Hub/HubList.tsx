@@ -150,34 +150,10 @@ const HubList = () => {
         <Box
           sx={{
             display: "flex",
-            justifyContent: isMobile ? "center" : "flex-end",
-            width: "100%"
-          }}
-        >
-          <Box
-            sx={{
-              borderRadius: "8px",
-              borderStyle: "solid",
-              padding: "10px",
-              mt: "20px",
-              color: theme.palette.primary.contrastText,
-              maxWidth: "350px"
-            }}
-          >
-            <Typography variant="caption">
-              Disclaimer: ⚠️ Hubs are currently invitation-only, and you can
-              join only the Hub you created or you've been invited to. Choose
-              wisely - or wait till June '24.
-            </Typography>
-          </Box>
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
             justifyContent: "center",
             alignItems: isMobile ? "center" : "flex-start",
             gap: "25px",
-            mt: "24px",
+            mt: "48px",
             flexDirection: isMobile ? "column" : "row"
           }}
         >
