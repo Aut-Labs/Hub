@@ -1,9 +1,9 @@
- 
 import { HubOSHub } from "./hub.model";
 import { HubOSAutID } from "./aut.model";
 import AutSDK, {
   AutIDNFT,
   fetchMetadata,
+  getOverrides,
   Hub,
   HubArchetype,
   HubArchetypeParameters,
@@ -413,7 +413,21 @@ export const updateHub = async (body: HubOSHub, api: BaseQueryApi) => {
     const sdk = await AutSDK.getInstance();
     const updatedHub = HubOSHub.updateHubNFT(body);
     const uri = await sdk.client.sendJSONToIPFS(updatedHub as any);
+    console.log("uri", uri);
     const hubService: Hub = sdk.initService<Hub>(Hub, body.properties.address);
+    const overrides = await getOverrides(sdk.signer, 4000);
+    const getMDres = await hubService.contract.metadata.getMetadataUri();
+    console.log("getMDres", getMDres);
+    // const tx = await (
+    //   await hubService.contract.metadata.functions.setMetadataUri(
+    //     uri,
+    //     overrides
+    //   )
+    // ).wait();
+    // console.log("tx", tx);
+
+    // const result = tx.getResult();
+    // console.log("tx", result);
     const result = await hubService.contract.metadata.setMetadataUri(uri);
 
     if (!result?.isSuccess) {
@@ -422,9 +436,10 @@ export const updateHub = async (body: HubOSHub, api: BaseQueryApi) => {
       };
     }
     return {
-      data: body
+      data: { body }
     };
   } catch (error) {
+    console.log("error", error);
     return {
       error: error?.message
     };

@@ -1,4 +1,3 @@
- 
 import { environment } from "@api/environment";
 import axios from "axios";
 import { useCallback, useState, useRef } from "react";
@@ -118,7 +117,7 @@ export const useOAuthSocials = () => {
 
     const callbackUrl = encodeURI(`${window.location.origin}/callback`);
     popupRef.current = openPopup(
-      `https://discord.com/oauth2/authorize?client_id=1080508975780474900&response_type=code&redirect_uri=${callbackUrl}&scope=identify`
+      `https://discord.com/oauth2/authorize?client_id=${environment.discordClientId}&response_type=code&redirect_uri=${callbackUrl}&scope=identify+guilds`
     ) as any;
 
     async function handleMessageListener(message) {
@@ -178,7 +177,7 @@ export const useOAuthSocials = () => {
 
     const callbackUrl = encodeURI(`${window.location.origin}/callback`);
     popupRef.current = openPopup(
-      `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=YTFySXpsSVZMblIxbGFSVzhGN1I6MTpjaQ&state=state&scope=tweet.read%20users.read%20offline.access&redirect_uri=${callbackUrl}&code_challenge=challenge&code_challenge_method=plain`
+      `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=${environment.twitterClientId}&state=state&scope=tweet.read%20users.read%20offline.access&redirect_uri=${callbackUrl}&code_challenge=challenge&code_challenge_method=plain`
     ) as any;
 
     async function handleMessageListener(message) {
@@ -268,7 +267,7 @@ export const useOAuthSocials = () => {
 
     const callbackUrl = encodeURI(`${window.location.origin}/callback`);
     popupRef.current = openPopup(
-      `https://github.com/login/oauth/authorize?response_type=code&client_id=Ov23lilzR4TMABVhvR6W&state=state&scope=read:user&redirect_uri=${callbackUrl}`
+      `https://github.com/login/oauth/authorize?response_type=code&client_id=${environment.githubClientId}&state=state&scope=read:user&redirect_uri=${callbackUrl}`
     ) as any;
 
     async function handleMessageListener(message) {

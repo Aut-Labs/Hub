@@ -28,6 +28,9 @@ import { HubOSHub } from "@api/hub.model";
 import ErrorDialog from "./Dialog/ErrorPopup";
 import LoadingDialog from "./Dialog/LoadingPopup";
 import { useUpdateHubMutation } from "@api/hub.api";
+import DiscordServerVerificationPopup from "./Dialog/DiscordServerVerificationPopup";
+import { getServerDetails } from "@api/discord.api";
+import axios from "axios";
 
 export interface EditDialogProps {
   title: string;
@@ -144,6 +147,7 @@ export enum SocialLinkPrefixes {
 export function AutEditHubDialog(props: EditDialogProps) {
   const { getAuthGithub, getAuthX, getAuthDiscord, authenticating } =
     useOAuthSocials();
+  const [discordDialogOpen, setDiscordDialogOpen] = useState(false);
   const theme = useTheme();
   const desktop = useMediaQuery(theme.breakpoints.up("md"));
   const dispatch = useAppDispatch();
@@ -167,6 +171,8 @@ export function AutEditHubDialog(props: EditDialogProps) {
         social.type !== "lensfrens" &&
         social.type !== "ens"
     ) || [];
+
+  console.log("hub", props.hub);
 
   function displaySocialUsername(value, field) {
     let prefix = "";
@@ -426,149 +432,167 @@ export function AutEditHubDialog(props: EditDialogProps) {
                         control={control}
                         render={({ field: { name, value, onChange } }) => {
                           return (
-                            <SocialFieldWrapper
-                              onClick={() => {
-                                if (field.type === "discord") {
-                                  getAuthDiscord(
-                                    async (data) => {
-                                      const { access_token } = data;
-                                      const response = await fetch(
-                                        "https://discord.com/api/v10/users/@me",
-                                        {
-                                          headers: {
-                                            Authorization: `Bearer ${access_token}`
-                                          }
-                                        }
-                                      );
-                                      const responseData =
-                                        await response.json();
-                                      const username = responseData.username;
-                                      onChange(username);
-                                      const fullLink = `${SocialLinkPrefixes.Discord}${username}`;
-                                      setValue(
-                                        `socials.${index}.link`,
-                                        fullLink
-                                      );
-                                    },
-                                    () => {
-                                      // setLoading(false);
-                                    }
-                                  );
-                                }
-                                if (field.type === "twitter") {
-                                  getAuthX(
-                                    async (data) => {
-                                      const { access_token } = data;
-                                      const response = await fetch(
-                                        "https://api.twitter.com/2/users/me",
-                                        {
-                                          headers: {
-                                            Authorization: `Bearer ${access_token}`
-                                          }
-                                        }
-                                      );
-                                      const responseData =
-                                        await response.json();
-                                      const username = responseData.screen_name;
-                                      onChange(username);
-                                      const fullLink = `${SocialLinkPrefixes.X}${username}`;
-                                      setValue(
-                                        `socials.${index}.link`,
-                                        fullLink
-                                      );
-                                    },
-                                    () => {
-                                      // setLoading(false);
-                                    }
-                                  );
-                                }
-                                if (field.type === "github") {
-                                  getAuthGithub(
-                                    async (data) => {
-                                      const { access_token } = data;
-                                      const response = await fetch(
-                                        "https://api.github.com/user",
-                                        {
-                                          headers: {
-                                            Authorization: `Bearer ${access_token}`
-                                          }
-                                        }
-                                      );
-                                      const responseData =
-                                        await response.json();
-                                      const username = responseData.login;
-                                      onChange(username);
-                                      const fullLink = `${SocialLinkPrefixes.GitHub}${username}`;
-                                      setValue(
-                                        `socials.${index}.link`,
-                                        fullLink
-                                      );
-                                    },
-                                    () => {
-                                      // setLoading(false);
-                                    }
-                                  );
-                                }
-                              }}
-                              sx={{ cursor: "pointer" }}
-                            >
-                              <Box
-                                sx={{ display: "flex", alignItems: "center" }}
-                              >
-                                <SvgIcon
-                                  sx={{
-                                    color: value
-                                      ? theme.palette.offWhite.main
-                                      : "#576176",
-                                    ml: theme.spacing(2),
-                                    mt: "5px"
-                                  }}
-                                  key={`socials.${index}.icon`}
-                                  component={AutIcon}
+                            <>
+                              {field.type === "discord" && (
+                                <DiscordServerVerificationPopup
+                                  open={discordDialogOpen}
+                                  onClose={() => setDiscordDialogOpen(false)}
+                                  hub={props.hub}
+                                  onChange={onChange}
+                                  setValue={setValue}
+                                  index={index}
                                 />
-                                <Box>
-                                  <Typography
-                                    fontSize="16px"
-                                    color={
-                                      value
-                                        ? theme.palette.offWhite.main
-                                        : "#576176"
-                                    }
+                              )}
+                              <SocialFieldWrapper
+                                onClick={() => {
+                                  if (field.type === "discord") {
+                                    setDiscordDialogOpen(true);
+                                    // getAuthDiscord(
+                                    //   async (data) => {
+                                    //     const { access_token } = data;
+                                    //     const response = await fetch(
+                                    //       "https://discord.com/api/v10/users/@me",
+                                    //       {
+                                    //         headers: {
+                                    //           Authorization: `Bearer ${access_token}`
+                                    //         }
+                                    //       }
+                                    //     );
+                                    //     const responseData =
+                                    //       await response.json();
+                                    //     const username = responseData.username;
+                                    //     onChange(username);
+                                    //     const fullLink = `${SocialLinkPrefixes.Discord}${username}`;
+                                    //     setValue(
+                                    //       `socials.${index}.link`,
+                                    //       fullLink
+                                    //     );
+                                    //   },
+                                    //   () => {
+                                    //     // setLoading(false);
+                                    //   }
+                                    // );
+                                  }
+                                  if (field.type === "twitter") {
+                                    getAuthX(
+                                      async (data) => {
+                                        const { access_token } = data;
+                                        const userMeResponse = await axios.get(
+                                          "https://api.twitter.com/2/users/me",
+                                          {
+                                            headers: {
+                                              Authorization: `Bearer ${access_token}`,
+                                            },
+                                          }
+                                        );
+                                        const responseData = userMeResponse.data;
+                                        // const responseData = {
+                                        //   id: "4889475844",
+                                        //   name: "Antonio",
+                                        //   username: "Antonio69459346"
+                                        // };
+                                        const username =
+                                          responseData.username;
+                                        onChange(username);
+                                        const fullLink = `${SocialLinkPrefixes.X}${username}`;
+                                        setValue(
+                                          `socials.${index}.link`,
+                                          fullLink
+                                        );
+                                      },
+                                      () => {
+                                        // setLoading(false);
+                                      }
+                                    );
+                                  }
+                                  if (field.type === "github") {
+                                    getAuthGithub(
+                                      async (data) => {
+                                        const { access_token } = data;
+                                        const response = await fetch(
+                                          "https://api.github.com/user",
+                                          {
+                                            headers: {
+                                              Authorization: `Bearer ${access_token}`
+                                            }
+                                          }
+                                        );
+                                        const responseData =
+                                          await response.json();
+                                        const username = responseData.login;
+                                        onChange(username);
+                                        const fullLink = `${SocialLinkPrefixes.GitHub}${username}`;
+                                        setValue(
+                                          `socials.${index}.link`,
+                                          fullLink
+                                        );
+                                      },
+                                      () => {
+                                        // setLoading(false);
+                                      }
+                                    );
+                                  }
+                                }}
+                                sx={{ cursor: "pointer" }}
+                              >
+                                <Box
+                                  sx={{ display: "flex", alignItems: "center" }}
+                                >
+                                  <SvgIcon
                                     sx={{
-                                      ml: theme.spacing(1)
+                                      color: value
+                                        ? theme.palette.offWhite.main
+                                        : "#576176",
+                                      ml: theme.spacing(2),
+                                      mt: "5px"
                                     }}
-                                  >
-                                    {value
-                                      ? displaySocialUsername(value, field)
-                                      : "connect"}
-                                  </Typography>
-                                  {value && (
+                                    key={`socials.${index}.icon`}
+                                    component={AutIcon}
+                                  />
+                                  <Box>
                                     <Typography
-                                      fontSize="12px"
-                                      color="offWhite.dark"
+                                      fontSize="16px"
+                                      color={
+                                        value
+                                          ? theme.palette.offWhite.main
+                                          : "#576176"
+                                      }
                                       sx={{
-                                        ml: theme.spacing(1),
-                                        "&.MuiTypography-root": {
-                                          fontSize: "12px"
-                                        }
+                                        ml: theme.spacing(1)
                                       }}
                                     >
-                                      {social}
+                                      {value
+                                        ? displaySocialUsername(value, field)
+                                        : "connect"}
                                     </Typography>
-                                  )}
+                                    {value && (
+                                      <Typography
+                                        fontSize="12px"
+                                        color="offWhite.dark"
+                                        sx={{
+                                          ml: theme.spacing(1),
+                                          "&.MuiTypography-root": {
+                                            fontSize: "12px"
+                                          }
+                                        }}
+                                      >
+                                        {social}
+                                      </Typography>
+                                    )}
+                                  </Box>
                                 </Box>
-                              </Box>
 
-                              {value && (
-                                <SvgIcon
-                                  sx={{
-                                    mr: theme.spacing(2)
-                                  }}
-                                  key={`socials.${index}.checkmark`}
-                                  component={SocialCheckIcon}
-                                ></SvgIcon>
-                              )}
-                            </SocialFieldWrapper>
+                                {value && (
+                                  <SvgIcon
+                                    sx={{
+                                      mr: theme.spacing(2)
+                                    }}
+                                    key={`socials.${index}.checkmark`}
+                                    component={SocialCheckIcon}
+                                  ></SvgIcon>
+                                )}
+                              </SocialFieldWrapper>
+                            </>
                           );
                         }}
                       />
