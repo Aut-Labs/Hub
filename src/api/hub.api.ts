@@ -224,9 +224,9 @@ export const registerDomain = async (body: any, api: BaseQueryApi) => {
     const sdk = await AutSDK.getInstance();
     const { domain, hubAddress, metadataUri } = body;
 
-    const result = await sdk.hub.contract.functions.registerDomain(
+    const hubService: Hub = sdk.initService<Hub>(Hub, hubAddress);
+    const result = await hubService.contract.functions.registerDomain(
       domain,
-      hubAddress,
       metadataUri
     );
 
