@@ -32,6 +32,7 @@ import DiscordServerVerificationPopup from "./Dialog/DiscordServerVerificationPo
 import { getServerDetails } from "@api/discord.api";
 import axios from "axios";
 import { environment } from "@api/environment";
+import GitHubOrgSelectionDialog from "./Dialog/GithubOrganisationPopup";
 
 export interface EditDialogProps {
   title: string;
@@ -155,6 +156,8 @@ export function AutEditHubDialog(props: EditDialogProps) {
   const navigate = useNavigate();
   const isAuthenticated = useSelector(IsAuthenticated);
   const [editInitiated, setEditInitiated] = useState(false);
+  const [githubDialogOpen, setGithubDialogOpen] = useState(false);
+  const [githubOrgs, setGithubOrgs] = useState([]);
   //TODO: watch out!! the index of each icon should match the socials in the hub.properties!
   const socialIcons = {
     discord: DiscordIcon,
@@ -444,6 +447,17 @@ export function AutEditHubDialog(props: EditDialogProps) {
                                   index={index}
                                 />
                               )}
+                              {field.type === "github" && (
+                                <GitHubOrgSelectionDialog
+                                  open={githubDialogOpen}
+                                  onClose={() => setGithubDialogOpen(false)}
+                                  organizations={githubOrgs}
+                                  hub={props.hub}
+                                  onChange={onChange}
+                                  setValue={setValue}
+                                  index={index}
+                                />
+                              )}
                               <SocialFieldWrapper
                                 onClick={() => {
                                   if (field.type === "discord") {
@@ -481,12 +495,12 @@ export function AutEditHubDialog(props: EditDialogProps) {
                                         const response = await axios.post(
                                           `${environment.apiUrl}/user/twitter/me`,
                                           {
-                                          accessToken: access_token
+                                            accessToken: access_token
                                           },
                                           {
-                                          headers: {
-                                            "Content-Type": "application/json"
-                                          }
+                                            headers: {
+                                              "Content-Type": "application/json"
+                                            }
                                           }
                                         );
                                         const responseData = response.data;
@@ -512,23 +526,37 @@ export function AutEditHubDialog(props: EditDialogProps) {
                                     getAuthGithub(
                                       async (data) => {
                                         const { access_token } = data;
-                                        const response = await fetch(
-                                          "https://api.github.com/user",
+                                        // eslint-disable-next-line no-debugger
+                                        debugger;
+                                        // eslint-disable-next-line no-debugger
+                                        // const orgs = await axios.post(
+                                        //   `${environment.apiUrl}/tasks/github/getOrganistaions`,
+                                        //   {
+                                        //     accessToken: access_token
+                                        //   }
+                                        // );
+                                        const orgsResponse = await axios.post(
+                                          `${environment.apiUrl}/task/github/getOrganistaions`,
                                           {
-                                            headers: {
-                                              Authorization: `Bearer ${access_token}`
-                                            }
+                                            accessToken: access_token
                                           }
                                         );
-                                        const responseData =
-                                          await response.json();
-                                        const username = responseData.login;
-                                        onChange(username);
-                                        const fullLink = `${SocialLinkPrefixes.GitHub}${username}`;
-                                        setValue(
-                                          `socials.${index}.link`,
-                                          fullLink
+
+                                        // eslint-disable-next-line no-debugger
+                                        debugger;
+                                        setGithubOrgs(
+                                          orgsResponse.data.organizations
                                         );
+                                        setGithubDialogOpen(true);
+                                        // const responseData =
+                                        //   await response.json();
+                                        // const username = responseData.login;
+                                        // onChange(username);
+                                        // const fullLink = `${SocialLinkPrefixes.GitHub}${username}`;
+                                        // setValue(
+                                        //   `socials.${index}.link`,
+                                        //   fullLink
+                                        // );
                                       },
                                       () => {
                                         // setLoading(false);
