@@ -304,7 +304,6 @@ const HubDetails = () => {
     return hub.properties.deployer.toLowerCase() === autId.properties.address.toLowerCase();
   }, [hub, autId]);
 
-
   const isAdmin = useMemo(() => {
     if (!autId) return false;
     const joinedHub = autId.properties.joinedHubs.find(
