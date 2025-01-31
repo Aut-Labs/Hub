@@ -305,11 +305,6 @@ const HubDetails = () => {
   }, [hub, autId]);
 
 
-  if(autId && hub)
-    {
-      debugger;
-    }
-
   const isAdmin = useMemo(() => {
     if (!autId) return false;
     const joinedHub = autId.properties.joinedHubs.find(
