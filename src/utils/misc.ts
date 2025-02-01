@@ -1,4 +1,4 @@
-/* eslint-disable max-len */
+ 
 export const MarketTemplates = [
   {
     title: "Infrastructure, & Web3 Tools",

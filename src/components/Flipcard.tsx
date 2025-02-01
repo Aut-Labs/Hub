@@ -1,5 +1,4 @@
-import * as React from "react";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, CSSProperties } from "react";
 
 const Flipcard = (props) => {
   const {
@@ -54,10 +53,10 @@ const Flipcard = (props) => {
   }deg)`;
 
   interface Styles {
-    back: React.CSSProperties;
-    container: React.CSSProperties;
-    flipper: React.CSSProperties;
-    front: React.CSSProperties;
+    back: CSSProperties;
+    container: CSSProperties;
+    flipper: CSSProperties;
+    front: CSSProperties;
   }
 
   const styles: Styles = {

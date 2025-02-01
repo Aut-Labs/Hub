@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { environment } from "@api/environment";
 import axios from "axios";
 import { useCallback, useState, useRef } from "react";
@@ -33,76 +32,6 @@ const xCleanUp = (xIntervalRef) => {
   }
 };
 
-export const useOAuth = () => {
-  const [authenticating, setAuthenticating] = useState(false);
-  const [finsihedFlow, setFinishedFlow] = useState(false);
-  const popupRef = useRef<Window>();
-  const intervalRef = useRef<ReturnType<typeof setInterval>>();
-
-  const getAuth = useCallback(async (onSuccess, onFailure) => {
-    setAuthenticating(true);
-    if (popupRef.current && !popupRef.current.closed) {
-      popupRef.current.close();
-    }
-
-    const callbackUrl = encodeURI(`${window.location.origin}/callback`);
-    popupRef.current = openPopup(
-      `https://discord.com/oauth2/authorize?response_type=code&client_id=1080508975780474900&scope=guilds&state=15773059ghq9183habn&redirect_uri=${callbackUrl}&prompt=consent`
-    ) as any;
-
-    async function handleMessageListener(message) {
-      try {
-        const type = message && message.data && message.data.type;
-        if (type === "OAUTH_RESPONSE") {
-          console.log("RECEIVE MESSAGE");
-          const error = message && message.data && message.data.error;
-          if (error) {
-            onFailure(error);
-          } else {
-            const response = await axios.post(
-              `${environment.apiUrl}/aut/config/oauth2AccessToken`,
-              {
-                code: message.data.payload.code,
-                callbackUrl
-              }
-            );
-            setAuthenticating(false);
-            clearInterval(intervalRef.current);
-            popupRef.current.close();
-            onSuccess(response.data);
-            cleanup(intervalRef, popupRef, handleMessageListener);
-          }
-        }
-      } catch (genericError) {
-        onFailure(genericError);
-        console.error(genericError);
-      }
-    }
-    window.addEventListener("message", handleMessageListener);
-
-    //Check for abrupt closing of popup
-    intervalRef.current = setInterval(() => {
-      const popupClosed =
-        !popupRef.current ||
-        !(popupRef.current as any).window ||
-        (popupRef.current as any).window.closed;
-      if (popupClosed) {
-        setAuthenticating(false);
-        clearInterval(intervalRef.current);
-        window.removeEventListener("message", handleMessageListener);
-        onFailure();
-      }
-    }, 550);
-
-    return () => {
-      setAuthenticating(false);
-      cleanup(intervalRef, popupRef, handleMessageListener);
-    };
-  }, []);
-
-  return { getAuth, authenticating };
-};
-
 export const useOAuthSocials = () => {
   const [authenticating, setAuthenticating] = useState(false);
   const [finsihedFlow, setFinishedFlow] = useState(false);
@@ -118,7 +47,7 @@ export const useOAuthSocials = () => {
 
     const callbackUrl = encodeURI(`${window.location.origin}/callback`);
     popupRef.current = openPopup(
-      `https://discord.com/oauth2/authorize?client_id=1080508975780474900&response_type=code&redirect_uri=${callbackUrl}&scope=identify`
+      `https://discord.com/oauth2/authorize?client_id=${environment.discordClientId}&response_type=code&redirect_uri=${callbackUrl}&scope=identify+guilds`
     ) as any;
 
     async function handleMessageListener(message) {
@@ -129,6 +58,8 @@ export const useOAuthSocials = () => {
           if (error) {
             onFailure(error);
           } else {
+            // eslint-disable-next-line no-debugger
+            debugger;
             const response = await axios.post(
               `${environment.apiUrl}/aut/config/oauth2AccessTokenDiscord`,
               {
@@ -178,7 +109,7 @@ export const useOAuthSocials = () => {
 
     const callbackUrl = encodeURI(`${window.location.origin}/callback`);
     popupRef.current = openPopup(
-      `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=YTFySXpsSVZMblIxbGFSVzhGN1I6MTpjaQ&state=state&scope=tweet.read%20users.read%20offline.access&redirect_uri=${callbackUrl}&code_challenge=challenge&code_challenge_method=plain`
+      `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=${environment.twitterClientId}&state=state&scope=tweet.read%20users.read%20offline.access&redirect_uri=${callbackUrl}&code_challenge=challenge&code_challenge_method=plain`
     ) as any;
 
     async function handleMessageListener(message) {
@@ -268,7 +199,7 @@ export const useOAuthSocials = () => {
 
     const callbackUrl = encodeURI(`${window.location.origin}/callback`);
     popupRef.current = openPopup(
-      `https://github.com/login/oauth/authorize?response_type=code&client_id=Ov23lilzR4TMABVhvR6W&state=state&scope=read:user&redirect_uri=${callbackUrl}`
+      `https://github.com/login/oauth/authorize?response_type=code&client_id=${environment.githubClientId}&state=state&scope=read:user%20read:org&redirect_uri=${callbackUrl}`
     ) as any;
 
     async function handleMessageListener(message) {

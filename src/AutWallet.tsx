@@ -2,8 +2,7 @@ import { memo, useEffect, useRef } from "react";
 import { Init } from "@aut-labs/d-aut";
 import { AutWalletConnector, useAutConnector } from "@aut-labs/connector";
 import { useSelector } from "react-redux";
-import { Connector, useConnect } from "wagmi";
-import { NetworkConfig } from "@api/ProviderFactory/network.config";
+import { NetworkConfig } from "@api/network.config";
 import { RequiredQueryParams } from "@api/RequiredQueryParams";
 import { MultiSigner } from "@aut-labs/sdk/dist/models/models";
 import { hubUpdateState } from "@store/Hub/hub.reducer";
@@ -11,7 +10,7 @@ import AutLoading from "@components/AutLoading";
 import AppTitle from "@components/AppTitle";
 import { useSearchParams } from "react-router-dom";
 import { environment, EnvMode } from "@api/environment";
-import AutSDK from "@aut-labs/sdk";
+import AutSDK, { getOverrides, Hub } from "@aut-labs/sdk";
 import {
   HubAddress,
   NetworksConfig,
@@ -24,7 +23,6 @@ import { IAutButtonConfig } from "@aut-labs/d-aut/build/components/AutButtonMenu
 const AutWallet = () => {
   const dispatch = useAppDispatch();
   const networks = useSelector(NetworksConfig);
-  const { connectors } = useConnect();
   const [searchParams] = useSearchParams();
   const dAutInitialized = useRef<boolean>(false);
   const {
@@ -34,13 +32,13 @@ const AutWallet = () => {
     setStateChangeCallback,
     disconnect,
     multiSigner,
+    connectors,
     multiSignerId,
     status,
     address,
     chainId
-  } = useAutConnector({
-    defaultChainId: +environment.defaultChainId
-  });
+  } = useAutConnector();
+  console.log(connectors, "connectors");
 
   const hubAddress = useSelector(HubAddress);
   const selectedRoleId = useSelector(SelectedRoleId);
@@ -50,13 +48,9 @@ const AutWallet = () => {
     multiSigner: MultiSigner
   ) => {
     const sdk = await AutSDK.getInstance(false);
-    return sdk.init(multiSigner, {
-      hubAddress,
-      daoTypesAddress: network.contracts.daoTypesAddress,
-      hubRegistryAddress: network.contracts.novaRegistryAddress,
-      autIDAddress: network.contracts.autIDAddress,
-      daoExpanderRegistryAddress: network.contracts.daoExpanderRegistryAddress,
-      pluginRegistryAddress: network.contracts.pluginRegistryAddress
+    await sdk.init(multiSigner, {
+      hubRegistryAddress: network.contracts.hubRegistryAddress,
+      autIDAddress: network.contracts.autIDAddress
     });
   };
 
@@ -73,6 +67,8 @@ const AutWallet = () => {
         })
       );
       if (searchParams?.get(RequiredQueryParams.HubAddress)) {
+        const sdk = await AutSDK.getInstance(false);
+        sdk.hub = sdk.initService<Hub>(Hub, hubAddress);
         await dispatch(
           hubUpdateState({
             selectedHubAddress: searchParams?.get(
@@ -105,32 +101,21 @@ const AutWallet = () => {
         }
       } as IAutButtonConfig;
 
-      const btnConfig = {
-        metaMask: true,
-        walletConnect: true,
-        coinbaseWalletSDK: true,
-        web3auth: true
-      };
-
-      const allowedConnectors: Connector[] = Object.keys(btnConfig)
-        .filter((connector) => btnConfig[connector])
-        .map((connector) => connectors.find((c) => c.id === connector));
-
       Init({
         config,
         envConfig: {
-          REACT_APP_API_URL: environment.apiUrl,
-          REACT_APP_GRAPH_API_URL: environment.graphApiUrl,
-          REACT_APP_IPFS_API_KEY: environment.ipfsApiKey,
-          REACT_APP_IPFS_API_SECRET: environment.ipfsApiSecret,
-          REACT_APP_IPFS_GATEWAY_URL: environment.ipfsGatewayUrl,
-          REACT_APP_ENV: environment.env as EnvMode
+          API_URL: environment.apiUrl,
+          GRAPH_API_URL: environment.graphApiUrl,
+          IPFS_API_KEY: environment.ipfsApiKey,
+          IPFS_API_SECRET: environment.ipfsApiSecret,
+          IPFS_GATEWAY_URL: environment.ipfsGatewayUrl,
+          ENV: environment.env as EnvMode
         },
         connector: {
           connect,
           disconnect,
           setStateChangeCallback,
-          connectors: allowedConnectors,
+          connectors,
           networks,
           state: {
             multiSignerId,
@@ -148,6 +133,7 @@ const AutWallet = () => {
 
   return (
     <>
+      {/* @ts-ignore */}
       <d-aut
         style={{
           // display: "none",

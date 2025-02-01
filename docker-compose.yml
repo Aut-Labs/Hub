@@ -3,30 +3,28 @@ version: "3.7"
 services:
   hub_mainnet:
     container_name: hub_mainnet
-    platform: linux/amd64
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        REACT_APP_NETWORK_ENV: "mainnet"
-        REACT_APP_API_URL: "https://mainnet-api.aut.id/api"
-        REACT_APP_NODE_ENV: "production"
-        REACT_APP_DEFAULT_CHAIN_ID: "137"
-        REACT_APP_GRAPH_API_URL: "https://subgraph.satsuma-prod.com/57f77e118c8e/3zi14w18sr5q42jggc1n6a--464735/aut-mainnet/api"
+        VITE_NETWORK_ENV: "mainnet"
+        VITE_API_URL: "https://mainnet-api.aut.id/api"
+        VITE_NODE_ENV: "production"
+        VITE_DEFAULT_CHAIN_ID: "137"
+        VITE_GRAPH_API_URL: "https://subgraph.satsuma-prod.com/57f77e118c8e/3zi14w18sr5q42jggc1n6a--464735/aut-mainnet/api"
     ports:
       - "5002:80"
 
   hub_main:
     container_name: hub_main
-    platform: linux/amd64
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        REACT_APP_NETWORK_ENV: "testnet"
-        REACT_APP_API_URL: "https://testnet-api.aut.id/api"
-        REACT_APP_NODE_ENV: "development"
-        REACT_APP_DEFAULT_CHAIN_ID: "80002"
-        REACT_APP_GRAPH_API_URL: "https://subgraph.satsuma-prod.com/57f77e118c8e/3zi14w18sr5q42jggc1n6a--464735/aut-amoy/api"
+        VITE_NETWORK_ENV: "testnet"
+        VITE_API_URL: "https://testnet-api.aut.id/api"
+        VITE_NODE_ENV: "development"
+        VITE_DEFAULT_CHAIN_ID: "80002"
+        VITE_GRAPH_API_URL: "https://subgraph.satsuma-prod.com/57f77e118c8e/3zi14w18sr5q42jggc1n6a--464735/aut-amoy/api"
     ports:
       - "5002:80"

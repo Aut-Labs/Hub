@@ -1,4 +1,4 @@
-/* eslint-disable max-len */
+
 import { AutOsButton } from "@components/AutButton";
 import {
   Avatar,
@@ -13,16 +13,13 @@ import {
   useMediaQuery,
   useTheme
 } from "@mui/material";
-import React from "react";
 import { archetypeChartValues } from "./ArchetypePieChart";
 import ErrorDialog from "@components/Dialog/ErrorPopup";
 import LoadingDialog from "@components/Dialog/LoadingPopup";
 import { useSetArchetypeMutation } from "@api/hub.api";
 import { HubOSHub } from "@api/hub.model";
-import {
-  HubArchetype,
-  HubArchetypeParameters
-} from "@aut-labs/sdk/dist/models/hub";
+import { HubArchetype, HubArchetypeParameters } from "@aut-labs/sdk";
+import { useState } from "react";
 
 export interface InteractionsDialogProps {
   title: string;
@@ -211,7 +208,7 @@ const ArchetypeCard = ({
 };
 
 export function ArchetypeDialog(props: InteractionsDialogProps) {
-  const [state, setState] = React.useState(
+  const [state, setState] = useState(
     archetypeChartValues(props.archetype)
   );
 

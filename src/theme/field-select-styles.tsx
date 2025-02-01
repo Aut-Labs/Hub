@@ -17,7 +17,6 @@ import {
   useTheme
 } from "@mui/material";
 import clsx from "clsx";
-import { ReactComponent as FlipIcon } from "@assets/flip.svg";
 
 const isNullEmptyOrUndefined = (v: any) =>
   v === null || v === "" || v === undefined;

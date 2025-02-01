@@ -34,7 +34,7 @@ export const sendDiscordNotification = createAsyncThunk(
       // return await sendNotification(hub.discordWebhookUrl, discordMsg);
     } catch (error) {
       const message = "Could not send notification to discord";
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+       
       dispatch(openSnackbar({ message, severity: "error" }));
     }
   }
@@ -71,7 +71,7 @@ export const sendDiscordPoll = createAsyncThunk(
       });
     } catch (error) {
       const message = "Could not send notification to discord";
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+       
       dispatch(openSnackbar({ message, severity: "error" }));
     }
   }

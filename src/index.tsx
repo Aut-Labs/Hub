@@ -17,23 +17,18 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
 import { WalletConnectorProvider, wagmiConfig } from "@aut-labs/connector";
 
-// markerSDK.loadWidget({
-//   project: `${process.env.REACT_APP_MARKER}`,
-//   reporter: {
-//     email: "frontend@aut.id",
-//     fullName: "HubOS"
-//   }
-// });
 const queryClient = new QueryClient();
 const container = document.getElementById("root");
 const root = createRoot(container);
-
 // const persistor = persistStore(store);
 
 root.render(
   <WagmiProvider config={wagmiConfig} reconnectOnMount={true}>
     <QueryClientProvider client={queryClient}>
-      <WalletConnectorProvider>
+      <WalletConnectorProvider
+        defaultChainId={+environment.defaultChainId}
+        requestSig={false}
+      >
         <ApolloProvider client={apolloClient}>
           <StyledEngineProvider injectFirst>
             <ThemeProvider theme={AutTheme}>

@@ -1,24 +1,24 @@
-/* eslint-disable max-len */
 import { HubOSHub } from "./hub.model";
 import { HubOSAutID } from "./aut.model";
-import AutSDK, { Allowlist, fetchMetadata, Hub, HubNFT } from "@aut-labs/sdk";
+import AutSDK, {
+  AutIDNFT,
+  fetchMetadata,
+  getOverrides,
+  Hub,
+  HubArchetype,
+  HubArchetypeParameters,
+  HubNFT
+} from "@aut-labs/sdk";
 import { BaseQueryApi, createApi } from "@reduxjs/toolkit/query/react";
 import { environment } from "./environment";
 import { gql } from "@apollo/client";
 import { apolloClient } from "@store/graphql";
-import { RootState } from "@store/store.model";
-import { NetworkConfig } from "./ProviderFactory/network.config";
-import { ReactComponent as Size } from "@assets/icons/size.svg";
-import { ReactComponent as Growth } from "@assets/icons/growth.svg";
-import { ReactComponent as Performance } from "@assets/icons/performance.svg";
-import { ReactComponent as Reputation } from "@assets/icons/reputation.svg";
-import { ReactComponent as Conviction } from "@assets/icons/conviction.svg";
+import Size from "@assets/icons/size.svg?react";
+import Growth from "@assets/icons/growth.svg?react";
+import Performance from "@assets/icons/performance.svg?react";
+import Reputation from "@assets/icons/reputation.svg?react";
+import Conviction from "@assets/icons/conviction.svg?react";
 import { ContractTransactionReceipt } from "ethers";
-import { AutIDNFT } from "@aut-labs/sdk/dist/models/aut.model";
-import {
-  HubArchetype,
-  HubArchetypeParameters
-} from "@aut-labs/sdk/dist/models/hub";
 import { AutIdJoinedHubState } from "@aut-labs/d-aut";
 
 export const fetchHubsAndAutIDs = async (
@@ -55,10 +55,16 @@ export const fetchHubsAndAutIDs = async (
   const fetchHubsMetadata = () => {
     return response.data.hubs.map(
       async ({ address, domain, metadataUri, deployer, minCommitment }) => {
-        const metadata = await fetchMetadata<HubNFT>(
-          metadataUri,
-          environment.ipfsGatewayUrl
-        );
+        let metadata = {} as HubNFT;
+        try {
+          metadata = await fetchMetadata<HubNFT>(
+            metadataUri,
+            environment.ipfsGatewayUrl
+          );
+        } catch (error) {
+          console.error(error);
+        }
+        metadata = metadata ?? ({} as HubNFT);
         return new HubOSHub({
           ...metadata,
           properties: {
@@ -77,10 +83,16 @@ export const fetchHubsAndAutIDs = async (
 
   const fetchAutIDsMetadata = () => {
     return response.data.autIDs.map(async ({ id, metadataUri, joinedHubs }) => {
-      const metadata = await fetchMetadata<AutIDNFT>(
-        metadataUri,
-        environment.ipfsGatewayUrl
-      );
+      let metadata = {} as AutIDNFT;
+      try {
+        metadata = await fetchMetadata<AutIDNFT>(
+          metadataUri,
+          environment.ipfsGatewayUrl
+        );
+      } catch (error) {
+        console.error(error);
+      }
+      metadata = metadata ?? ({} as AutIDNFT);
       return new HubOSAutID({
         ...metadata,
         properties: {
@@ -212,9 +224,9 @@ export const registerDomain = async (body: any, api: BaseQueryApi) => {
     const sdk = await AutSDK.getInstance();
     const { domain, hubAddress, metadataUri } = body;
 
-    const result = await sdk.hubRegistry.contract.functions.registerDomain(
+    const hubService: Hub = sdk.initService<Hub>(Hub, hubAddress);
+    const result = await hubService.contract.functions.registerDomain(
       domain,
-      hubAddress,
       metadataUri
     );
 
@@ -303,17 +315,17 @@ const getHubTasks = async (address: any, api: BaseQueryApi) => {
 };
 
 const checkOnboardingAllowlist = async (address: string, api: BaseQueryApi) => {
-  const sdk = await AutSDK.getInstance();
-  const state: RootState = api.getState() as RootState;
-  const network: NetworkConfig = state.walletProvider.selectedNetwork;
-  const allowlistContract = sdk.initService<Allowlist>(
-    Allowlist,
-    network.contracts.allowListAddress
-  );
-  const isAllowed =
-    await allowlistContract.contract.functions.isAllowListed(address);
+  // const sdk = await AutSDK.getInstance();
+  // const state: RootState = api.getState() as RootState;
+  // const network: NetworkConfig = state.walletProvider.selectedNetwork;
+  // const allowlistContract = sdk.initService<Allowlist>(
+  //   Allowlist,
+  //   network.contracts.allowListAddress
+  // );
+  // const isAllowed =
+  //   await allowlistContract.contract.functions.isAllowListed(address);
   return {
-    data: { isAllowed }
+    data: { isAllowed: true }
   };
 };
 
@@ -401,7 +413,21 @@ export const updateHub = async (body: HubOSHub, api: BaseQueryApi) => {
     const sdk = await AutSDK.getInstance();
     const updatedHub = HubOSHub.updateHubNFT(body);
     const uri = await sdk.client.sendJSONToIPFS(updatedHub as any);
+    console.log("uri", uri);
     const hubService: Hub = sdk.initService<Hub>(Hub, body.properties.address);
+    const overrides = await getOverrides(sdk.signer, 4000);
+    const getMDres = await hubService.contract.metadata.getMetadataUri();
+    console.log("getMDres", getMDres);
+    // const tx = await (
+    //   await hubService.contract.metadata.functions.setMetadataUri(
+    //     uri,
+    //     overrides
+    //   )
+    // ).wait();
+    // console.log("tx", tx);
+
+    // const result = tx.getResult();
+    // console.log("tx", result);
     const result = await hubService.contract.metadata.setMetadataUri(uri);
 
     if (!result?.isSuccess) {
@@ -410,9 +436,10 @@ export const updateHub = async (body: HubOSHub, api: BaseQueryApi) => {
       };
     }
     return {
-      data: body
+      data: { body }
     };
   } catch (error) {
+    console.log("error", error);
     return {
       error: error?.message
     };

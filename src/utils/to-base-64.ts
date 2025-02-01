@@ -18,7 +18,7 @@ export const isBase64 = (str: string) => {
   }
 };
 
-// eslint-disable-next-line default-param-last
+ 
 export const base64toFile = (dataurl = "", filename: string) => {
   if (!dataurl) {
     throw new Error("No content was provided");
@@ -33,7 +33,7 @@ export const base64toFile = (dataurl = "", filename: string) => {
   let n = bstr.length;
   const u8arr = new Uint8Array(n);
 
-  // eslint-disable-next-line no-plusplus
+   
   while (n--) {
     u8arr[n] = bstr.charCodeAt(n);
   }

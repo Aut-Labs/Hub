@@ -1,4 +1,4 @@
-/* eslint-disable max-len */
+ 
 import AutLoading from "@components/AutLoading";
 import {
   Box,
@@ -18,9 +18,9 @@ import HubCard from "@components/HubCard";
 import { useGetAllHubsQuery } from "@api/hub.api";
 import { TOOLBAR_HEIGHT } from "./ToolbarConnector";
 import { AutSelectField } from "@theme/field-select-styles";
-import { ReactComponent as Markets } from "@assets/icons/markets.svg";
-import { ReactComponent as Archetypes } from "@assets/icons/archetype.svg";
-import { ReactComponent as Filters } from "@assets/icons/filters.svg";
+import Markets from "@assets/icons/markets.svg?react";
+import Archetypes from "@assets/icons/archetype.svg?react";
+import Filters from "@assets/icons/filters.svg?react";
 import { useParams } from "react-router-dom";
 import { useAccount } from "wagmi";
 import { HubOSHub, MarketTemplates } from "@api/hub.model";
@@ -150,34 +150,10 @@ const HubList = () => {
         <Box
           sx={{
             display: "flex",
-            justifyContent: isMobile ? "center" : "flex-end",
-            width: "100%"
-          }}
-        >
-          <Box
-            sx={{
-              borderRadius: "8px",
-              borderStyle: "solid",
-              padding: "10px",
-              mt: "20px",
-              color: theme.palette.primary.contrastText,
-              maxWidth: "350px"
-            }}
-          >
-            <Typography variant="caption">
-              Disclaimer: ⚠️ Hubs are currently invitation-only, and you can
-              join only the Hub you created or you've been invited to. Choose
-              wisely - or wait till June '24.
-            </Typography>
-          </Box>
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
             justifyContent: "center",
             alignItems: isMobile ? "center" : "flex-start",
             gap: "25px",
-            mt: "24px",
+            mt: "48px",
             flexDirection: isMobile ? "column" : "row"
           }}
         >

@@ -1,7 +1,7 @@
-/* eslint-disable max-len */
+
 import axios from "axios";
 import { environment } from "./environment";
-import { NetworkConfig } from "./ProviderFactory/network.config";
+import { NetworkConfig } from "./network.config";
 
 export const getAppConfig = async (): Promise<NetworkConfig[]> => {
   return axios

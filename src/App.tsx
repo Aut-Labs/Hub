@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { useAppDispatch } from "@store/store.model";
 import SWSnackbar from "./components/snackbar";
-import { environment } from "@api/environment";
+import { environment, EnvMode } from "@api/environment";
 import { setNetworks } from "@store/WalletProvider/WalletProvider";
 import { getAppConfig } from "@api/aut.api";
 import AutSDK from "@aut-labs/sdk";
@@ -33,6 +33,7 @@ function App() {
         .then(async (res) => {
           dispatch(setNetworks(res));
           const sdk = new AutSDK({
+            enableDebug: environment.env === EnvMode.Development,
             ipfs: {
               apiKey: environment.ipfsApiKey,
               secretApiKey: environment.ipfsApiSecret,

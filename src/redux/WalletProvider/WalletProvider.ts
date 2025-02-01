@@ -1,4 +1,4 @@
-import { NetworkConfig } from "@api/ProviderFactory/network.config";
+import { NetworkConfig } from "@api/network.config";
 import { createSelector, createSlice } from "@reduxjs/toolkit";
 
 export enum ConnectorTypes {

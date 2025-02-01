@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 import {
   PieChart,
   Pie,
@@ -9,10 +9,7 @@ import {
 } from "recharts";
 import { ArchetypeTypes } from "@api/hub.api";
 import { Box, Typography } from "@mui/material";
-import {
-  HubArchetype,
-  HubArchetypeParameters
-} from "@aut-labs/sdk/dist/models/hub";
+import { HubArchetype, HubArchetypeParameters } from "@aut-labs/sdk";
 
 const COLORS = ["#9BA1ED", "#272D76", "#4A3398", "#5C0E8D", "#2360EA"];
 const RADIAN = Math.PI / 180;

@@ -1,14 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Accordion,
   AccordionSummary,
   Typography,
-  AccordionDetails,
-  Box,
-  FormControlLabel,
-  Switch
+  AccordionDetails
 } from "@mui/material";
-import { AutTextField } from "@theme/field-text-styles";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 export const StyledAccordion = ({
