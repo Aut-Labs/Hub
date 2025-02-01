@@ -291,6 +291,19 @@ const HubDetails = () => {
     );
   }, [data, address]);
 
+  const hasJoinedHub = useMemo(() => {
+    if (!autId) return false;
+    return autId.properties.joinedHubs.some(
+      (h) => h.hubAddress.toLowerCase() === hub?.properties.address.toLowerCase()
+    );
+  }
+  , [autId, hub]);
+
+  const isHubDeployer = useMemo(() => {
+    if (!hub || !autId) return false;
+    return hub.properties.deployer.toLowerCase() === autId.properties.address.toLowerCase();
+  }, [hub, autId]);
+
   const isAdmin = useMemo(() => {
     if (!autId) return false;
     const joinedHub = autId.properties.joinedHubs.find(
@@ -947,6 +960,15 @@ const HubDetails = () => {
               </Stack>
             </LeftWrapper>
             <RightWrapper>
+              {isHubDeployer && !hasJoinedHub && (
+                <Typography
+                  variant="h5"
+                  color="white"
+                  sx={{ textAlign: "center", marginBottom: theme.spacing(2) }}
+                >
+                  Pick a Role to verify your Hub
+                </Typography>
+              )}
               {!!tasks && !!hub && (
                 <AutTaskTabs
                   hub={hub}
