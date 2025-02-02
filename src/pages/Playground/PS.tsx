@@ -550,7 +550,7 @@ const ParticipationScore = () => {
             'meta[name="description"]'
           );
           if (metaDescription) {
-            metaDescription.setAttribute("content", "Playground to test");
+            metaDescription.setAttribute("content", "Playground to test participation score");
           }
         }}
       >
