@@ -552,8 +552,13 @@ const ParticipationScore = () => {
           if (metaDescription) {
             metaDescription.setAttribute("content", "Playground to test participation score");
           }
+          const ogTitle = document.querySelector('meta[property="og:title"]');
+          if (ogTitle) {
+            ogTitle.setAttribute("content", "Participation Score Playground");
+          }
         }}
       >
+        <meta property="og:title" content="Participation Score Playgroun" />
         <title>Participation Score Playground</title>
       </Helmet>
       <Grid
