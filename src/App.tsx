@@ -25,7 +25,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const location = useLocation();
 
-  const isParticipationScorePage = location.pathname === "/ps";
+  const isParticipationScorePage = location.pathname === "/playground";
 
   useEffect(() => {
     if (!isParticipationScorePage) {
@@ -81,7 +81,7 @@ function App() {
         <Box sx={backgroundStyle}>
           <Suspense fallback={<AutLoading />}>
             <Routes>
-              <Route path="/ps" element={<ParticipationScore />} />
+              <Route path="/playground" element={<ParticipationScore />} />
             </Routes>
           </Suspense>
         </Box>

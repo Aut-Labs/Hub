@@ -47,6 +47,7 @@ import { StyledAccordion } from "./Accordion";
 import { ValueChart } from "./ValueChart";
 import { TabPanel } from "./TabPanel";
 import { CustomSlider } from "./CustomSlider";
+import { Helmet } from "react-helmet";
 
 // Utility functions (unchanged)
 const calculateTiCl = (TCM, avgICL) => Math.round(TCM * avgICL);
@@ -543,6 +544,18 @@ const ParticipationScore = () => {
 
   const renderMemberData = () => (
     <Box sx={{ overflowX: "auto" }}>
+      <Helmet
+        onChangeClientState={(newState, addedTags, removedTags) => {
+          const metaDescription = document.querySelector(
+            'meta[name="description"]'
+          );
+          if (metaDescription) {
+            metaDescription.setAttribute("content", "Playground to test participation score");
+          }
+        }}
+      >
+        <title>Participation Score Playground</title>
+      </Helmet>
       <Grid
         container
         sx={{
